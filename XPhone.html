@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XPhone</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+```
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    .app-container {
+        width: 100vw;
+        height: 100vh;
+        background: var(--bg-image, linear-gradient(135deg, #1e3c72 0%, #2a5298 100%));
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .home-screen {
+        padding: 40px 20px;
+        height: 100vh;
+    }
+
+    .app-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .app-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: white;
+        text-decoration: none;
+        flex-direction: column;
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .app-icon:hover {
+        transform: scale(1.1);
+        background: rgba(255,255,255,0.25);
+    }
+
+    .app-name {
+        font-size: 10px;
+        margin-top: 4px;
+        text-align: center;
+        color: white;
+    }
+
+    .chat-screen, .settings-screen, .wallpaper-screen {
+        display: none;
+        height: 100vh;
+        background: rgba(0,0,0,0.8);
+        backdrop-filter: blur(20px);
+    }
+
+    .chat-header, .settings-header, .wallpaper-header {
+        height: 60px;
+        background: rgba(0,0,0,0.9);
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        color: white;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .back-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        margin-right: 15px;
+    }
+
+    .chat-messages {
+        height: calc(100vh - 180px);
+        overflow-y: auto;
+        padding: 20px;
+    }
+
+    .message {
+        margin-bottom: 15px;
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .message.user {
+        flex-direction: row-reverse;
+    }
+
+    .message-bubble {
+        max-width: 70%;
+        padding: 12px 16px;
+        border-radius: 18px;
+        word-wrap: break-word;
+    }
+
+    .message.user .message-bubble {
+        background: #007AFF;
+        color: white;
+        border-bottom-right-radius: 6px;
+    }
+
+    .message.ai .message-bubble {
+        background: rgba(255,255,255,0.15);
+        color: white;
+        border-bottom-left-radius: 6px;
+    }
+
+    .special-message {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        color: white;
+        border-radius: 12px;
+        padding: 15px;
+        margin: 10px 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .special-message.image {
+        background: linear-gradient(135deg, #74b9ff, #0984e3);
+    }
+
+    .special-message.voice {
+        background: linear-gradient(135deg, #fd79a8, #e84393);
+    }
+
+    .special-message.link {
+        background: linear-gradient(135deg, #55a3ff, #3742fa);
+    }
+
+    .special-message.money {
+        background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+        color: #2d3436;
+    }
+
+    .special-message-header {
+        font-weight: bold;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .chat-input-area {
+        height: 120px;
+        background: rgba(0,0,0,0.9);
+        padding: 10px 20px;
+    }
+
+    .chat-tools {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+        justify-content: space-around;
+    }
+
+    .tool-btn {
+        flex: 1;
+        height: 40px;
+        border: none;
+        border-radius: 20px;
+        background: rgba(255,255,255,0.15);
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        font-size: 12px;
+        transition: all 0.2s ease;
+    }
+
+    .tool-btn:hover {
+        background: rgba(255,255,255,0.25);
+        transform: scale(1.05);
+    }
+
+    .chat-input {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .chat-input input {
+        flex: 1;
+        height: 36px;
+        border: none;
+        border-radius: 18px;
+        padding: 0 15px;
+        background: rgba(255,255,255,0.15);
+        color: white;
+        outline: none;
+    }
+
+    .chat-input input::placeholder {
+        color: rgba(255,255,255,0.6);
+    }
+
+    .send-btn {
+        width: 36px;
+        height: 36px;
+        border: none;
+        border-radius: 18px;
+        background: #007AFF;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .settings-content, .wallpaper-content {
+        padding: 20px;
+        color: white;
+        height: calc(100vh - 60px);
+        overflow-y: auto;
+    }
+
+    .setting-item {
+        background: rgba(255,255,255,0.1);
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 15px;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .setting-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+
+    .setting-item input, .setting-item select, .setting-item textarea {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        background: rgba(255,255,255,0.15);
+        color: white;
+        outline: none;
+    }
+
+    .setting-item input::placeholder, .setting-item textarea::placeholder {
+        color: rgba(255,255,255,0.6);
+    }
+
+    .wallpaper-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .wallpaper-option {
+        aspect-ratio: 1;
+        border-radius: 12px;
+        background-size: cover;
+        background-position: center;
+        cursor: pointer;
+        border: 3px solid transparent;
+        transition: all 0.2s ease;
+    }
+
+    .wallpaper-option.active {
+        border-color: #007AFF;
+    }
+
+    .wallpaper-option:hover {
+        transform: scale(1.05);
+    }
+
+    .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .dock {
+        position: absolute;
+        bottom: 30px;
+        left: 20px;
+        right: 20px;
+        height: 80px;
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(20px);
+        border-radius: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 25px;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .dock-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: white;
+        background: rgba(255,255,255,0.1);
+    }
+
+    .dock-icon:hover {
+        transform: scale(1.1);
+        background: rgba(255,255,255,0.2);
+    }
+
+    .custom-wallpaper {
+        margin-top: 15px;
+    }
+
+    .file-input-wrapper {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+        background: #007AFF;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+    }
+
+    .file-input-wrapper:hover {
+        background: #0056b3;
+    }
+
+    .file-input-wrapper input[type="file"] {
+        position: absolute;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+
+    /* 模态框样式 */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 30px;
+        width: 90%;
+        max-width: 400px;
+        color: #333;
+    }
+
+    .modal-header {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .modal-body {
+        margin-bottom: 20px;
+    }
+
+    .modal-input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        outline: none;
+    }
+
+    .modal-textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        outline: none;
+        min-height: 80px;
+        resize: vertical;
+    }
+
+    .modal-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .modal-btn {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.2s ease;
+    }
+
+    .modal-btn.cancel {
+        background: #f8f9fa;
+        color: #6c757d;
+    }
+
+    .modal-btn.confirm {
+        background: #007AFF;
+        color: white;
+    }
+
+    .modal-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 480px) {
+        .home-screen {
+            padding: 20px 15px;
+        }
+        
+        .app-grid {
+            gap: 15px;
+        }
+        
+        .chat-messages {
+            height: calc(100vh - 160px);
+            padding: 15px;
+        }
+        
+        .chat-input-area {
+            height: 100px;
+            padding: 8px 15px;
+        }
+        
+        .chat-tools {
+            gap: 8px;
+        }
+        
+        .tool-btn {
+            height: 35px;
+            font-size: 11px;
+        }
+    }
+</style>
+```
+
+</head>
+<body>
+    <div class="app-container" id="appContainer">
+        <!-- 主屏幕 -->
+        <div class="home-screen" id="homeScreen">
+            <div class="app-grid">
+                <div class="app-icon" onclick="openChat()">
+                    💬
+                    <div class="app-name">聊天</div>
+                </div>
+                <div class="app-icon" onclick="openSettings()">
+                    ⚙️
+                    <div class="app-name">设置</div>
+                </div>
+                <div class="app-icon" onclick="openWallpaper()">
+                    🖼️
+                    <div class="app-name">壁纸</div>
+                </div>
+                <div class="app-icon">
+                    📊
+                    <div class="app-name">统计</div>
+                </div>
+            </div>
+
+```
+        <!-- Dock栏 -->
+        <div class="dock">
+            <div class="dock-icon" onclick="openChat()">💬</div>
+            <div class="dock-icon">📞</div>
+            <div class="dock-icon">📱</div>
+            <div class="dock-icon" onclick="openSettings()">⚙️</div>
+        </div>
+    </div>
+
+    <!-- 聊天界面 -->
+    <div class="chat-screen" id="chatScreen">
+        <div class="chat-header">
+            <button class="back-btn" onclick="goHome()">←</button>
+            <div>聊天</div>
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input-area">
+            <div class="chat-tools">
+                <button class="tool-btn" onclick="openImageModal()">
+                    🖼️ 图片
+                </button>
+                <button class="tool-btn" onclick="openVoiceModal()">
+                    🎤 语音
+                </button>
+                <button class="tool-btn" onclick="openLinkModal()">
+                    🔗 链接
+                </button>
+                <button class="tool-btn" onclick="openMoneyModal()">
+                    💰 转账
+                </button>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="messageInput" placeholder="输入消息..." onkeypress="handleKeyPress(event)">
+                <button class="send-btn" onclick="sendMessage()">
+                    <span id="sendIcon">➤</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 设置界面 -->
+    <div class="settings-screen" id="settingsScreen">
+        <div class="settings-header">
+            <button class="back-btn" onclick="goHome()">←</button>
+            <div>API设置</div>
+        </div>
+        <div class="settings-content">
+            <div class="setting-item">
+                <label class="setting-label">API服务商</label>
+                <select id="apiProvider" onchange="updateApiSettings()">
+                    <option value="openai">OpenAI</option>
+                    <option value="claude">Claude</option>
+                    <option value="custom">自定义</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <label class="setting-label">API地址</label>
+                <input type="text" id="apiUrl" placeholder="https://api.openai.com/v1/chat/completions">
+            </div>
+            <div class="setting-item">
+                <label class="setting-label">API密钥</label>
+                <input type="password" id="apiKey" placeholder="输入你的API密钥">
+            </div>
+            <div class="setting-item">
+                <label class="setting-label">模型名称</label>
+                <input type="text" id="modelName" placeholder="gpt-3.5-turbo">
+            </div>
+            <div class="setting-item">
+                <label class="setting-label">系统提示词</label>
+                <textarea id="systemPrompt" rows="3" placeholder="你是一个有用的AI助手..."></textarea>
+            </div>
+            <div class="setting-item">
+                <button onclick="saveSettings()" style="width: 100%; padding: 12px; background: #007AFF; color: white; border: none; border-radius: 8px; cursor: pointer;">保存设置</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 壁纸界面 -->
+    <div class="wallpaper-screen" id="wallpaperScreen">
+        <div class="wallpaper-header">
+            <button class="back-btn" onclick="goHome()">←</button>
+            <div>选择壁纸</div>
+        </div>
+        <div class="wallpaper-content">
+            <div class="wallpaper-grid">
+                <div class="wallpaper-option" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)" onclick="setWallpaper('linear-gradient(135deg, #667eea 0%, #764ba2 100%)')"></div>
+                <div class="wallpaper-option" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%)" onclick="setWallpaper('linear-gradient(135deg, #f093fb 0%, #f5576c 100%)')"></div>
+                <div class="wallpaper-option" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)" onclick="setWallpaper('linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)')"></div>
+                <div class="wallpaper-option" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)" onclick="setWallpaper('linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)')"></div>
+                <div class="wallpaper-option" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%)" onclick="setWallpaper('linear-gradient(135deg, #fa709a 0%, #fee140 100%)')"></div>
+                <div class="wallpaper-option" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)" onclick="setWallpaper('linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)')"></div>
+            </div>
+            <div class="custom-wallpaper">
+                <label class="setting-label">自定义壁纸</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="wallpaperFile" accept="image/*" onchange="uploadWallpaper(event)">
+                    上传图片
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 图片模态框 -->
+<div class="modal" id="imageModal">
+    <div class="modal-content">
+        <div class="modal-header">📸 发送图片</div>
+        <div class="modal-body">
+            <input type="text" class="modal-input" id="imageTitle" placeholder="图片标题">
+            <textarea class="modal-textarea" id="imageDesc" placeholder="请描述这张图片的内容..."></textarea>
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+            <button class="modal-btn confirm" onclick="sendImage()">发送</button>
+        </div>
+    </div>
+</div>
+
+<!-- 语音模态框 -->
+<div class="modal" id="voiceModal">
+    <div class="modal-content">
+        <div class="modal-header">🎤 发送语音</div>
+        <div class="modal-body">
+            <input type="text" class="modal-input" id="voiceDuration" placeholder="语音时长（秒）">
+            <textarea class="modal-textarea" id="voiceContent" placeholder="请输入要发送的语音内容..."></textarea>
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+            <button class="modal-btn confirm" onclick="sendVoice()">发送</button>
+        </div>
+    </div>
+</div>
+
+<!-- 链接模态框 -->
+<div class="modal" id="linkModal">
+    <div class="modal-content">
+        <div class="modal-header">🔗 分享链接</div>
+        <div class="modal-body">
+            <input type="text" class="modal-input" id="linkTitle" placeholder="链接标题">
+            <input type="text" class="modal-input" id="linkUrl" placeholder="链接地址">
+            <textarea class="modal-textarea" id="linkDesc" placeholder="链接描述..."></textarea>
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+            <button class="modal-btn confirm" onclick="sendLink()">发送</button>
+        </div>
+    </div>
+</div>
+
+<!-- 转账模态框 -->
+<div class="modal" id="moneyModal">
+    <div class="modal-content">
+        <div class="modal-header">💰 转账红包</div>
+        <div class="modal-body">
+            <input type="number" class="modal-input" id="moneyAmount" placeholder="转账金额">
+            <input type="text" class="modal-input" id="moneyNote" placeholder="转账备注">
+            <select class="modal-input" id="moneyType">
+                <option value="transfer">转账</option>
+                <option value="redpack">红包</option>
+            </select>
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+            <button class="modal-btn confirm" onclick="sendMoney()">发送</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 配置管理
+    const config = {
+        apiProvider: 'openai',
+        apiUrl: 'https://api.openai.com/v1/chat/completions',
+        apiKey: '',
+        modelName: 'gpt-3.5-turbo',
+        systemPrompt: '你是一个有用的AI助手，请用中文回答问题。'
+    };
+
+    // 加载配置
+    function loadSettings() {
+        const savedConfig = localStorage.getItem('aiChatConfig');
+        if (savedConfig) {
+            Object.assign(config, JSON.parse(savedConfig));
+            updateSettingsUI();
+        }
+    }
+
+    // 更新设置界面
+    function updateSettingsUI() {
+        document.getElementById('apiProvider').value = config.apiProvider;
+        document.getElementById('apiUrl').value = config.apiUrl;
+        document.getElementById('apiKey').value = config.apiKey;
+        document.getElementById('modelName').value = config.modelName;
+        document.getElementById('systemPrompt').value = config.systemPrompt;
+    }
+
+    // 更新API设置
+    function updateApiSettings() {
+        const provider = document.getElementById('apiProvider').value;
+        const urlInput = document.getElementById('apiUrl');
+        const modelInput = document.getElementById('modelName');
+        
+        if (provider === 'openai') {
+            urlInput.value = 'https://api.openai.com/v1/chat/completions';
+            modelInput.value = 'gpt-3.5-turbo';
+        } else if (provider === 'claude') {
+            urlInput.value = 'https://api.anthropic.com/v1/messages';
+            modelInput.value = 'claude-3-sonnet-20240229';
+        }
+    }
+
+    // 保存设置
+    function saveSettings() {
+        config.apiProvider = document.getElementById('apiProvider').value;
+        config.apiUrl = document.getElementById('apiUrl').value;
+        config.apiKey = document.getElementById('apiKey').value;
+        config.modelName = document.getElementById('modelName').value;
+        config.systemPrompt = document.getElementById('systemPrompt').value;
+        
+        localStorage.setItem('aiChatConfig', JSON.stringify(config));
+        
+        // 显示保存成功提示
+        const btn = event.target;
+        const originalText = btn.textContent;
+        btn.textContent = '保存成功！';
+        btn.style.background = '#28a745';
+        setTimeout(() => {
+            btn.textContent = originalText;
+            btn.style.background = '#007AFF';
+        }, 2000);
+    }
+
+    // 界面切换函数
+    function goHome() {
+        document.getElementById('homeScreen').style.display = 'block';
+        document.getElementById('chatScreen').style.display = 'none';
+        document.getElementById('settingsScreen').style.display = 'none';
+        document.getElementById('wallpaperScreen').style.display = 'none';
+    }
+
+    function openChat() {
+        document.getElementById('homeScreen').style.display = 'none';
+        document.getElementById('chatScreen').style.display = 'block';
+    }
+
+    function openSettings() {
+        document.getElementById('homeScreen').style.display = 'none';
+        document.getElementById('settingsScreen').style.display = 'block';
+    }
+
+    function openWallpaper() {
+        document.getElementById('homeScreen').style.display = 'none';
+        document.getElementById('wallpaperScreen').style.display = 'block';
+    }
+
+    // 模态框控制
+    function openImageModal() {
+        document.getElementById('imageModal').style.display = 'flex';
+    }
+
+    function openVoiceModal() {
+        document.getElementById('voiceModal').style.display = 'flex';
+    }
+
+    function openLinkModal() {
+        document.getElementById('linkModal').style.display = 'flex';
+    }
+
+    function openMoneyModal() {
+        document.getElementById('moneyModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.style.display = 'none';
+        });
+        // 清空表单
+        document.querySelectorAll('.modal-input, .modal-textarea').forEach(input => {
+            input.value = '';
+        });
+    }
+
+    // 发送特殊消息
+    function sendImage() {
+        const title = document.getElementById('imageTitle').value.trim();
+        const desc = document.getElementById('imageDesc').value.trim();
+        
+        if (!desc) {
+            alert('请输入图片描述');
+            return;
+        }
+        
+        const imageMsg = createSpecialMessage('image', '📸 ' + (title || '图片'), desc);
+        addMessage(imageMsg, 'user', true);
+        closeModal();
+        
+        // 模拟AI回复
+        setTimeout(() => {
+            addMessage('我看到了你描述的图片：' + desc + '。这听起来很有趣！', 'ai');
+        }, 1000);
+    }
+
+    function sendVoice() {
+        const duration = document.getElementById('voiceDuration').value.trim();
+        const content = document.getElementById('voiceContent').value.trim();
+        
+        if (!content) {
+            alert('请输入语音内容');
+            return;
+        }
+        
+        const voiceMsg = createSpecialMessage('voice', '🎤 语音消息', 
+            `时长: ${duration || '未知'}秒\n内容: ${content}`);
+        addMessage(voiceMsg, 'user', true);
+        closeModal();
+        
+        // 模拟AI回复
+        setTimeout(() => {
+            addMessage('我收到了你的语音消息：' + content, 'ai');
+        }, 1000);
+    }
+
+    function sendLink() {
+        const title = document.getElementById('linkTitle').value.trim();
+        const url = document.getElementById('linkUrl').value.trim();
+        const desc = document.getElementById('linkDesc').value.trim();
+        
+        if (!title || !url) {
+            alert('请输入链接标题和地址');
+            return;
+        }
+        
+        const linkMsg = createSpecialMessage('link', '🔗 ' + title, 
+            `链接: ${url}\n${desc ? '描述: ' + desc : ''}`);
+        addMessage(linkMsg, 'user', true);
+        closeModal();
+        
+        // 模拟AI回复
+        setTimeout(() => {
+            addMessage('感谢分享链接：' + title + '，我已经记录了这个信息。', 'ai');
+        }, 1000);
+    }
+
+    function sendMoney() {
+        const amount = document.getElementById('moneyAmount').value.trim();
+        const note = document.getElementById('moneyNote').value.trim();
+        const type = document.getElementById('moneyType').value;
+        
+        if (!amount) {
+            alert('请输入转账金额');
+            return;
+        }
+        
+        const typeText = type === 'redpack' ? '红包' : '转账';
+        const moneyMsg = createSpecialMessage('money', `💰 ${typeText}`, 
+            `金额: ¥${amount}\n${note ? '备注: ' + note : ''}`);
+        addMessage(moneyMsg, 'user', true);
+        closeModal();
+        
+        // 模拟AI回复
+        setTimeout(() => {
+            addMessage(`收到你的${typeText}：¥${amount}，谢谢！${note ? '备注：' + note : ''}`, 'ai');
+        }, 1000);
+    }
+
+    function createSpecialMessage(type, header, content) {
+        return `<div class="special-message ${type}">
+            <div class="special-message-header">${header}</div>
+            <div>${content.replace(/\n/g, '<br>')}</div>
+        </div>`;
+    }
+
+    // 聊天功能
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    }
+
+    function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const message = input.value.trim();
+        
+        if (!message) return;
+        
+        // 检查API配置
+        if (!config.apiKey) {
+            addMessage('请先在设置中配置API密钥！', 'ai');
+            return;
+        }
+        
+        addMessage(message, 'user');
+        input.value = '';
+        
+        // 显示加载状态
+        const sendIcon = document.getElementById('sendIcon');
+        sendIcon.innerHTML = '<div class="loading"></div>';
+        
+        // 调用AI API
+        callAI(message).then(response => {
+            addMessage(response, 'ai');
+        }).catch(error => {
+            addMessage('抱歉，AI服务暂时不可用：' + error.message, 'ai');
+        }).finally(() => {
+            sendIcon.innerHTML = '➤';
+        });
+    }
+
+    function addMessage(text, sender, isHtml = false) {
+        const messagesContainer = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}`;
+        
+        const bubbleDiv = document.createElement('div');
+        bubbleDiv.className = 'message-bubble';
+        
+        if (isHtml) {
+            bubbleDiv.innerHTML = text;
+        } else {
+            bubbleDiv.textContent = text;
+        }
+        
+        messageDiv.appendChild(bubbleDiv);
+        messagesContainer.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    // AI API调用
+    async function callAI(message) {
+        const requestBody = {
+            model: config.modelName,
+            messages: [
+                { role: 'system', content: config.systemPrompt },
+                { role: 'user', content: message }
+            ],
+            max_tokens: 1000,
+            temperature: 0.7
+        };
+
+        // 根据API提供商调整请求格式
+        if (config.apiProvider === 'claude') {
+            requestBody.max_tokens = 1000;
+            requestBody.messages = [{ role: 'user', content: message }];
+            requestBody.system = config.systemPrompt;
+        }
+
+        const response = await fetch(config.apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${config.apiKey}`,
+                ...(config.apiProvider === 'claude' && {
+                    'anthropic-version': '2023-06-01'
+                })
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+            throw new Error(`API请求失败: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        // 根据API提供商解析响应
+        if (config.apiProvider === 'claude') {
+            return data.content[0].text;
+        } else {
+            return data.choices[0].message.content;
+        }
+    }
+
+    // 壁纸功能
+    function setWallpaper(wallpaper) {
+        const appContainer = document.getElementById('appContainer');
+        appContainer.style.setProperty('--bg-image', wallpaper);
+        localStorage.setItem('wallpaper', wallpaper);
+        
+        // 更新选中状态
+        document.querySelectorAll('.wallpaper-option').forEach(option => {
+            option.classList.remove('active');
+        });
+        event.target.classList.add('active');
+    }
+
+    function uploadWallpaper(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imageUrl = e.target.result;
+                setWallpaper(`url(${imageUrl})`);
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // 加载壁纸
+    function loadWallpaper() {
+        const savedWallpaper = localStorage.getItem('wallpaper');
+        if (savedWallpaper) {
+            const appContainer = document.getElementById('appContainer');
+            appContainer.style.setProperty('--bg-image', savedWallpaper);
+        }
+    }
+
+    // 点击模态框外部关闭
+    document.addEventListener('click', function(event) {
+        if (event.target.classList.contains('modal')) {
+            closeModal();
+        }
+    });
+
+    // 阻止滚动穿透
+    document.addEventListener('touchmove', function(event) {
+        if (document.querySelector('.modal[style*="flex"]')) {
+            event.preventDefault();
+        }
+    }, { passive: false });
+
+    // 初始化
+    window.onload = function() {
+        loadSettings();
+        loadWallpaper();
+        
+        // 添加欢迎消息
+        setTimeout(() => {
+            addMessage('你好！我是AI助手，有什么可以帮助你的吗？', 'ai');
+        }, 500);
+    };
+</script>
+```
+
+</body>
+</html>
