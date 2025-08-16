@@ -72,18 +72,13 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* [修复] 添加 html 高度，确保 body 高度计算正确 */
-        html {
-            height: 100%;
-        }
-
-        body {
+        html, body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             height: 100%;
             min-height: 100vh;
             min-height: 100svh;
             overflow: hidden;
-            /* [修复] 移除 body 上的 padding，让 app-container 可以占满全屏 */
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
         .app-container {
@@ -102,8 +97,7 @@
             flex-direction: column;
             justify-content: space-between;
             height: 100%;
-            /* [修复] 动态计算顶部内边距，适配“刘海屏”等安全区域 */
-            padding: calc(env(safe-area-inset-top) + 40px) 20px calc(env(safe-area-inset-bottom) + 130px) 20px;
+            padding: 40px 20px calc(env(safe-area-inset-bottom) + 130px) 20px;
         }
 
         /* 大号时间显示 */
@@ -870,5 +864,1196 @@
     </style>
 </head>
 <body>
-    </body>
+    <div class="app-container" id="appContainer">
+        <div class="home-screen" id="homeScreen">
+            <div class="time-widget">
+                <div class="time" id="currentTime"></div>
+                <div class="date" id="currentDate"></div>
+            </div>
+            
+            <div class="app-grid"></div>
+
+            <div class="dock">
+                <div class="app-icon" id="chat-app-icon" onclick="openChatApp()">
+                    <span id="chatAppIcon">💬</span>
+                    <div class="app-name" id="chatAppName">XChat</div>
+                </div>
+                <div class="app-icon" id="settings-app-icon" onclick="openSettings()">
+                    <span id="settingsIcon">⚙️</span>
+                    <div class="app-name" id="settingsName">设置</div>
+                </div>
+                <div class="app-icon" id="theme-app-icon" onclick="openTheme()">
+                    <span id="themeIcon">🎨</span>
+                    <div class="app-name" id="themeName">主题</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-app" id="chatApp">
+            <div class="chat-nav">
+                <div class="nav-item active" onclick="switchTab('chats')">消息</div>
+                <div class="nav-item" onclick="switchTab('contacts')">联系人</div>
+                <div class="nav-item" onclick="switchTab('moments')">朋友圈</div>
+                <div class="nav-item" onclick="switchTab('me')">我</div>
+            </div>
+
+            <div class="chat-list" id="chatList">
+                <div class="empty-state">
+                    <div class="empty-state-icon">💬</div>
+                    <div>还没有联系人</div>
+                    <div>点击右下角"+"添加AI朋友吧</div>
+                </div>
+            </div>
+
+            <div class="moments-list" id="momentsList" style="display: none;">
+                <div class="empty-state">
+                    <div class="empty-state-icon">🌟</div>
+                    <div>朋友圈还很安静</div>
+                    <div>添加AI朋友开始互动吧</div>
+                </div>
+            </div>
+
+            <div class="profile-screen" id="profileScreen" style="display: none;">
+                <div class="profile-content">
+                    <div class="avatar-upload">
+                        <div class="profile-avatar" id="profileAvatar">😊</div>
+                        <input type="file" accept="image/*" onchange="updateProfileAvatar(event)">
+                    </div>
+                    <div class="profile-name" id="profileName">我</div>
+                    <div class="profile-bio" id="profileBio">这个人很懒，什么都没有留下...</div>
+                    
+                    <div class="profile-actions">
+                        <button class="profile-btn" onclick="openEditProfileModal()">编辑个人资料</button>
+                        <div class="data-actions">
+                            <button class="data-btn" onclick="exportData()">导出数据</button>
+                            <button class="data-btn" onclick="importData()">导入数据</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="add-contact-btn" onclick="openAddContactModal()" id="addContactBtn">+</button>
+        </div>
+
+        <div class="chat-screen" id="chatScreen">
+            <div class="chat-header">
+                <button class="back-btn" onclick="backToChatApp()">←</button>
+                <div class="chat-title" id="chatTitle">AI助手</div>
+            </div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input-area">
+                <div class="chat-tools">
+                    <button class="tool-btn" onclick="openImageModal()">🖼️</button>
+                    <button class="tool-btn" onclick="openVoiceModal()">🎤</button>
+                    <button class="tool-btn" onclick="openLinkModal()">🔗</button>
+                    <button class="tool-btn" onclick="openMoneyModal()">💰</button>
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="messageInput" placeholder="输入消息..." onkeypress="handleKeyPress(event)">
+                    <button class="send-btn" onclick="sendMessage()">
+                        <span id="sendIcon">➤</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-screen" id="settingsScreen">
+            <div class="settings-header">
+                <button class="back-btn" onclick="goHome()">←</button>
+                <div>API设置</div>
+            </div>
+            <div class="settings-content">
+                <div class="setting-item">
+                    <label class="setting-label">API服务商</label>
+                    <select id="apiProvider" onchange="updateApiSettings()">
+                        <option value="openai">OpenAI</option>
+                        <option value="claude">Claude</option>
+                        <option value="custom">自定义</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label class="setting-label">API地址</label>
+                    <input type="text" id="apiUrl" placeholder="https://api.openai.com/v1/chat/completions">
+                </div>
+                <div class="setting-item">
+                    <label class="setting-label">API密钥</label>
+                    <input type="password" id="apiKey" placeholder="输入你的API密钥">
+                </div>
+                <div class="setting-item">
+                    <label class="setting-label">默认模型</label>
+                    <input type="text" id="modelName" placeholder="gpt-3.5-turbo">
+                </div>
+                <div class="setting-item">
+                    <button onclick="saveSettings()" style="width: 100%; padding: 12px; background: #007AFF; color: white; border: none; border-radius: 8px; cursor: pointer;">保存设置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="theme-screen" id="themeScreen">
+            <div class="theme-header">
+                <button class="back-btn" onclick="goHome()">←</button>
+                <div>主题</div>
+            </div>
+            <div class="theme-content">
+                <div class="theme-section">
+                    <div class="theme-section-title">壁纸</div>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="wallpaperFile" accept="image/*" onchange="uploadWallpaper(event)">
+                        上传自定义壁纸
+                    </div>
+                    <p style="color: rgba(255,255,255,0.6); margin-top: 15px;">选择一张图片作为XPhone的壁纸</p>
+                </div>
+                <div class="theme-section">
+                    <div class="theme-section-title">应用图标</div>
+                    <label class="setting-label">选择应用</label>
+                    <select class="modal-input" id="iconAppSelect" onchange="updateIconPreview()">
+                        <option value="chat">XChat</option>
+                        <option value="settings">设置</option>
+                        <option value="theme">主题</option>
+                    </select>
+                    <label class="setting-label">应用名称</label>
+                    <input type="text" class="modal-input" id="iconAppName" placeholder="应用名称">
+                    <label class="setting-label">图标</label>
+                    <input type="text" class="modal-input" id="iconEmoji" placeholder="输入表情符号或文字">
+                    <label class="setting-label">或上传图片</label>
+                    <div class="file-input-wrapper" style="width: 100%; margin: 0;">
+                        <input type="file" id="iconImageFile" accept="image/*" onchange="updateAppIcon(event)">
+                        选择图片
+                    </div>
+                    <button onclick="saveCustomIcon()" style="width: 100%; padding: 12px; background: #007AFF; color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 20px;">保存图标</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="addContactModal">
+        <div class="modal-content">
+            <div class="modal-header">添加AI联系人</div>
+            <div class="modal-body">
+                <input type="text" class="modal-input" id="contactName" placeholder="联系人姓名">
+                <div class="avatar-upload" style="margin-bottom: 15px;">
+                    <div style="width: 60px; height: 60px; border-radius: 30px; background: linear-gradient(135deg, #007AFF, #5AC8FA); margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; background-size: cover; background-position: center;" id="newContactAvatar">🤖</div>
+                    <input type="file" accept="image/*" onchange="updateContactAvatar(event)" style="position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer;">
+                </div>
+                <input type="text" class="modal-input" id="contactEmoji" placeholder="或输入表情符号作为头像" onchange="updateContactEmojiAvatar()">
+                <textarea class="modal-textarea" id="contactPrompt" placeholder="个性化prompt，描述这个AI的特点和回答风格..."></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+                <button class="modal-btn confirm" onclick="addContact()">添加</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="editProfileModal">
+        <div class="modal-content">
+            <div class="modal-header">编辑个人资料</div>
+            <div class="modal-body">
+                <input type="text" class="modal-input" id="editProfileName" placeholder="您的昵称">
+                <textarea class="modal-textarea" id="editProfileBio" placeholder="个人简介..."></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+                <button class="modal-btn confirm" onclick="saveProfile()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="commentModal">
+        <div class="modal-content">
+            <div class="modal-header">发表评论</div>
+            <div class="modal-body">
+                <textarea class="modal-textarea" id="commentInput" placeholder="写下你的评论..."></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+                <button class="modal-btn confirm" onclick="postComment()">发表</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="imageModal">
+        <div class="modal-content">
+            <div class="modal-header">📸 发送图片</div>
+            <div class="modal-body">
+                <input type="text" class="modal-input" id="imageTitle" placeholder="图片标题">
+                <textarea class="modal-textarea" id="imageDesc" placeholder="请描述这张图片的内容..."></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+                <button class="modal-btn confirm" onclick="sendImage()">发送</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="voiceModal">
+        <div class="modal-content">
+            <div class="modal-header">🎤 发送语音</div>
+            <div class="modal-body">
+                <input type="text" class="modal-input" id="voiceDuration" placeholder="语音时长（秒）">
+                <textarea class="modal-textarea" id="voiceContent" placeholder="请输入要发送的语音内容..."></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+                <button class="modal-btn confirm" onclick="sendVoice()">发送</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="linkModal">
+        <div class="modal-content">
+            <div class="modal-header">🔗 分享链接</div>
+            <div class="modal-body">
+                <input type="text" class="modal-input" id="linkTitle" placeholder="链接标题">
+                <input type="text" class="modal-input" id="linkUrl" placeholder="链接地址">
+                <textarea class="modal-textarea" id="linkDesc" placeholder="链接描述..."></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+                <button class="modal-btn confirm" onclick="sendLink()">发送</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="moneyModal">
+        <div class="modal-content">
+            <div class="modal-header">💰 转账红包</div>
+            <div class="modal-body">
+                <input type="number" class="modal-input" id="moneyAmount" placeholder="转账金额">
+                <input type="text" class="modal-input" id="moneyNote" placeholder="转账备注">
+                <select class="modal-input" id="moneyType">
+                    <option value="transfer">转账</option>
+                    <option value="redpack">红包</option>
+                </select>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+                <button class="modal-btn confirm" onclick="sendMoney()">发送</button>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="handleImportFile(event)">
+
+    <script>
+        // 全局状态管理
+        const state = {
+            currentContact: null,
+            currentTab: 'chats',
+            currentMomentId: null,
+            contacts: [],
+            messages: {},
+            moments: [],
+            profile: {
+                name: '我',
+                bio: '这个人很懒，什么都没有留下...',
+                avatar: '😊'
+            },
+            appIcons: {
+                chat: { icon: '💬', name: 'XChat' },
+                settings: { icon: '⚙️', name: '设置' },
+                theme: { icon: '🎨', name: '主题' }
+            },
+            config: {
+                apiProvider: 'openai',
+                apiUrl: 'https://api.openai.com/v1/chat/completions',
+                apiKey: '',
+                modelName: 'gpt-3.5-turbo'
+            }
+        };
+
+        // ... （JavaScript 代码大部分保持不变，只做以下修改） ...
+        
+        // 初始化应用
+        function initApp() {
+            loadProfile();
+            loadAppIcons();
+            loadSettings();
+            loadWallpaper();
+            loadContacts();
+            loadMoments();
+            renderChatList();
+            renderMoments();
+            updateClock();
+            setInterval(updateClock, 1000); // 每秒更新时间
+        }
+
+        // 更新时钟和日期
+        function updateClock() {
+            const now = new Date();
+            const time = now.toTimeString().slice(0, 5);
+            const date = now.toLocaleDateString('zh-CN', {
+                year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'
+            });
+            document.getElementById('currentTime').textContent = time;
+            document.getElementById('currentDate').textContent = date;
+        }
+
+        // 个人资料管理
+        function loadProfile() {
+            const saved = localStorage.getItem('xphone_profile');
+            if (saved) {
+                state.profile = JSON.parse(saved);
+            }
+            updateProfileDisplay();
+        }
+
+        function updateProfileDisplay() {
+            const avatarEl = document.getElementById('profileAvatar');
+            const nameEl = document.getElementById('profileName');
+            const bioEl = document.getElementById('profileBio');
+            
+            if (state.profile.avatar.startsWith('data:image')) {
+                avatarEl.style.backgroundImage = `url(${state.profile.avatar})`;
+                avatarEl.textContent = '';
+            } else {
+                avatarEl.style.backgroundImage = '';
+                avatarEl.textContent = state.profile.avatar;
+            }
+            
+            nameEl.textContent = state.profile.name;
+            bioEl.textContent = state.profile.bio;
+        }
+
+        function openEditProfileModal() {
+            document.getElementById('editProfileName').value = state.profile.name;
+            document.getElementById('editProfileBio').value = state.profile.bio;
+            document.getElementById('editProfileModal').style.display = 'flex';
+        }
+
+        function saveProfile() {
+            state.profile.name = document.getElementById('editProfileName').value.trim() || '我';
+            state.profile.bio = document.getElementById('editProfileBio').value.trim() || '这个人很懒，什么都没有留下...';
+            
+            localStorage.setItem('xphone_profile', JSON.stringify(state.profile));
+            updateProfileDisplay();
+            closeModal();
+        }
+
+        function updateProfileAvatar(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    state.profile.avatar = e.target.result;
+                    localStorage.setItem('xphone_profile', JSON.stringify(state.profile));
+                    updateProfileDisplay();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        // 应用图标管理
+        function loadAppIcons() {
+            const saved = localStorage.getItem('xphone_icons');
+            if (saved) {
+                state.appIcons = { ...state.appIcons, ...JSON.parse(saved) };
+            }
+            updateAppIconDisplay();
+        }
+
+        function updateAppIconDisplay() {
+            Object.keys(state.appIcons).forEach(app => {
+                const iconEl = document.getElementById(app + 'Icon');
+                const nameEl = document.getElementById(app + 'Name');
+                const parentEl = iconEl ? iconEl.parentElement : null;
+                
+                if (parentEl) {
+                    const appData = state.appIcons[app];
+                    if (appData.iconImage) {
+                        parentEl.classList.add('custom-icon');
+                        parentEl.style.backgroundImage = `url(${appData.iconImage})`;
+                        iconEl.textContent = '';
+                    } else {
+                        parentEl.classList.remove('custom-icon');
+                        parentEl.style.backgroundImage = '';
+                        iconEl.textContent = appData.icon;
+                    }
+                    nameEl.textContent = appData.name;
+                }
+            });
+        }
+        
+        function openTheme() {
+            hideAllScreens();
+            document.getElementById('themeScreen').style.display = 'block';
+            updateIconPreview();
+        }
+
+        function updateIconPreview() {
+            const app = document.getElementById('iconAppSelect').value;
+            const appData = state.appIcons[app];
+            document.getElementById('iconAppName').value = appData.name;
+            document.getElementById('iconEmoji').value = appData.icon || '';
+        }
+
+        function updateAppIcon(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const app = document.getElementById('iconAppSelect').value;
+                    state.appIcons[app].iconImage = e.target.result;
+                    document.getElementById('iconEmoji').value = ''; // 清空emoji输入
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function saveCustomIcon() {
+            const app = document.getElementById('iconAppSelect').value;
+            const name = document.getElementById('iconAppName').value.trim();
+            const emoji = document.getElementById('iconEmoji').value.trim();
+            
+            // 如果输入了emoji，则清空图片数据
+            if (emoji) {
+                state.appIcons[app].icon = emoji;
+                state.appIcons[app].iconImage = null;
+            }
+            
+            if (name) state.appIcons[app].name = name;
+            
+            localStorage.setItem('xphone_icons', JSON.stringify(state.appIcons));
+            updateAppIconDisplay();
+            goHome(); // 保存后返回主页
+        }
+
+        // 联系人管理
+        function loadContacts() {
+            const saved = localStorage.getItem('xphone_contacts');
+            state.contacts = saved ? JSON.parse(saved) : [];
+            state.messages = JSON.parse(localStorage.getItem('xphone_messages') || '{}');
+            
+            state.contacts.forEach(contact => {
+                if (!state.messages[contact.id]) {
+                    state.messages[contact.id] = [];
+                }
+            });
+        }
+
+        function renderChatList() {
+            const chatList = document.getElementById('chatList');
+            
+            if (state.contacts.length === 0) {
+                chatList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💬</div>
+                        <div>还没有联系人</div>
+                        <div>点击右下角"+"添加AI朋友吧</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            chatList.innerHTML = '';
+            state.contacts.forEach(contact => {
+                const messages = state.messages[contact.id] || [];
+                const lastMessage = messages[messages.length - 1];
+                
+                const chatItem = document.createElement('div');
+                chatItem.className = 'chat-item';
+                chatItem.onclick = () => openChat(contact);
+                
+                const avatarStyle = contact.avatar && contact.avatar.startsWith('data:image') 
+                    ? `background-image: url(${contact.avatar}); color: transparent;`
+                    : '';
+                
+                chatItem.innerHTML = `
+                    <div class="chat-avatar" style="${avatarStyle}">${contact.avatar && !contact.avatar.startsWith('data:image') ? contact.avatar : ''}</div>
+                    <div class="chat-info">
+                        <div class="chat-name">${contact.name}</div>
+                        <div class="chat-preview">${lastMessage ? (lastMessage.text.length > 20 ? lastMessage.text.substring(0, 20) + '...' : lastMessage.text) : '暂无消息'}</div>
+                    </div>
+                `;
+                
+                chatList.appendChild(chatItem);
+            });
+        }
+
+        function openAddContactModal() {
+            document.getElementById('newContactAvatar').textContent = '🤖';
+            document.getElementById('newContactAvatar').style.backgroundImage = '';
+            document.getElementById('addContactModal').style.display = 'flex';
+        }
+
+        function updateContactAvatar(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const avatar = document.getElementById('newContactAvatar');
+                    avatar.style.backgroundImage = `url(${e.target.result})`;
+                    avatar.textContent = '';
+                    avatar.dataset.avatarData = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function updateContactEmojiAvatar() {
+            const emoji = document.getElementById('contactEmoji').value.trim();
+            if (emoji) {
+                const avatar = document.getElementById('newContactAvatar');
+                avatar.style.backgroundImage = '';
+                avatar.textContent = emoji;
+                delete avatar.dataset.avatarData;
+            }
+        }
+
+        function addContact() {
+            const name = document.getElementById('contactName').value.trim();
+            const emoji = document.getElementById('contactEmoji').value.trim();
+            const prompt = document.getElementById('contactPrompt').value.trim();
+            const avatarEl = document.getElementById('newContactAvatar');
+            
+            if (!name || !prompt) {
+                alert('请填写联系人姓名和个性化prompt');
+                return;
+            }
+            
+            const avatar = avatarEl.dataset.avatarData || emoji || '🤖';
+            
+            const contact = {
+                id: 'contact-' + Date.now(),
+                name: name,
+                avatar: avatar,
+                prompt: prompt
+            };
+            
+            state.contacts.push(contact);
+            state.messages[contact.id] = [];
+            
+            localStorage.setItem('xphone_contacts', JSON.stringify(state.contacts));
+            localStorage.setItem('xphone_messages', JSON.stringify(state.messages));
+            
+            // 为新联系人生成一个朋友圈动态
+            generateWelcomeMoment(contact);
+            
+            renderChatList();
+            renderMoments();
+            closeModal();
+        }
+
+        // 朋友圈管理
+        function loadMoments() {
+            const saved = localStorage.getItem('xphone_moments');
+            state.moments = saved ? JSON.parse(saved) : [];
+        }
+
+        function generateWelcomeMoment(contact) {
+            const welcomeTexts = [
+                '很高兴加入这个大家庭！期待与大家的交流 😊',
+                '新人报到！请多多关照 ✨',
+                'Hello everyone! 我是新来的AI助手 👋',
+                '刚刚加入，希望能和大家成为好朋友 🎉',
+                '第一次发朋友圈，有点紧张呢 😅'
+            ];
+            
+            const moment = {
+                id: 'moment-' + Date.now(),
+                contactId: contact.id,
+                contactName: contact.name,
+                contactAvatar: contact.avatar,
+                content: welcomeTexts[Math.floor(Math.random() * welcomeTexts.length)],
+                timestamp: Date.now(),
+                likes: [],
+                comments: []
+            };
+            
+            state.moments.unshift(moment);
+            localStorage.setItem('xphone_moments', JSON.stringify(state.moments));
+        }
+
+        function renderMoments() {
+            const momentsList = document.getElementById('momentsList');
+            
+            if (state.moments.length === 0) {
+                momentsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🌟</div>
+                        <div>朋友圈还很安静</div>
+                        <div>添加AI朋友开始互动吧</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            momentsList.innerHTML = '';
+            state.moments.forEach(moment => {
+                const momentDiv = document.createElement('div');
+                momentDiv.className = 'moment-item';
+                
+                const avatarStyle = moment.contactAvatar && moment.contactAvatar.startsWith('data:image') 
+                    ? `background-image: url(${moment.contactAvatar}); color: transparent;`
+                    : '';
+                
+                const isLiked = moment.likes.includes('user');
+                const timeStr = new Date(moment.timestamp).toLocaleString();
+                
+                momentDiv.innerHTML = `
+                    <div class="moment-header">
+                        <div class="chat-avatar" style="${avatarStyle}">${moment.contactAvatar && !moment.contactAvatar.startsWith('data:image') ? moment.contactAvatar : ''}</div>
+                        <div class="chat-info">
+                            <div class="chat-name">${moment.contactName}</div>
+                        </div>
+                    </div>
+                    <div class="moment-content">${moment.content}</div>
+                    <div class="moment-actions">
+                        <span class="moment-action ${isLiked ? 'liked' : ''}" onclick="toggleLike('${moment.id}')">
+                            ${isLiked ? '❤️' : '🤍'} ${moment.likes.length}
+                        </span>
+                        <span class="moment-action" onclick="openCommentModal('${moment.id}')">
+                            💬 ${moment.comments.length}
+                        </span>
+                    </div>
+                    ${moment.comments.length > 0 ? renderComments(moment.comments) : ''}
+                    <div class="moment-time">${timeStr}</div>
+                `;
+                
+                momentsList.appendChild(momentDiv);
+            });
+        }
+
+        function renderComments(comments) {
+            if (comments.length === 0) return '';
+            
+            const commentsHtml = comments.map(comment => `
+                <div class="comment-item">
+                    <span class="comment-author">${comment.author}:</span> ${comment.content}
+                </div>
+            `).join('');
+            
+            return `<div class="moment-comments">${commentsHtml}</div>`;
+        }
+
+        function toggleLike(momentId) {
+            const moment = state.moments.find(m => m.id === momentId);
+            if (!moment) return;
+            
+            const userIndex = moment.likes.indexOf('user');
+            if (userIndex > -1) {
+                moment.likes.splice(userIndex, 1);
+            } else {
+                moment.likes.push('user');
+            }
+            
+            localStorage.setItem('xphone_moments', JSON.stringify(state.moments));
+            renderMoments();
+        }
+
+        function openCommentModal(momentId) {
+            state.currentMomentId = momentId;
+            document.getElementById('commentModal').style.display = 'flex';
+        }
+
+        function postComment() {
+            const content = document.getElementById('commentInput').value.trim();
+            if (!content) return;
+            
+            const moment = state.moments.find(m => m.id === state.currentMomentId);
+            if (!moment) return;
+            
+            moment.comments.push({
+                author: state.profile.name,
+                content: content,
+                timestamp: Date.now()
+            });
+            
+            localStorage.setItem('xphone_moments', JSON.stringify(state.moments));
+            renderMoments();
+            closeModal();
+        }
+
+        // 界面切换
+        function goHome() {
+            hideAllScreens();
+            document.getElementById('homeScreen').style.display = 'flex';
+        }
+
+        function openChatApp() {
+            hideAllScreens();
+            document.getElementById('chatApp').style.display = 'block';
+            switchTab('chats');
+        }
+
+        function openSettings() {
+            hideAllScreens();
+            document.getElementById('settingsScreen').style.display = 'block';
+        }
+        
+        function openTheme() {
+            hideAllScreens();
+            document.getElementById('themeScreen').style.display = 'block';
+            updateIconPreview();
+        }
+
+        function backToChatApp() {
+            hideAllScreens();
+            document.getElementById('chatApp').style.display = 'block';
+        }
+
+        function hideAllScreens() {
+            document.getElementById('homeScreen').style.display = 'none';
+            document.getElementById('chatApp').style.display = 'none';
+            document.getElementById('chatScreen').style.display = 'none';
+            document.getElementById('settingsScreen').style.display = 'none';
+            document.getElementById('themeScreen').style.display = 'none';
+        }
+
+        function switchTab(tab) {
+            state.currentTab = tab;
+            
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            
+            const tabs = ['chats', 'contacts', 'moments', 'me'];
+            const activeIndex = tabs.indexOf(tab);
+            if (activeIndex !== -1) {
+                document.querySelectorAll('.nav-item')[activeIndex].classList.add('active');
+            }
+            
+            document.getElementById('chatList').style.display = tab === 'chats' ? 'block' : 'none';
+            document.getElementById('momentsList').style.display = tab === 'moments' ? 'block' : 'none';
+            document.getElementById('profileScreen').style.display = tab === 'me' ? 'block' : 'none';
+            document.getElementById('addContactBtn').style.display = (tab === 'chats' || tab === 'contacts') ? 'block' : 'none';
+        }
+
+        // 聊天功能
+        function openChat(contact) {
+            state.currentContact = contact;
+            hideAllScreens();
+            document.getElementById('chatScreen').style.display = 'block';
+            document.getElementById('chatTitle').textContent = contact.name;
+            loadChatMessages();
+        }
+
+        function loadChatMessages() {
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = '';
+            
+            const messages = state.messages[state.currentContact.id] || [];
+            messages.forEach(msg => {
+                addMessage(msg.text, msg.sender, msg.isHtml);
+            });
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message || !state.currentContact) return;
+            
+            if (!state.config.apiKey) {
+                addMessage('请先在设置中配置API密钥！', 'ai');
+                return;
+            }
+            
+            addMessage(message, 'user');
+            saveMessage(message, 'user');
+            input.value = '';
+            
+            const sendIcon = document.getElementById('sendIcon');
+            sendIcon.innerHTML = '<div class="loading"></div>';
+            
+            callAI(message).then(response => {
+                addMessage(response, 'ai');
+                saveMessage(response, 'ai');
+            }).catch(error => {
+                const errorMsg = '抱歉，AI服务暂时不可用：' + error.message;
+                addMessage(errorMsg, 'ai');
+                saveMessage(errorMsg, 'ai');
+            }).finally(() => {
+                sendIcon.innerHTML = '➤';
+            });
+        }
+
+        function addMessage(text, sender, isHtml = false) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = 'message-bubble';
+            
+            if (isHtml) {
+                bubbleDiv.innerHTML = text;
+            } else {
+                bubbleDiv.textContent = text;
+            }
+            
+            messageDiv.appendChild(bubbleDiv);
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function saveMessage(text, sender, isHtml = false) {
+            if (!state.messages[state.currentContact.id]) {
+                state.messages[state.currentContact.id] = [];
+            }
+            
+            state.messages[state.currentContact.id].push({
+                text: text,
+                sender: sender,
+                isHtml: isHtml,
+                timestamp: Date.now()
+            });
+            
+            localStorage.setItem('xphone_messages', JSON.stringify(state.messages));
+            renderChatList();
+        }
+
+        async function callAI(message) {
+            const contact = state.currentContact;
+            const requestBody = {
+                model: state.config.modelName,
+                messages: [
+                    { role: 'system', content: contact.prompt },
+                    { role: 'user', content: message }
+                ],
+                max_tokens: 1000,
+                temperature: 0.7
+            };
+
+            if (state.config.apiProvider === 'claude') {
+                requestBody.max_tokens = 1000;
+                requestBody.messages = [{ role: 'user', content: message }];
+                requestBody.system = contact.prompt;
+            }
+
+            const response = await fetch(state.config.apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${state.config.apiKey}`,
+                    ...(state.config.apiProvider === 'claude' && {
+                        'anthropic-version': '2023-06-01'
+                    })
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                throw new Error(`API请求失败: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            if (state.config.apiProvider === 'claude') {
+                return data.content[0].text;
+            } else {
+                return data.choices[0].message.content;
+            }
+        }
+
+        // 特殊消息发送
+        function sendImage() {
+            const title = document.getElementById('imageTitle').value.trim();
+            const desc = document.getElementById('imageDesc').value.trim();
+            
+            if (!desc) {
+                alert('请输入图片描述');
+                return;
+            }
+            
+            const imageMsg = createSpecialMessage('image', '📸 ' + (title || '图片'), desc);
+            addMessage(imageMsg, 'user', true);
+            saveMessage(imageMsg, 'user', true);
+            closeModal();
+            
+            setTimeout(() => {
+                const response = '好的，我收到了你发送的图片信息。';
+                addMessage(response, 'ai');
+                saveMessage(response, 'ai');
+            }, 1000);
+        }
+
+        function sendVoice() {
+            const duration = document.getElementById('voiceDuration').value.trim();
+            const content = document.getElementById('voiceContent').value.trim();
+            
+            if (!content) {
+                alert('请输入语音内容');
+                return;
+            }
+            
+            const voiceMsg = createSpecialMessage('voice', '🎤 语音消息', 
+                `时长: ${duration || '未知'}秒<br>内容: ${content}`);
+            addMessage(voiceMsg, 'user', true);
+            saveMessage(voiceMsg, 'user', true);
+            closeModal();
+            
+            setTimeout(() => {
+                const response = '我收到了你的语音消息：' + content;
+                addMessage(response, 'ai');
+                saveMessage(response, 'ai');
+            }, 1000);
+        }
+
+        function sendLink() {
+            const title = document.getElementById('linkTitle').value.trim();
+            const url = document.getElementById('linkUrl').value.trim();
+            const desc = document.getElementById('linkDesc').value.trim();
+            
+            if (!title || !url) {
+                alert('请输入链接标题和地址');
+                return;
+            }
+            
+            const linkMsg = createSpecialMessage('link', '🔗 ' + title, 
+                `链接: ${url}<br>${desc ? '描述: ' + desc : ''}`);
+            addMessage(linkMsg, 'user', true);
+            saveMessage(linkMsg, 'user', true);
+            closeModal();
+            
+            setTimeout(() => {
+                const response = '感谢分享链接：' + title + '，我已经记录了这个信息。';
+                addMessage(response, 'ai');
+                saveMessage(response, 'ai');
+            }, 1000);
+        }
+
+        function sendMoney() {
+            const amount = document.getElementById('moneyAmount').value.trim();
+            const note = document.getElementById('moneyNote').value.trim();
+            const type = document.getElementById('moneyType').value;
+            
+            if (!amount) {
+                alert('请输入转账金额');
+                return;
+            }
+            
+            const typeText = type === 'redpack' ? '红包' : '转账';
+            const moneyMsg = createSpecialMessage('money', `💰 ${typeText}`, 
+                `金额: ¥${amount}<br>${note ? '备注: ' + note : ''}`);
+            addMessage(moneyMsg, 'user', true);
+            saveMessage(moneyMsg, 'user', true);
+            closeModal();
+            
+            setTimeout(() => {
+                const response = `收到你的${typeText}：¥${amount}，谢谢！${note ? '备注：' + note : ''}`;
+                addMessage(response, 'ai');
+                saveMessage(response, 'ai');
+            }, 1000);
+        }
+
+        function createSpecialMessage(type, header, content) {
+            return `<div class="special-message ${type}">
+                <div class="special-message-header">${header}</div>
+                <div>${content}</div>
+            </div>`;
+        }
+
+        // 模态框控制
+        function openImageModal() { document.getElementById('imageModal').style.display = 'flex'; }
+        function openVoiceModal() { document.getElementById('voiceModal').style.display = 'flex'; }
+        function openLinkModal() { document.getElementById('linkModal').style.display = 'flex'; }
+        function openMoneyModal() { document.getElementById('moneyModal').style.display = 'flex'; }
+
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+            document.querySelectorAll('.modal-input, .modal-textarea').forEach(input => {
+                input.value = '';
+            });
+        }
+
+        // 设置管理
+        function loadSettings() {
+            const savedConfig = localStorage.getItem('xphone_config');
+            if (savedConfig) {
+                Object.assign(state.config, JSON.parse(savedConfig));
+                updateSettingsUI();
+            }
+        }
+
+        function updateSettingsUI() {
+            document.getElementById('apiProvider').value = state.config.apiProvider;
+            document.getElementById('apiUrl').value = state.config.apiUrl;
+            document.getElementById('apiKey').value = state.config.apiKey;
+            document.getElementById('modelName').value = state.config.modelName;
+        }
+
+        function updateApiSettings() {
+            const provider = document.getElementById('apiProvider').value;
+            const urlInput = document.getElementById('apiUrl');
+            const modelInput = document.getElementById('modelName');
+            
+            if (provider === 'openai') {
+                urlInput.value = 'https://api.openai.com/v1/chat/completions';
+                modelInput.value = 'gpt-3.5-turbo';
+            } else if (provider === 'claude') {
+                urlInput.value = 'https://api.anthropic.com/v1/messages';
+                modelInput.value = 'claude-3-sonnet-20240229';
+            }
+        }
+
+        function saveSettings() {
+            state.config.apiProvider = document.getElementById('apiProvider').value;
+            state.config.apiUrl = document.getElementById('apiUrl').value;
+            state.config.apiKey = document.getElementById('apiKey').value;
+            state.config.modelName = document.getElementById('modelName').value;
+            
+            localStorage.setItem('xphone_config', JSON.stringify(state.config));
+            
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '保存成功！';
+            btn.style.background = '#28a745';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '#007AFF';
+            }, 2000);
+        }
+
+        // 壁纸功能
+        function uploadWallpaper(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageUrl = e.target.result;
+                    setWallpaper(`url(${imageUrl})`);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function setWallpaper(wallpaper) {
+            const appContainer = document.getElementById('appContainer');
+            appContainer.style.setProperty('--bg-image', wallpaper);
+            localStorage.setItem('xphone_wallpaper', wallpaper);
+        }
+
+        function loadWallpaper() {
+            const savedWallpaper = localStorage.getItem('xphone_wallpaper');
+            if (savedWallpaper) {
+                const appContainer = document.getElementById('appContainer');
+                appContainer.style.setProperty('--bg-image', savedWallpaper);
+            }
+        }
+
+        // 数据导入导出
+        function exportData() {
+            const exportData = {
+                version: '1.0',
+                timestamp: Date.now(),
+                profile: state.profile,
+                contacts: state.contacts,
+                messages: state.messages,
+                moments: state.moments,
+                appIcons: state.appIcons,
+                config: state.config,
+                wallpaper: localStorage.getItem('xphone_wallpaper')
+            };
+            
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `xphone_backup_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            alert('数据导出成功！');
+        }
+
+        function importData() {
+            document.getElementById('importFile').click();
+        }
+
+        function handleImportFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importData = JSON.parse(e.target.result);
+                    
+                    if (!importData.version) {
+                        throw new Error('无效的备份文件格式');
+                    }
+                    
+                    // 确认导入
+                    if (!confirm('导入数据将覆盖当前所有数据，是否继续？')) {
+                        return;
+                    }
+                    
+                    // 导入数据
+                    if (importData.profile) {
+                        state.profile = importData.profile;
+                        localStorage.setItem('xphone_profile', JSON.stringify(state.profile));
+                    }
+                    
+                    if (importData.contacts) {
+                        state.contacts = importData.contacts;
+                        localStorage.setItem('xphone_contacts', JSON.stringify(state.contacts));
+                    }
+                    
+                    if (importData.messages) {
+                        state.messages = importData.messages;
+                        localStorage.setItem('xphone_messages', JSON.stringify(state.messages));
+                    }
+                    
+                    if (importData.moments) {
+                        state.moments = importData.moments;
+                        localStorage.setItem('xphone_moments', JSON.stringify(state.moments));
+                    }
+                    
+                    if (importData.appIcons) {
+                        state.appIcons = { ...state.appIcons, ...importData.appIcons };
+                        localStorage.setItem('xphone_icons', JSON.stringify(state.appIcons));
+                    }
+                    
+                    if (importData.config) {
+                        state.config = { ...state.config, ...importData.config };
+                        localStorage.setItem('xphone_config', JSON.stringify(state.config));
+                    }
+                    
+                    if (importData.wallpaper) {
+                        localStorage.setItem('xphone_wallpaper', importData.wallpaper);
+                    }
+                    
+                    // 重新初始化应用
+                    initApp();
+                    alert('数据导入成功！');
+                    
+                } catch (error) {
+                    alert('导入失败：' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // 事件处理
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // 点击模态框外部关闭
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal')) {
+                closeModal();
+            }
+        });
+
+        // 阻止滚动穿透
+        document.addEventListener('touchmove', function(event) {
+            if (document.querySelector('.modal[style*="flex"]')) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+
+        // 初始化应用
+        window.addEventListener('load', function() {
+            initApp();
+        });
+    </script>
+</body>
 </html>
