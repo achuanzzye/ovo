@@ -6,95 +6,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1e3c72">
     <title>XPhone</title>
     <style>
-        :root {
-            /* 浅色模式变量 */
-            --bg-color-light: #f0f2f5;
-            --text-color-light: #1c1c1e;
-            --container-bg-light: rgba(255, 255, 255, 0.7);
-            --border-color-light: rgba(0, 0, 0, 0.1);
-            --icon-bg-light: rgba(255, 255, 255, 0.2);
-            --modal-bg-light: rgba(255, 255, 255, 0.95);
-            --modal-content-bg-light: #fff;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-        /* 深色模式变量 */
-        --bg-color-dark: #1c1c1e;
-        --text-color-dark: #f0f2f5;
-        --container-bg-dark: rgba(28, 28, 30, 0.7);
-        --border-color-dark: rgba(255, 255, 255, 0.1);
-        --icon-bg-dark: rgba(255, 255, 255, 0.15);
-        --modal-bg-dark: rgba(0, 0, 0, 0.8);
-        --modal-content-bg-dark: rgba(28, 28, 30, 0.95);
+    /* 完全填充屏幕，包括浏览器UI */
+    html {
+        height: 100%;
+        height: 100vh;
+        height: 100svh;
+        overflow: hidden;
     }
 
-    /* 默认主题 (浅色) */
     body {
-        background-color: var(--bg-color-light);
-        color: var(--text-color-light);
-    }
-    
-    /* 启用深色模式时的变量覆盖 */
-    @media (prefers-color-scheme: dark) {
-        body {
-            background-color: var(--bg-color-dark);
-            color: var(--text-color-dark);
-        }
-        .app-icon, .dock, .modal-content, .settings-content, .chat-nav, .chat-header, .profile-screen, .chat-screen {
-            background: var(--container-bg-dark);
-            backdrop-filter: blur(20px);
-        }
-        .app-icon {
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-        .dock {
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-        .chat-nav, .chat-header {
-            border-bottom-color: rgba(255, 255, 255, 0.1);
-        }
-        .modal-content {
-            background: var(--modal-content-bg-dark);
-            color: var(--text-color-dark);
-        }
-        .modal-input, .modal-textarea, .modal-btn.cancel, .tool-btn {
-            background: rgba(255, 255, 255, 0.15);
-            color: var(--text-color-dark);
-        }
-        .modal-input::placeholder, .modal-textarea::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-    }
-
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        -webkit-tap-highlight-color: transparent;
-    }
-
-    html, body {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         height: 100%;
-        min-height: 100vh;
-        min-height: 100svh;
+        height: 100vh;
+        height: 100svh;
         overflow: hidden;
-        margin: 0;
-        padding: 0;
-    }
-
-    .app-container {
         position: fixed;
         top: 0;
         left: 0;
+        right: 0;
+        bottom: 0;
         width: 100vw;
-        height: 100vh;
+    }
+
+    .app-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
         background: var(--bg-image, linear-gradient(135deg, #1e3c72 0%, #2a5298 100%));
         background-size: cover;
         background-position: center;
-        background-attachment: fixed;
+        background-repeat: no-repeat;
         overflow: hidden;
-        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
 
     /* 主屏幕 */
@@ -103,10 +57,10 @@
         flex-direction: column;
         justify-content: space-between;
         height: 100%;
-        padding: 40px 20px calc(env(safe-area-inset-bottom) + 130px) 20px;
+        padding: 40px 20px 150px 20px;
     }
 
-    /* 大号时间显示 */
+    /* 时间显示 */
     .time-widget {
         text-align: center;
         color: white;
@@ -123,7 +77,7 @@
         margin-top: 10px;
     }
 
-    /* 应用列表和 Dock */
+    /* 应用图标 */
     .app-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -140,66 +94,35 @@
         justify-content: center;
         font-size: 24px;
         cursor: pointer;
-        transition: transform 0.3s ease, background-color 0.3s ease;
+        transition: transform 0.3s ease;
         color: white;
-        flex-direction: column;
-        background: var(--icon-bg-dark);
+        background: rgba(255,255,255,0.15);
         backdrop-filter: blur(20px);
-        border: 1px solid var(--border-color-dark);
-        position: relative;
+        border: 1px solid rgba(255,255,255,0.1);
         overflow: hidden;
-        flex-shrink: 0;
-    }
-
-    .app-icon.custom-icon {
         background-size: cover;
         background-position: center;
     }
 
     .app-icon:active {
         transform: scale(0.95);
-        background: rgba(255,255,255,0.25);
-    }
-
-    .app-name {
-        font-size: 10px;
-        margin-top: 4px;
-        color: white;
-        text-shadow: 0 1px 4px rgba(0,0,0,0.2);
     }
 
     /* Dock栏 */
     .dock {
         position: fixed;
-        bottom: calc(env(safe-area-inset-bottom) + 20px);
+        bottom: 20px;
         left: 20px;
         right: 20px;
         height: 80px;
-        background: var(--icon-bg-dark);
+        background: rgba(255,255,255,0.15);
         backdrop-filter: blur(20px);
         border-radius: 25px;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 25px;
-        border: 1px solid var(--border-color-dark);
-    }
-    .dock-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        color: white;
-        background: rgba(255,255,255,0.1);
-    }
-    .dock-icon:active {
-        transform: scale(0.9);
-        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.1);
     }
     
     /* 聊天应用界面 */
@@ -207,23 +130,14 @@
         display: none;
         height: 100%;
         background: rgba(0,0,0,0.95);
-        backdrop-filter: blur(20px);
     }
-    /* 聊天应用导航 */
+
     .chat-nav {
-        height: calc(50px + env(safe-area-inset-top));
-        padding-top: env(safe-area-inset-top);
+        height: 50px;
         background: rgba(0,0,0,0.9);
         display: flex;
         align-items: center;
         border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-
-    /* 聊天应用返回按钮 */
-    .chat-header .back-btn {
-        position: absolute;
-        left: 10px;
-        padding: 5px;
     }
 
     .nav-item {
@@ -240,8 +154,9 @@
         color: white;
         border-bottom: 2px solid #007AFF;
     }
+
     .chat-list {
-        height: calc(100% - 50px - env(safe-area-inset-top));
+        height: calc(100% - 50px);
         overflow-y: auto;
         padding: 10px 0;
     }
@@ -302,7 +217,7 @@
 
     /* 朋友圈界面 */
     .moments-list {
-        height: calc(100% - 50px - env(safe-area-inset-top));
+        height: calc(100% - 50px);
         overflow-y: auto;
         padding: 10px 0;
     }
@@ -375,18 +290,6 @@
         background: rgba(0,0,0,0.95);
     }
 
-    .profile-header {
-        height: calc(60px + env(safe-area-inset-top));
-        padding-top: env(safe-area-inset-top);
-        background: rgba(0,0,0,0.9);
-        display: flex;
-        align-items: center;
-        padding-left: 20px;
-        padding-right: 20px;
-        color: white;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-
     .profile-content {
         padding: 30px 20px;
         text-align: center;
@@ -448,16 +351,13 @@
     }
 
     .chat-header {
-        height: calc(60px + env(safe-area-inset-top));
-        padding-top: env(safe-area-inset-top);
+        height: 60px;
         background: rgba(0,0,0,0.9);
         display: flex;
         align-items: center;
-        padding-left: 20px;
-        padding-right: 20px;
+        padding: 0 20px;
         color: white;
         border-bottom: 1px solid rgba(255,255,255,0.1);
-        position: relative; /* 添加相对定位 */
     }
     
     .back-btn {
@@ -477,7 +377,7 @@
     }
 
     .chat-messages {
-        height: calc(100% - 120px - 60px - env(safe-area-inset-top));
+        height: calc(100% - 180px);
         overflow-y: auto;
         padding: 20px;
     }
@@ -511,10 +411,8 @@
         border-bottom-left-radius: 6px;
     }
 
-    /* 聊天输入区域 */
     .chat-input-area {
-        height: calc(120px + env(safe-area-inset-bottom));
-        padding-bottom: env(safe-area-inset-bottom);
+        height: 120px;
         background: rgba(0,0,0,0.9);
         padding: 10px 20px;
     }
@@ -536,14 +434,12 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 4px;
         font-size: 12px;
         transition: all 0.3s ease;
     }
 
     .tool-btn:active {
         background: rgba(255,255,255,0.25);
-        transform: scale(0.95);
     }
 
     .chat-input {
@@ -588,20 +484,18 @@
     }
 
     .settings-header {
-        height: calc(60px + env(safe-area-inset-top));
-        padding-top: env(safe-area-inset-top);
+        height: 60px;
         background: rgba(0,0,0,0.9);
         display: flex;
         align-items: center;
-        padding-left: 20px;
-        padding-right: 20px;
+        padding: 0 20px;
         color: white;
         border-bottom: 1px solid rgba(255,255,255,0.1);
     }
 
     .settings-content {
         padding: 20px;
-        height: calc(100% - 60px - env(safe-area-inset-top));
+        height: calc(100% - 60px);
         overflow-y: auto;
         color: white;
     }
@@ -611,7 +505,6 @@
         border-radius: 12px;
         padding: 15px;
         margin-bottom: 15px;
-        border: 1px solid rgba(255,255,255,0.2);
     }
 
     .setting-label {
@@ -634,7 +527,7 @@
         color: rgba(255,255,255,0.6);
     }
 
-    /* 壁纸/主题界面 */
+    /* 主题界面 */
     .theme-screen {
         display: none;
         height: 100%;
@@ -642,30 +535,32 @@
     }
 
     .theme-header {
-        height: calc(60px + env(safe-area-inset-top));
-        padding-top: env(safe-area-inset-top);
+        height: 60px;
         background: rgba(0,0,0,0.9);
         display: flex;
         align-items: center;
-        padding-left: 20px;
-        padding-right: 20px;
+        padding: 0 20px;
         color: white;
         border-bottom: 1px solid rgba(255,255,255,0.1);
     }
+
     .theme-content {
         padding: 20px;
-        height: calc(100% - 60px - env(safe-area-inset-top));
+        height: calc(100% - 60px);
         overflow-y: auto;
         color: white;
     }
+
     .theme-section {
         margin-bottom: 30px;
     }
+
     .theme-section-title {
         font-size: 18px;
         font-weight: bold;
         margin-bottom: 15px;
     }
+
     .file-input-wrapper {
         position: relative;
         display: inline-block;
@@ -804,7 +699,7 @@
     /* 添加联系人按钮 */
     .add-contact-btn {
         position: fixed;
-        bottom: calc(env(safe-area-inset-bottom) + 100px);
+        bottom: 100px;
         right: 20px;
         width: 56px;
         height: 56px;
@@ -822,7 +717,6 @@
         transform: scale(0.9);
     }
 
-    /* 头像上传区域 */
     .avatar-upload {
         position: relative;
         display: inline-block;
@@ -836,7 +730,6 @@
         cursor: pointer;
     }
 
-    /* 数据管理按钮 */
     .data-actions {
         display: flex;
         gap: 10px;
@@ -858,15 +751,8 @@
     .data-btn:active {
         background: rgba(255,255,255,0.2);
     }
-
-    /* 响应式适配 */
-    @media screen and (max-width: 375px) {
-        .app-grid { gap: 15px; }
-        .dock { gap: 20px; }
-        .tool-btn { font-size: 11px; }
-        .modal-content { padding: 20px; margin: 10px; }
-    }
 </style>
+```
 
 </head>
 <body>
@@ -880,18 +766,9 @@
         <div class="app-grid"></div>
 
         <div class="dock">
-            <div class="app-icon" id="chat-app-icon" onclick="openChatApp()">
-                <span id="chatIcon">💬</span>
-                <div class="app-name" id="chatAppName">XChat</div>
-            </div>
-            <div class="app-icon" id="settings-app-icon" onclick="openSettings()">
-                <span id="settingsIcon">⚙️</span>
-                <div class="app-name" id="settingsName">设置</div>
-            </div>
-            <div class="app-icon" id="theme-app-icon" onclick="openTheme()">
-                <span id="themeIcon">🎨</span>
-                <div class="app-name" id="themeName">主题</div>
-            </div>
+            <div class="app-icon" id="chat-app-icon" onclick="openChatApp()">💬</div>
+            <div class="app-icon" id="settings-app-icon" onclick="openSettings()">⚙️</div>
+            <div class="app-icon" id="theme-app-icon" onclick="openTheme()">🎨</div>
         </div>
     </div>
 
@@ -1012,16 +889,12 @@
             <div class="theme-section">
                 <div class="theme-section-title">应用图标</div>
                 <label class="setting-label">选择应用</label>
-                <select class="modal-input" id="iconAppSelect" onchange="updateIconPreview()">
+                <select class="modal-input" id="iconAppSelect">
                     <option value="chat">XChat</option>
                     <option value="settings">设置</option>
                     <option value="theme">主题</option>
                 </select>
-                <label class="setting-label">应用名称</label>
-                <input type="text" class="modal-input" id="iconAppName" placeholder="应用名称">
-                <label class="setting-label">图标</label>
-                <input type="text" class="modal-input" id="iconEmoji" placeholder="输入表情符号或文字">
-                <label class="setting-label">或上传图片</label>
+                <label class="setting-label">上传图标</label>
                 <div class="file-input-wrapper" style="width: 100%; margin: 0;">
                     <input type="file" id="iconImageFile" accept="image/*" onchange="updateAppIcon(event)">
                     选择图片
@@ -1041,7 +914,6 @@
                 <div style="width: 60px; height: 60px; border-radius: 30px; background: linear-gradient(135deg, #007AFF, #5AC8FA); margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; background-size: cover; background-position: center;" id="newContactAvatar">🤖</div>
                 <input type="file" accept="image/*" onchange="updateContactAvatar(event)" style="position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer;">
             </div>
-            <input type="text" class="modal-input" id="contactEmoji" placeholder="或输入表情符号作为头像" onchange="updateContactEmojiAvatar()">
             <textarea class="modal-textarea" id="contactPrompt" placeholder="个性化prompt，描述这个AI的特点和回答风格..."></textarea>
         </div>
         <div class="modal-buttons">
@@ -1142,7 +1014,7 @@
 <input type="file" id="importFile" accept=".json" style="display: none;" onchange="handleImportFile(event)">
 
 <script>
-    // 全局状态管理
+    // 精简全局状态管理
     const state = {
         currentContact: null,
         currentTab: 'chats',
@@ -1150,44 +1022,53 @@
         contacts: [],
         messages: {},
         moments: [],
-        profile: {
-            name: '我',
-            bio: '这个人很懒，什么都没有留下...',
-            avatar: '😊'
-        },
-        appIcons: {
-            chat: { icon: '💬', name: 'XChat' },
-            settings: { icon: '⚙️', name: '设置' },
-            theme: { icon: '🎨', name: '主题' }
-        },
-        config: {
-            apiProvider: 'openai',
-            apiUrl: 'https://api.openai.com/v1/chat/completions',
-            apiKey: '',
-            modelName: 'gpt-3.5-turbo'
-        }
+        profile: { name: '我', bio: '这个人很懒，什么都没有留下...', avatar: '😊' },
+        appIcons: { chat: '💬', settings: '⚙️', theme: '🎨' },
+        config: { apiProvider: 'openai', apiUrl: 'https://api.openai.com/v1/chat/completions', apiKey: '', modelName: 'gpt-3.5-turbo' }
     };
 
-    // 初始化应用
+    // 初始化
     function initApp() {
-        loadProfile();
-        loadAppIcons();
-        loadSettings();
-        loadWallpaper();
-        loadContacts();
-        loadMoments();
+        loadData();
         renderChatList();
         renderMoments();
         updateClock();
-        setInterval(updateClock, 1000); // 每秒更新时间
+        setInterval(updateClock, 1000);
     }
 
+    // 精简数据加载
+    function loadData() {
+        try {
+            const profile = localStorage.getItem('xphone_profile');
+            const contacts = localStorage.getItem('xphone_contacts');
+            const messages = localStorage.getItem('xphone_messages');
+            const moments = localStorage.getItem('xphone_moments');
+            const icons = localStorage.getItem('xphone_icons');
+            const config = localStorage.getItem('xphone_config');
+            const wallpaper = localStorage.getItem('xphone_wallpaper');
+
+            if (profile) state.profile = JSON.parse(profile);
+            if (contacts) state.contacts = JSON.parse(contacts);
+            if (messages) state.messages = JSON.parse(messages);
+            if (moments) state.moments = JSON.parse(moments);
+            if (icons) state.appIcons = { ...state.appIcons, ...JSON.parse(icons) };
+            if (config) state.config = { ...state.config, ...JSON.parse(config) };
+            if (wallpaper) document.getElementById('appContainer').style.setProperty('--bg-image', wallpaper);
+
+            updateProfileDisplay();
+            updateAppIconDisplay();
+            updateSettingsUI();
+        } catch (error) {
+            console.warn('数据加载失败', error);
+        }
+    }
+
+    // 时间显示
     function updateClock() {
         const now = new Date();
         const time = now.toTimeString().slice(0, 5);
-        const date = now.toLocaleDateString('zh-CN', {
-            year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'
-        });
+        const options = { month: 'long', day: 'numeric', weekday: 'long' };
+        const date = now.toLocaleDateString('zh-CN', options);
         
         const timeElement = document.getElementById('currentTime');
         const dateElement = document.getElementById('currentDate');
@@ -1196,15 +1077,7 @@
         if (dateElement) dateElement.textContent = date;
     }
 
-    // 个人资料管理
-    function loadProfile() {
-        const saved = localStorage.getItem('xphone_profile');
-        if (saved) {
-            state.profile = JSON.parse(saved);
-        }
-        updateProfileDisplay();
-    }
-
+    // 更新个人资料显示
     function updateProfileDisplay() {
         const avatarEl = document.getElementById('profileAvatar');
         const nameEl = document.getElementById('profileName');
@@ -1224,148 +1097,79 @@
         if (bioEl) bioEl.textContent = state.profile.bio;
     }
 
-    function openEditProfileModal() {
-        document.getElementById('editProfileName').value = state.profile.name;
-        document.getElementById('editProfileBio').value = state.profile.bio;
-        document.getElementById('editProfileModal').style.display = 'flex';
-    }
-
-    function saveProfile() {
-        state.profile.name = document.getElementById('editProfileName').value.trim() || '我';
-        state.profile.bio = document.getElementById('editProfileBio').value.trim() || '这个人很懒，什么都没有留下...';
-        
-        localStorage.setItem('xphone_profile', JSON.stringify(state.profile));
-        updateProfileDisplay();
-        closeModal();
-    }
-
-    function updateProfileAvatar(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                state.profile.avatar = e.target.result;
-                localStorage.setItem('xphone_profile', JSON.stringify(state.profile));
-                updateProfileDisplay();
-            };
-            reader.readAsDataURL(file);
-        }
-    }
-    
-    function loadAppIcons() {
-        // 保持原有的localStorage逻辑，但在加载失败时提供默认值
-        try {
-            const saved = localStorage.getItem('xphone_icons');
-            if (saved) {
-                const savedIcons = JSON.parse(saved);
-                state.appIcons = { ...state.appIcons, ...savedIcons };
-            }
-        } catch (error) {
-            console.warn('加载图标设置失败，使用默认设置');
-        }
-        updateAppIconDisplay();
-    }
-
+    // 更新应用图标显示 - 只支持图片，默认emoji
     function updateAppIconDisplay() {
         Object.keys(state.appIcons).forEach(app => {
-            const iconEl = document.getElementById(app + 'Icon');
-            const nameEl = document.getElementById(app + 'AppName') || document.getElementById(app + 'Name');
-            const parentEl = iconEl ? iconEl.parentElement : null;
-            
-            if (parentEl && iconEl && nameEl) {
-                const appData = state.appIcons[app];
-                if (appData.iconImage) {
-                    parentEl.classList.add('custom-icon');
-                    parentEl.style.backgroundImage = `url(${appData.iconImage})`;
+            const iconEl = document.getElementById(app + '-app-icon');
+            if (iconEl) {
+                if (typeof state.appIcons[app] === 'object' && state.appIcons[app].image) {
+                    iconEl.style.backgroundImage = `url(${state.appIcons[app].image})`;
                     iconEl.textContent = '';
                 } else {
-                    parentEl.classList.remove('custom-icon');
-                    parentEl.style.backgroundImage = '';
-                    iconEl.textContent = appData.icon;
+                    iconEl.style.backgroundImage = '';
+                    const defaultEmojis = { chat: '💬', settings: '⚙️', theme: '🎨' };
+                    iconEl.textContent = defaultEmojis[app] || '📱';
                 }
-                nameEl.textContent = appData.name;
             }
         });
     }
-    
+
+    // 界面切换
+    function goHome() {
+        hideAllScreens();
+        document.getElementById('homeScreen').style.display = 'flex';
+    }
+
+    function openChatApp() {
+        hideAllScreens();
+        document.getElementById('chatApp').style.display = 'block';
+        switchTab('chats');
+    }
+
+    function openSettings() {
+        hideAllScreens();
+        document.getElementById('settingsScreen').style.display = 'block';
+    }
+
     function openTheme() {
         hideAllScreens();
         document.getElementById('themeScreen').style.display = 'block';
-        updateIconPreview();
     }
 
-    function updateIconPreview() {
-        const app = document.getElementById('iconAppSelect').value;
-        const appData = state.appIcons[app];
-        document.getElementById('iconAppName').value = appData.name;
-        document.getElementById('iconEmoji').value = appData.icon || '';
+    function backToChatApp() {
+        hideAllScreens();
+        document.getElementById('chatApp').style.display = 'block';
     }
 
-    function updateAppIcon(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const app = document.getElementById('iconAppSelect').value;
-                state.appIcons[app].iconImage = e.target.result;
-                document.getElementById('iconEmoji').value = ''; // 清空emoji输入
-            };
-            reader.readAsDataURL(file);
-        }
+    function hideAllScreens() {
+        const screens = ['homeScreen', 'chatApp', 'chatScreen', 'settingsScreen', 'themeScreen'];
+        screens.forEach(screen => {
+            document.getElementById(screen).style.display = 'none';
+        });
     }
 
-    function saveCustomIcon() {
-        const app = document.getElementById('iconAppSelect').value;
-        const name = document.getElementById('iconAppName').value.trim();
-        const emoji = document.getElementById('iconEmoji').value.trim();
+    function switchTab(tab) {
+        state.currentTab = tab;
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
         
-        // 如果输入了emoji，则清空图片数据
-        if (emoji) {
-            state.appIcons[app].icon = emoji;
-            state.appIcons[app].iconImage = null;
+        const tabs = ['chats', 'contacts', 'moments', 'me'];
+        const activeIndex = tabs.indexOf(tab);
+        if (activeIndex !== -1) {
+            document.querySelectorAll('.nav-item')[activeIndex].classList.add('active');
         }
         
-        if (name) state.appIcons[app].name = name;
-        
-        try {
-            localStorage.setItem('xphone_icons', JSON.stringify(state.appIcons));
-        } catch (error) {
-            console.warn('保存图标设置失败');
-        }
-        updateAppIconDisplay();
-        goHome(); // 保存后返回主页
+        document.getElementById('chatList').style.display = tab === 'chats' ? 'block' : 'none';
+        document.getElementById('momentsList').style.display = tab === 'moments' ? 'block' : 'none';
+        document.getElementById('profileScreen').style.display = tab === 'me' ? 'block' : 'none';
+        document.getElementById('addContactBtn').style.display = (tab === 'chats' || tab === 'contacts') ? 'block' : 'none';
     }
 
     // 联系人管理
-    function loadContacts() {
-        try {
-            const saved = localStorage.getItem('xphone_contacts');
-            state.contacts = saved ? JSON.parse(saved) : [];
-            state.messages = JSON.parse(localStorage.getItem('xphone_messages') || '{}');
-            
-            state.contacts.forEach(contact => {
-                if (!state.messages[contact.id]) {
-                    state.messages[contact.id] = [];
-                }
-            });
-        } catch (error) {
-            console.warn('加载联系人数据失败');
-            state.contacts = [];
-            state.messages = {};
-        }
-    }
-
     function renderChatList() {
         const chatList = document.getElementById('chatList');
         
         if (state.contacts.length === 0) {
-            chatList.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-state-icon">💬</div>
-                    <div>还没有联系人</div>
-                    <div>点击右下角"+"添加AI朋友吧</div>
-                </div>
-            `;
+            chatList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">💬</div><div>还没有联系人</div><div>点击右下角"+"添加AI朋友吧</div></div>';
             return;
         }
         
@@ -1414,19 +1218,8 @@
         }
     }
 
-    function updateContactEmojiAvatar() {
-        const emoji = document.getElementById('contactEmoji').value.trim();
-        if (emoji) {
-            const avatar = document.getElementById('newContactAvatar');
-            avatar.style.backgroundImage = '';
-            avatar.textContent = emoji;
-            delete avatar.dataset.avatarData;
-        }
-    }
-
     function addContact() {
         const name = document.getElementById('contactName').value.trim();
-        const emoji = document.getElementById('contactEmoji').value.trim();
         const prompt = document.getElementById('contactPrompt').value.trim();
         const avatarEl = document.getElementById('newContactAvatar');
         
@@ -1435,7 +1228,7 @@
             return;
         }
         
-        const avatar = avatarEl.dataset.avatarData || emoji || '🤖';
+        const avatar = avatarEl.dataset.avatarData || '🤖';
         
         const contact = {
             id: 'contact-' + Date.now(),
@@ -1447,32 +1240,14 @@
         state.contacts.push(contact);
         state.messages[contact.id] = [];
         
-        try {
-            localStorage.setItem('xphone_contacts', JSON.stringify(state.contacts));
-            localStorage.setItem('xphone_messages', JSON.stringify(state.messages));
-        } catch (error) {
-            console.warn('保存联系人数据失败');
-        }
-        
-        // 为新联系人生成一个朋友圈动态
+        saveData();
         generateWelcomeMoment(contact);
-        
         renderChatList();
         renderMoments();
         closeModal();
     }
 
     // 朋友圈管理
-    function loadMoments() {
-        try {
-            const saved = localStorage.getItem('xphone_moments');
-            state.moments = saved ? JSON.parse(saved) : [];
-        } catch (error) {
-            console.warn('加载朋友圈数据失败');
-            state.moments = [];
-        }
-    }
-
     function generateWelcomeMoment(contact) {
         const welcomeTexts = [
             '很高兴加入这个大家庭！期待与大家的交流 😊',
@@ -1494,24 +1269,14 @@
         };
         
         state.moments.unshift(moment);
-        try {
-            localStorage.setItem('xphone_moments', JSON.stringify(state.moments));
-        } catch (error) {
-            console.warn('保存朋友圈数据失败');
-        }
+        saveData();
     }
 
     function renderMoments() {
         const momentsList = document.getElementById('momentsList');
         
         if (state.moments.length === 0) {
-            momentsList.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-state-icon">🌟</div>
-                    <div>朋友圈还很安静</div>
-                    <div>添加AI朋友开始互动吧</div>
-                </div>
-            `;
+            momentsList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🌟</div><div>朋友圈还很安静</div><div>添加AI朋友开始互动吧</div></div>';
             return;
         }
         
@@ -1552,14 +1317,9 @@
     }
 
     function renderComments(comments) {
-        if (comments.length === 0) return '';
-        
-        const commentsHtml = comments.map(comment => `
-            <div class="comment-item">
-                <span class="comment-author">${comment.author}:</span> ${comment.content}
-            </div>
-        `).join('');
-        
+        const commentsHtml = comments.map(comment => 
+            `<div class="comment-item"><span class="comment-author">${comment.author}:</span> ${comment.content}</div>`
+        ).join('');
         return `<div class="moment-comments">${commentsHtml}</div>`;
     }
 
@@ -1574,11 +1334,7 @@
             moment.likes.push('user');
         }
         
-        try {
-            localStorage.setItem('xphone_moments', JSON.stringify(state.moments));
-        } catch (error) {
-            console.warn('保存点赞数据失败');
-        }
+        saveData();
         renderMoments();
     }
 
@@ -1600,60 +1356,9 @@
             timestamp: Date.now()
         });
         
-        try {
-            localStorage.setItem('xphone_moments', JSON.stringify(state.moments));
-        } catch (error) {
-            console.warn('保存评论数据失败');
-        }
+        saveData();
         renderMoments();
         closeModal();
-    }
-
-    // 界面切换
-    function goHome() {
-        hideAllScreens();
-        document.getElementById('homeScreen').style.display = 'flex';
-    }
-
-    function openChatApp() {
-        hideAllScreens();
-        document.getElementById('chatApp').style.display = 'block';
-        switchTab('chats');
-    }
-
-    function openSettings() {
-        hideAllScreens();
-        document.getElementById('settingsScreen').style.display = 'block';
-    }
-
-    function backToChatApp() {
-        hideAllScreens();
-        document.getElementById('chatApp').style.display = 'block';
-    }
-
-    function hideAllScreens() {
-        document.getElementById('homeScreen').style.display = 'none';
-        document.getElementById('chatApp').style.display = 'none';
-        document.getElementById('chatScreen').style.display = 'none';
-        document.getElementById('settingsScreen').style.display = 'none';
-        document.getElementById('themeScreen').style.display = 'none';
-    }
-
-    function switchTab(tab) {
-        state.currentTab = tab;
-        
-        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-        
-        const tabs = ['chats', 'contacts', 'moments', 'me'];
-        const activeIndex = tabs.indexOf(tab);
-        if (activeIndex !== -1) {
-            document.querySelectorAll('.nav-item')[activeIndex].classList.add('active');
-        }
-        
-        document.getElementById('chatList').style.display = tab === 'chats' ? 'block' : 'none';
-        document.getElementById('momentsList').style.display = tab === 'moments' ? 'block' : 'none';
-        document.getElementById('profileScreen').style.display = tab === 'me' ? 'block' : 'none';
-        document.getElementById('addContactBtn').style.display = (tab === 'chats' || tab === 'contacts') ? 'block' : 'none';
     }
 
     // 聊天功能
@@ -1736,11 +1441,7 @@
             timestamp: Date.now()
         });
         
-        try {
-            localStorage.setItem('xphone_messages', JSON.stringify(state.messages));
-        } catch (error) {
-            console.warn('保存消息失败');
-        }
+        saveData();
         renderChatList();
     }
 
@@ -1767,9 +1468,7 @@
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${state.config.apiKey}`,
-                ...(state.config.apiProvider === 'claude' && {
-                    'anthropic-version': '2023-06-01'
-                })
+                ...(state.config.apiProvider === 'claude' && { 'anthropic-version': '2023-06-01' })
             },
             body: JSON.stringify(requestBody)
         });
@@ -1803,9 +1502,8 @@
         closeModal();
         
         setTimeout(() => {
-            const response = '好的，我收到了你发送的图片信息。';
-            addMessage(response, 'ai');
-            saveMessage(response, 'ai');
+            addMessage('好的，我收到了你发送的图片信息。', 'ai');
+            saveMessage('好的，我收到了你发送的图片信息。', 'ai');
         }, 1000);
     }
 
@@ -1818,8 +1516,7 @@
             return;
         }
         
-        const voiceMsg = createSpecialMessage('voice', '🎤 语音消息', 
-            `时长: ${duration || '未知'}秒<br>内容: ${content}`);
+        const voiceMsg = createSpecialMessage('voice', '🎤 语音消息', `时长: ${duration || '未知'}秒<br>内容: ${content}`);
         addMessage(voiceMsg, 'user', true);
         saveMessage(voiceMsg, 'user', true);
         closeModal();
@@ -1841,8 +1538,7 @@
             return;
         }
         
-        const linkMsg = createSpecialMessage('link', '🔗 ' + title, 
-            `链接: ${url}<br>${desc ? '描述: ' + desc : ''}`);
+        const linkMsg = createSpecialMessage('link', '🔗 ' + title, `链接: ${url}<br>${desc ? '描述: ' + desc : ''}`);
         addMessage(linkMsg, 'user', true);
         saveMessage(linkMsg, 'user', true);
         closeModal();
@@ -1865,8 +1561,7 @@
         }
         
         const typeText = type === 'redpack' ? '红包' : '转账';
-        const moneyMsg = createSpecialMessage('money', `💰 ${typeText}`, 
-            `金额: ¥${amount}<br>${note ? '备注: ' + note : ''}`);
+        const moneyMsg = createSpecialMessage('money', `💰 ${typeText}`, `金额: ¥${amount}<br>${note ? '备注: ' + note : ''}`);
         addMessage(moneyMsg, 'user', true);
         saveMessage(moneyMsg, 'user', true);
         closeModal();
@@ -1885,46 +1580,42 @@
         </div>`;
     }
 
-    // 模态框控制
-    function openImageModal() { document.getElementById('imageModal').style.display = 'flex'; }
-    function openVoiceModal() { document.getElementById('voiceModal').style.display = 'flex'; }
-    function openLinkModal() { document.getElementById('linkModal').style.display = 'flex'; }
-    function openMoneyModal() { document.getElementById('moneyModal').style.display = 'flex'; }
-
-    function closeModal() {
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.style.display = 'none';
-        });
-        document.querySelectorAll('.modal-input, .modal-textarea').forEach(input => {
-            input.value = '';
-        });
+    // 个人资料
+    function openEditProfileModal() {
+        document.getElementById('editProfileName').value = state.profile.name;
+        document.getElementById('editProfileBio').value = state.profile.bio;
+        document.getElementById('editProfileModal').style.display = 'flex';
     }
 
-    // 设置管理
-    function loadSettings() {
-        try {
-            const savedConfig = localStorage.getItem('xphone_config');
-            if (savedConfig) {
-                Object.assign(state.config, JSON.parse(savedConfig));
-                updateSettingsUI();
-            }
-        } catch (error) {
-            console.warn('加载设置失败');
+    function saveProfile() {
+        state.profile.name = document.getElementById('editProfileName').value.trim() || '我';
+        state.profile.bio = document.getElementById('editProfileBio').value.trim() || '这个人很懒，什么都没有留下...';
+        
+        saveData();
+        updateProfileDisplay();
+        closeModal();
+    }
+
+    function updateProfileAvatar(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                state.profile.avatar = e.target.result;
+                saveData();
+                updateProfileDisplay();
+            };
+            reader.readAsDataURL(file);
         }
     }
 
+    // 设置管理
     function updateSettingsUI() {
-        const elements = {
-            apiProvider: document.getElementById('apiProvider'),
-            apiUrl: document.getElementById('apiUrl'),
-            apiKey: document.getElementById('apiKey'),
-            modelName: document.getElementById('modelName')
-        };
-        
-        if (elements.apiProvider) elements.apiProvider.value = state.config.apiProvider;
-        if (elements.apiUrl) elements.apiUrl.value = state.config.apiUrl;
-        if (elements.apiKey) elements.apiKey.value = state.config.apiKey;
-        if (elements.modelName) elements.modelName.value = state.config.modelName;
+        const elements = ['apiProvider', 'apiUrl', 'apiKey', 'modelName'];
+        elements.forEach(id => {
+            const el = document.getElementById(id);
+            if (el && state.config[id]) el.value = state.config[id];
+        });
     }
 
     function updateApiSettings() {
@@ -1947,11 +1638,7 @@
         state.config.apiKey = document.getElementById('apiKey').value;
         state.config.modelName = document.getElementById('modelName').value;
         
-        try {
-            localStorage.setItem('xphone_config', JSON.stringify(state.config));
-        } catch (error) {
-            console.warn('保存设置失败');
-        }
+        saveData();
         
         const btn = event.target;
         const originalText = btn.textContent;
@@ -1963,7 +1650,7 @@
         }, 2000);
     }
 
-    // 修复问题2：壁纸功能，使用内存存储
+    // 主题功能
     function uploadWallpaper(event) {
         const file = event.target.files[0];
         if (file) {
@@ -1977,39 +1664,51 @@
     }
 
     function setWallpaper(wallpaper) {
-        const appContainer = document.getElementById('appContainer');
-        appContainer.style.setProperty('--bg-image', wallpaper);
+        document.getElementById('appContainer').style.setProperty('--bg-image', wallpaper);
         try {
             localStorage.setItem('xphone_wallpaper', wallpaper);
         } catch (error) {
-            console.warn('保存壁纸失败，但壁纸将在当前会话中生效');
-            // 壁纸仍然会在当前会话中显示，只是不会持久保存
+            console.warn('保存壁纸失败');
         }
     }
 
-    function loadWallpaper() {
+    function updateAppIcon(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const app = document.getElementById('iconAppSelect').value;
+                state.appIcons[app] = { image: e.target.result };
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function saveCustomIcon() {
+        saveData();
+        updateAppIconDisplay();
+        goHome();
+    }
+
+    // 数据管理
+    function saveData() {
         try {
-            const savedWallpaper = localStorage.getItem('xphone_wallpaper');
-            if (savedWallpaper) {
-                const appContainer = document.getElementById('appContainer');
-                appContainer.style.setProperty('--bg-image', savedWallpaper);
-            }
+            localStorage.setItem('xphone_profile', JSON.stringify(state.profile));
+            localStorage.setItem('xphone_contacts', JSON.stringify(state.contacts));
+            localStorage.setItem('xphone_messages', JSON.stringify(state.messages));
+            localStorage.setItem('xphone_moments', JSON.stringify(state.moments));
+            localStorage.setItem('xphone_icons', JSON.stringify(state.appIcons));
+            localStorage.setItem('xphone_config', JSON.stringify(state.config));
         } catch (error) {
-            console.warn('加载壁纸失败');
+            console.warn('保存数据失败', error);
         }
     }
 
-    // 数据导入导出
     function exportData() {
         const exportData = {
             version: '1.0',
             timestamp: Date.now(),
-            profile: state.profile,
-            contacts: state.contacts,
-            messages: state.messages,
-            moments: state.moments,
-            appIcons: state.appIcons,
-            config: state.config,
+            ...state,
             wallpaper: localStorage.getItem('xphone_wallpaper')
         };
         
@@ -2045,47 +1744,20 @@
                     throw new Error('无效的备份文件格式');
                 }
                 
-                // 确认导入
                 if (!confirm('导入数据将覆盖当前所有数据，是否继续？')) {
                     return;
                 }
                 
                 // 导入数据
-                if (importData.profile) {
-                    state.profile = importData.profile;
-                    localStorage.setItem('xphone_profile', JSON.stringify(state.profile));
-                }
-                
-                if (importData.contacts) {
-                    state.contacts = importData.contacts;
-                    localStorage.setItem('xphone_contacts', JSON.stringify(state.contacts));
-                }
-                
-                if (importData.messages) {
-                    state.messages = importData.messages;
-                    localStorage.setItem('xphone_messages', JSON.stringify(state.messages));
-                }
-                
-                if (importData.moments) {
-                    state.moments = importData.moments;
-                    localStorage.setItem('xphone_moments', JSON.stringify(state.moments));
-                }
-                
-                if (importData.appIcons) {
-                    state.appIcons = { ...state.appIcons, ...importData.appIcons };
-                    localStorage.setItem('xphone_icons', JSON.stringify(state.appIcons));
-                }
-                
-                if (importData.config) {
-                    state.config = { ...state.config, ...importData.config };
-                    localStorage.setItem('xphone_config', JSON.stringify(state.config));
-                }
+                Object.keys(state).forEach(key => {
+                    if (importData[key]) state[key] = importData[key];
+                });
                 
                 if (importData.wallpaper) {
                     localStorage.setItem('xphone_wallpaper', importData.wallpaper);
                 }
                 
-                // 重新初始化应用
+                saveData();
                 initApp();
                 alert('数据导入成功！');
                 
@@ -2094,6 +1766,21 @@
             }
         };
         reader.readAsText(file);
+    }
+
+    // 模态框控制
+    function openImageModal() { document.getElementById('imageModal').style.display = 'flex'; }
+    function openVoiceModal() { document.getElementById('voiceModal').style.display = 'flex'; }
+    function openLinkModal() { document.getElementById('linkModal').style.display = 'flex'; }
+    function openMoneyModal() { document.getElementById('moneyModal').style.display = 'flex'; }
+
+    function closeModal() {
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.style.display = 'none';
+        });
+        document.querySelectorAll('.modal-input, .modal-textarea').forEach(input => {
+            input.value = '';
+        });
     }
 
     // 事件处理
