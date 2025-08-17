@@ -32,28 +32,23 @@
         width: 100vw;
     }
 
-.app-container {
-    /* 核心属性：确保元素完全覆盖视口 */
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    
-    /* 背景图片属性 */
-    background: var(--bg-image, linear-gradient(135deg, #1e3c72 0%, #2a5298 100%));
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    
-    /* 关键属性：将背景图片固定在视口上，不随内容滚动 */
-    background-attachment: fixed;
-    
-    /* 确保容器本身没有滚动条 */
-    overflow: hidden;
-}
-
-
+    .app-container {
+        /* 核心属性：确保元素完全覆盖视口 */
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        /* 背景图片属性 */
+        background: var(--bg-image, linear-gradient(135deg, #1e3c72 0%, #2a5298 100%));
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        /* 关键属性：将背景图片固定在视口上，不随内容滚动 */
+        background-attachment: fixed;
+        /* 确保容器本身没有滚动条 */
+        overflow: hidden;
+    }
 
     /* 主屏幕 */
     .home-screen {
