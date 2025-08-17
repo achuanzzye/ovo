@@ -19,7 +19,7 @@
     /* 完全填充屏幕，包括浏览器UI */
     html, body {
         height: 100%;
-        overflow: hidden;
+        overflow: hidden; /* 阻止页面滚动 */
     }
 
     body {
@@ -30,25 +30,35 @@
         right: 0;
         bottom: 0;
         width: 100vw;
+        height: 100vh;
+        overflow: hidden;
     }
 
     .app-container {
-        /* 核心属性：确保元素完全覆盖视口 */
+        /* 核心：使用 inset: 0 来完全覆盖视口 */
         position: fixed;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        /* 背景图片属性 */
+        inset: 0;
+        
+        /* 关键：确保背景可以延伸到安全区域之外 */
+        padding-top: constant(safe-area-inset-top);
+        padding-top: env(safe-area-inset-top);
+        padding-right: constant(safe-area-inset-right);
+        padding-right: env(safe-area-inset-right);
+        padding-bottom: constant(safe-area-inset-bottom);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: constant(safe-area-inset-left);
+        padding-left: env(safe-area-inset-left);
+
+        /* 背景图片样式 */
         background: var(--bg-image, linear-gradient(135deg, #1e3c72 0%, #2a5298 100%));
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
-        /* 关键属性：将背景图片固定在视口上，不随内容滚动 */
-        background-attachment: fixed;
-        /* 确保容器本身没有滚动条 */
+        
+        /* 防止容器内部产生滚动 */
         overflow: hidden;
     }
+
 
     /* 主屏幕 */
     .home-screen {
