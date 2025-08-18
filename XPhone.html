@@ -32,11 +32,11 @@
         -webkit-tap-highlight-color: transparent;
     }
 
-    /* PWA全屏适配 + 统一背景解决方案 */
+    /* PWA完美全屏 + 沉浸式状态栏解决方案 */
     html {
         height: 100%;
         height: 100vh;
-        height: 100svh;
+        height: 100dvh; /* 动态视口高度 */
         overflow: hidden;
         margin: 0;
         padding: 0;
@@ -52,7 +52,7 @@
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         height: 100%;
         height: 100vh;
-        height: 100svh;
+        height: 100dvh;
         margin: 0;
         padding: 0;
         width: 100vw;
@@ -60,33 +60,140 @@
         /* 统一背景继承 */
         background: inherit;
         background-attachment: fixed;
+        /* 强制隐藏滚动条 */
+        -ms-overflow-style: none;
+        scrollbar-width: none;
     }
 
-    /* PWA独立应用模式检测和适配 */
+    body::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* PWA独立应用模式 + 完美全屏适配 */
     @media all and (display-mode: standalone) {
         html, body {
             height: 100vh !important;
+            height: 100dvh !important;
             min-height: 100vh !important;
-            /* PWA模式下强制填充整个屏幕 */
+            min-height: 100dvh !important;
+            max-height: 100vh !important;
+            max-height: 100dvh !important;
             padding: 0 !important;
             margin: 0 !important;
+            /* 消除iOS底部安全区域 */
+            padding-bottom: 0 !important;
         }
         
         .app-container {
             height: 100vh !important;
+            height: 100dvh !important;
             min-height: 100vh !important;
+            min-height: 100dvh !important;
+            max-height: 100vh !important;
+            max-height: 100dvh !important;
             padding: 0 !important;
             margin: 0 !important;
+            /* 完全覆盖状态栏 */
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
         }
         
         .pwa-hint {
             display: none !important;
         }
 
-        /* PWA模式下的所有界面都保持统一背景 */
+        /* PWA模式下的所有界面完全填充 + 沉浸式状态栏 */
         .theme-screen, .settings-screen, .chat-app, .chat-screen {
+            height: 100vh !important;
+            height: 100dvh !important;
+            min-height: 100vh !important;
+            min-height: 100dvh !important;
             background: rgba(0, 0, 0, 0.85) !important;
             backdrop-filter: blur(20px) !important;
+            /* 覆盖状态栏 */
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            z-index: 100 !important;
+        }
+
+        /* PWA模式下的界面头部适配 */
+        .theme-header, .settings-header, .chat-header {
+            height: calc(60px + env(safe-area-inset-top)) !important;
+            padding-top: env(safe-area-inset-top) !important;
+            background: rgba(0, 0, 0, 0.95) !important;
+        }
+
+        .chat-nav {
+            height: calc(50px + env(safe-area-inset-top)) !important;
+            padding-top: env(safe-area-inset-top) !important;
+            background: rgba(0, 0, 0, 0.95) !important;
+        }
+
+        /* 调整内容区域高度 */
+        .theme-content {
+            height: calc(100vh - 60px - env(safe-area-inset-top)) !important;
+            height: calc(100dvh - 60px - env(safe-area-inset-top)) !important;
+        }
+
+        .settings-content {
+            height: calc(100vh - 60px - env(safe-area-inset-top)) !important;
+            height: calc(100dvh - 60px - env(safe-area-inset-top)) !important;
+        }
+
+        .chat-list, .moments-list {
+            height: calc(100vh - 50px - env(safe-area-inset-top)) !important;
+            height: calc(100dvh - 50px - env(safe-area-inset-top)) !important;
+        }
+
+        .chat-messages {
+            height: calc(100vh - 180px - 60px - env(safe-area-inset-top)) !important;
+            height: calc(100dvh - 180px - 60px - env(safe-area-inset-top)) !important;
+        }
+
+        /* 底部输入区域适配 */
+        .chat-input-area {
+            height: calc(120px + env(safe-area-inset-bottom)) !important;
+            padding-bottom: env(safe-area-inset-bottom) !important;
+        }
+
+        /* Dock适配 */
+        .dock {
+            bottom: calc(20px + env(safe-area-inset-bottom)) !important;
+        }
+
+        .add-contact-btn {
+            bottom: calc(100px + env(safe-area-inset-bottom)) !important;
+        }
+
+        /* 主屏幕适配 */
+        .home-screen {
+            padding-bottom: calc(150px + env(safe-area-inset-bottom)) !important;
+            padding-top: calc(40px + env(safe-area-inset-top)) !important;
+        }
+    }
+
+    /* 非PWA模式下的适配 */
+    @media not all and (display-mode: standalone) {
+        /* iOS Safari特殊处理 */
+        @supports (-webkit-touch-callout: none) {
+            html {
+                height: -webkit-fill-available;
+                min-height: -webkit-fill-available;
+            }
+            
+            body {
+                height: -webkit-fill-available;
+                min-height: -webkit-fill-available;
+            }
+            
+            .app-container {
+                height: -webkit-fill-available;
+                min-height: -webkit-fill-available;
+            }
         }
     }
 
@@ -176,6 +283,7 @@
         left: 0;
         width: 100vw;
         height: 100vh;
+        height: 100dvh;
         /* 移除背景，使用继承的背景 */
         background: transparent;
         overflow: hidden;
@@ -208,7 +316,8 @@
         flex-direction: column;
         justify-content: space-between;
         height: 100%;
-        padding: 40px 20px 150px 20px;
+        /* 完全填充，考虑安全区域 */
+        padding: calc(40px + env(safe-area-inset-top)) 20px calc(150px + env(safe-area-inset-bottom)) 20px;
     }
 
     /* 时间显示 - 不显示年份 */
@@ -259,10 +368,10 @@
         transform: scale(0.95);
     }
 
-    /* Dock栏 */
+    /* Dock栏 - 完全适配底部安全区域 */
     .dock {
         position: fixed;
-        bottom: 20px;
+        bottom: calc(20px + env(safe-area-inset-bottom));
         left: 20px;
         right: 20px;
         height: 80px;
@@ -276,17 +385,24 @@
         border: 1px solid rgba(255,255,255,0.1);
     }
     
-    /* 聊天应用界面 - 统一背景 */
+    /* 聊天应用界面 - 完全覆盖屏幕 */
     .chat-app {
         display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
         height: 100vh;
+        height: 100dvh;
         background: rgba(0, 0, 0, 0.85);
         backdrop-filter: blur(20px);
+        z-index: 1000;
     }
 
     .chat-nav {
-        height: 50px;
-        background: rgba(0, 0, 0, 0.9);
+        height: calc(50px + env(safe-area-inset-top));
+        padding-top: env(safe-area-inset-top);
+        background: rgba(0, 0, 0, 0.95);
         display: flex;
         align-items: center;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -308,207 +424,54 @@
     }
 
     .chat-list {
-        height: calc(100vh - 50px);
+        height: calc(100vh - 50px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        height: calc(100dvh - 50px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
         overflow-y: auto;
         padding: 10px 0;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom));
     }
 
-    .empty-state {
-        text-align: center;
-        padding: 60px 20px;
-        color: rgba(255, 255, 255, 0.6);
-    }
-
-    .empty-state-icon {
-        font-size: 48px;
-        margin-bottom: 20px;
-    }
-
-    .chat-item {
-        display: flex;
-        align-items: center;
-        padding: 15px 20px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .chat-item:active {
-        background: rgba(255, 255, 255, 0.1);
-    }
-
-    .chat-avatar {
-        width: 50px;
-        height: 50px;
-        border-radius: 25px;
-        background: linear-gradient(135deg, #007AFF, #5AC8FA);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 18px;
-        margin-right: 15px;
-        background-size: cover;
-        background-position: center;
-    }
-
-    .chat-info {
-        flex: 1;
-    }
-
-    .chat-name {
-        color: white;
-        font-size: 16px;
-        margin-bottom: 5px;
-    }
-
-    .chat-preview {
-        color: rgba(255, 255, 255, 0.6);
-        font-size: 14px;
-    }
-
-    /* 朋友圈界面 - 统一背景 */
+    /* 朋友圈界面 - 统一高度 */
     .moments-list {
-        height: calc(100vh - 50px);
+        height: calc(100vh - 50px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        height: calc(100dvh - 50px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
         overflow-y: auto;
         padding: 10px 0;
-    }
-
-    .moment-item {
-        padding: 20px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .moment-header {
-        display: flex;
-        align-items: center;
-        margin-bottom: 15px;
-    }
-
-    .moment-content {
-        color: white;
-        line-height: 1.6;
-        margin-bottom: 15px;
-    }
-
-    .moment-actions {
-        display: flex;
-        gap: 20px;
-        margin-bottom: 10px;
-    }
-
-    .moment-action {
-        color: rgba(255, 255, 255, 0.6);
-        cursor: pointer;
-        font-size: 14px;
-        transition: all 0.3s ease;
-    }
-
-    .moment-action:active {
-        color: #007AFF;
-    }
-
-    .moment-action.liked {
-        color: #ff6b6b;
-    }
-
-    .moment-comments {
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 8px;
-        padding: 10px;
-        margin-top: 10px;
-    }
-
-    .comment-item {
-        padding: 5px 0;
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 14px;
-    }
-
-    .comment-author {
-        color: #007AFF;
-        font-weight: 500;
-    }
-
-    .moment-time {
-        color: rgba(255, 255, 255, 0.5);
-        font-size: 12px;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom));
     }
 
     /* 个人资料界面 - 统一背景 */
     .profile-screen {
         display: none;
-        height: 100vh;
+        height: calc(100vh - 50px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        height: calc(100dvh - 50px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
         background: transparent;
+        overflow-y: auto;
+        padding-bottom: calc(env(safe-area-inset-bottom));
     }
 
-    .profile-content {
-        padding: 30px 20px;
-        text-align: center;
-        color: white;
-    }
-
-    .profile-avatar {
-        width: 100px;
-        height: 100px;
-        border-radius: 50px;
-        background: linear-gradient(135deg, #007AFF, #5AC8FA);
-        margin: 0 auto 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 36px;
-        cursor: pointer;
-        background-size: cover;
-        background-position: center;
-    }
-
-    .profile-name {
-        font-size: 24px;
-        margin-bottom: 10px;
-    }
-
-    .profile-bio {
-        color: rgba(255, 255, 255, 0.7);
-        line-height: 1.6;
-        margin-bottom: 30px;
-    }
-
-    .profile-actions {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .profile-btn {
-        padding: 15px;
-        background: rgba(255, 255, 255, 0.1);
-        border: none;
-        border-radius: 12px;
-        color: white;
-        cursor: pointer;
-        font-size: 16px;
-        transition: all 0.3s ease;
-    }
-
-    .profile-btn:active {
-        background: rgba(255, 255, 255, 0.2);
-    }
-
-    /* 聊天界面 - 统一背景 */
+    /* 聊天界面 - 完全覆盖屏幕 */
     .chat-screen {
         display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
         height: 100vh;
+        height: 100dvh;
         background: rgba(0, 0, 0, 0.85);
         backdrop-filter: blur(20px);
+        z-index: 1000;
     }
 
     .chat-header {
-        height: 60px;
-        background: rgba(0, 0, 0, 0.9);
+        height: calc(60px + env(safe-area-inset-top));
+        padding-top: env(safe-area-inset-top);
+        background: rgba(0, 0, 0, 0.95);
         display: flex;
         align-items: center;
-        padding: 0 20px;
+        padding-left: 20px;
+        padding-right: 20px;
         color: white;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
@@ -530,7 +493,8 @@
     }
 
     .chat-messages {
-        height: calc(100vh - 180px);
+        height: calc(100vh - 180px - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        height: calc(100dvh - 180px - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
         overflow-y: auto;
         padding: 20px;
     }
@@ -629,29 +593,39 @@
         justify-content: center;
     }
 
-    /* 设置界面 - 统一背景 */
+    /* 设置界面 - 完全覆盖屏幕 */
     .settings-screen {
         display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
         height: 100vh;
+        height: 100dvh;
         background: rgba(0, 0, 0, 0.85);
         backdrop-filter: blur(20px);
+        z-index: 1000;
     }
 
     .settings-header {
-        height: 60px;
-        background: rgba(0, 0, 0, 0.9);
+        height: calc(60px + env(safe-area-inset-top));
+        padding-top: env(safe-area-inset-top);
+        background: rgba(0, 0, 0, 0.95);
         display: flex;
         align-items: center;
-        padding: 0 20px;
+        padding-left: 20px;
+        padding-right: 20px;
         color: white;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .settings-content {
         padding: 20px;
-        height: calc(100vh - 60px);
+        height: calc(100vh - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        height: calc(100dvh - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
         overflow-y: auto;
         color: white;
+        padding-bottom: calc(20px + env(safe-area-inset-bottom));
     }
 
     .setting-item {
@@ -681,29 +655,39 @@
         color: rgba(255, 255, 255, 0.6);
     }
 
-    /* 主题界面 - 统一背景 */
+    /* 主题界面 - 完全覆盖屏幕 */
     .theme-screen {
         display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
         height: 100vh;
+        height: 100dvh;
         background: rgba(0, 0, 0, 0.85);
         backdrop-filter: blur(20px);
+        z-index: 1000;
     }
 
     .theme-header {
-        height: 60px;
-        background: rgba(0, 0, 0, 0.9);
+        height: calc(60px + env(safe-area-inset-top));
+        padding-top: env(safe-area-inset-top);
+        background: rgba(0, 0, 0, 0.95);
         display: flex;
         align-items: center;
-        padding: 0 20px;
+        padding-left: 20px;
+        padding-right: 20px;
         color: white;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .theme-content {
         padding: 20px;
-        height: calc(100vh - 60px);
+        height: calc(100vh - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        height: calc(100dvh - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
         overflow-y: auto;
         color: white;
+        padding-bottom: calc(20px + env(safe-area-inset-bottom));
     }
 
     .theme-section {
@@ -1325,7 +1309,7 @@
         }
     }
 
-    // 精简数据加载
+    // 精简数据加载 + 壁纸修复
     function loadData() {
         try {
             const profile = localStorage.getItem('xphone_profile');
@@ -1342,7 +1326,11 @@
             if (moments) state.moments = JSON.parse(moments);
             if (icons) state.appIcons = { ...state.appIcons, ...JSON.parse(icons) };
             if (config) state.config = { ...state.config, ...JSON.parse(config) };
-            if (wallpaper) document.getElementById('appContainer').style.setProperty('--bg-image', wallpaper);
+            
+            // 修复壁纸加载
+            if (wallpaper) {
+                setWallpaper(wallpaper);
+            }
 
             updateProfileDisplay();
             updateAppIconDisplay();
