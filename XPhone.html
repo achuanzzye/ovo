@@ -71,118 +71,63 @@
 
     /* PWA独立应用模式 + 完美全屏适配 */
     @media all and (display-mode: standalone) {
-        html, body {
+    /* 强制所有顶层元素填满屏幕 */
+        html, body, .app-container {
             height: 100vh !important;
             height: 100dvh !important;
             min-height: 100vh !important;
             min-height: 100dvh !important;
             max-height: 100vh !important;
             max-height: 100dvh !important;
-            padding: 0 !important;
             margin: 0 !important;
-            /* 消除iOS底部安全区域 */
-            padding-bottom: 0 !important;
+            padding: 0 !important;
+            padding-bottom: env(safe-area-inset-bottom) !important;
+        /* 在这里统一设置底部安全区域，而不是在每个子元素上 */
         }
-        
-        .app-container {
-            height: 100vh !important;
-            height: 100dvh !important;
-            min-height: 100vh !important;
-            min-height: 100dvh !important;
-            max-height: 100vh !important;
-            max-height: 100dvh !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            /* 完全覆盖状态栏 */
-            top: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            bottom: 0 !important;
-            /* 修复PWA模式下底部安全区域问题 */
+    
+    /* 修复 iOS Safari 底部安全区域问题 */
+        html {
             padding-bottom: env(safe-area-inset-bottom) !important;
         }
-        
-        /* 修复PWA模式下主屏幕底部空白 */
+
+    /* 所有需要全屏的界面都通过 flex 或 grid 布局，并让其子元素去适配 */
         .home-screen {
             height: 100% !important;
+        /* 使用 padding 来适配顶部和底部，这里不再需要计算复杂的 calc */
             padding-bottom: calc(150px + env(safe-area-inset-bottom)) !important;
             padding-top: calc(40px + env(safe-area-inset-top)) !important;
-            /* 确保内容不被底部安全区域遮挡 */
             box-sizing: border-box !important;
         }
-        
-        .pwa-hint {
-            display: none !important;
-        }
 
-        /* PWA模式下的所有界面完全填充 + 沉浸式状态栏 */
+    /* 统一调整所有界面的高度 */
         .theme-screen, .settings-screen, .chat-app, .chat-screen {
-            height: 100vh !important;
-            height: 100dvh !important;
-            min-height: 100vh !important;
-            min-height: 100dvh !important;
-            background: rgba(0, 0, 0, 0.85) !important;
-            backdrop-filter: blur(20px) !important;
-            /* 覆盖状态栏 */
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100vw !important;
-            z-index: 100 !important;
-            /* 适配底部安全区域 */
+            height: 100% !important; /* 它们都应该填满父容器 .app-container */
+            padding-bottom: 0 !important; /* 避免双重安全区域适配 */
+        }
+    
+    /* 统一处理所有界面的头部和底部，让内容区自适应 */
+        .theme-header, .settings-header, .chat-header, .chat-nav {
+            padding-top: env(safe-area-inset-top) !important;
+            box-sizing: border-box !important;
+        }
+    
+        .chat-input-area {
             padding-bottom: env(safe-area-inset-bottom) !important;
             box-sizing: border-box !important;
         }
 
-        /* PWA模式下的界面头部适配 */
-        .theme-header, .settings-header, .chat-header {
-            height: calc(60px + env(safe-area-inset-top)) !important;
-            padding-top: env(safe-area-inset-top) !important;
-            background: rgba(0, 0, 0, 0.95) !important;
+    /* 调整内容区域高度 */
+        .theme-content, .settings-content, .chat-list, .moments-list, .chat-messages {
+            height: calc(100% - var(--header-height, 60px) - var(--footer-height, 0px)) !important;
+        /* 更好的做法是使用 flexbox 布局，让内容区自动伸缩 */
         }
 
-        .chat-nav {
-            height: calc(50px + env(safe-area-inset-top)) !important;
-            padding-top: env(safe-area-inset-top) !important;
-            background: rgba(0, 0, 0, 0.95) !important;
-        }
-
-        /* 调整内容区域高度 */
-        .theme-content {
-            height: calc(100vh - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
-            height: calc(100dvh - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
-        }
-
-        .settings-content {
-            height: calc(100vh - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
-            height: calc(100dvh - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
-        }
-
-        .chat-list, .moments-list {
-            height: calc(100vh - 50px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
-            height: calc(100dvh - 50px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
-        }
-
-        .chat-messages {
-            height: calc(100vh - 180px - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
-            height: calc(100dvh - 180px - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
-        }
-
-        /* 底部输入区域适配 */
-        .chat-input-area {
-            height: calc(120px + env(safe-area-inset-bottom)) !important;
-            padding-bottom: env(safe-area-inset-bottom) !important;
-        }
-
-        /* Dock适配 */
+    /* Dock适配 */
         .dock {
             bottom: calc(20px + env(safe-area-inset-bottom)) !important;
         }
-
-        .add-contact-btn {
-            bottom: calc(100px + env(safe-area-inset-bottom)) !important;
-        }
     }
+
 
     /* 非PWA模式下的适配 */
     @media not all and (display-mode: standalone) {
@@ -262,27 +207,6 @@
         font-size: 18px;
         cursor: pointer;
         opacity: 0.6;
-    }
-
-    /* Safari滚动hack - 作为备用方案 */
-    .safari-fullscreen-hack {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 200vh;
-        overflow-y: scroll;
-        overflow-x: hidden;
-        -webkit-overflow-scrolling: touch;
-        background: transparent;
-        pointer-events: none;
-        z-index: -1;
-    }
-
-    .safari-scroll-content {
-        height: 300vh;
-        width: 100%;
-        background: transparent;
     }
 
     .app-container {
@@ -914,12 +838,6 @@
         </div>
     </div>
 
-
-<!-- Safari滚动hack备用方案 -->
-<div class="safari-fullscreen-hack">
-    <div class="safari-scroll-content"></div>
-</div>
-
 <div class="app-container" id="appContainer">
     <div class="home-screen" id="homeScreen">
         <div class="time-widget">
@@ -1203,36 +1121,23 @@
 
     // PWA功能初始化
     function initPWA() {
-        // 检测是否已经在PWA模式下运行
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                            window.navigator.standalone || 
-                            document.referrer.includes('android-app://');
-        
-        // 检测是否为移动设备上的Safari
-        const isMobileSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && 
-                              /Safari/.test(navigator.userAgent) && 
-                              !/CriOS|FxiOS|OPiOS|mercury/.test(navigator.userAgent);
-        
+                             window.navigator.standalone || 
+                             document.referrer.includes('android-app://');
+    
         if (isStandalone) {
-            // 已经在PWA模式，隐藏提示
             document.getElementById('pwaHint').style.display = 'none';
             console.log('🎉 运行在PWA模式，完美全屏！');
-        } else if (isMobileSafari) {
-            // 在Safari中，显示PWA安装提示
-            showPwaHint();
-            // 同时尝试Safari全屏hack作为备用
-            initSafariFullscreen();
         } else {
-            // 其他浏览器隐藏提示
-            document.getElementById('pwaHint').style.display = 'none';
+            showPwaHint();
         }
-        
-        // 监听PWA安装事件
+    
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             console.log('PWA可以安装');
         });
     }
+
 
     // 显示PWA安装提示
     function showPwaHint() {
@@ -1257,64 +1162,6 @@
         setTimeout(() => {
             hint.style.display = 'none';
         }, 300);
-    }
-
-    // Safari全屏适配 - 终极方案
-    function initSafariFullscreen() {
-        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || 
-                         /iPad|iPhone|iPod/.test(navigator.userAgent);
-        
-        if (isSafari) {
-            const hack = document.querySelector('.safari-fullscreen-hack');
-            
-            // 强制触发Safari全屏
-            function triggerSafariFullscreen() {
-                // 先滚动到底部
-                hack.scrollTop = hack.scrollHeight;
-                
-                setTimeout(() => {
-                    // 再滚动到中间
-                    hack.scrollTop = hack.scrollHeight / 2;
-                    
-                    setTimeout(() => {
-                        // 最后滚动到顶部
-                        hack.scrollTop = 1;
-                    }, 100);
-                }, 100);
-            }
-            
-            // 页面加载后立即触发
-            setTimeout(triggerSafariFullscreen, 100);
-            
-            // 用户交互后触发
-            document.addEventListener('touchstart', triggerSafariFullscreen, { once: true });
-            document.addEventListener('click', triggerSafariFullscreen, { once: true });
-            
-            // 窗口大小变化时触发
-            window.addEventListener('resize', triggerSafariFullscreen);
-            
-            // 页面可见性变化时触发
-            document.addEventListener('visibilitychange', () => {
-                if (document.visibilityState === 'visible') {
-                    setTimeout(triggerSafariFullscreen, 100);
-                }
-            });
-            
-            // 定期强制触发（每5秒）
-            setInterval(() => {
-                if (document.visibilityState === 'visible' && 
-                    window.innerHeight < screen.height * 0.9) {
-                    triggerSafariFullscreen();
-                }
-            }, 5000);
-            
-            // 监听滚动事件，保持工具栏隐藏
-            hack.addEventListener('scroll', () => {
-                if (hack.scrollTop === 0) {
-                    hack.scrollTop = 1;
-                }
-            });
-        }
     }
 
     // 精简数据加载 + 壁纸修复
