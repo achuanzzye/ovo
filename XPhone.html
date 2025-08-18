@@ -16,12 +16,15 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-    /* 完全填充屏幕，包括浏览器UI - Safari适配 */
+
+    /* 完全填充屏幕，包括浏览器UI - 终极Safari适配 */
     html {
         height: 100%;
         height: 100vh;
         height: 100svh;
         overflow: hidden;
+        margin: 0;
+        padding: 0;
     }
 
     body {
@@ -29,6 +32,8 @@
         height: 100%;
         height: 100vh;
         height: 100svh;
+        margin: 0;
+        padding: 0;
         position: fixed;
         top: 0;
         left: 0;
@@ -36,25 +41,26 @@
         bottom: 0;
         width: 100vw;
         overflow: hidden;
+        background: #000;
     }
 
-    /* Safari全屏适配：创建可滚动区域触发Safari隐藏工具栏 */
-    .safari-scroll-trigger {
-        position: absolute;
+    /* Safari终极全屏解决方案 */
+    .safari-fullscreen-hack {
+        position: fixed;
         top: 0;
         left: 0;
-        width: 100%;
-        height: calc(100% + 1px);
+        width: 100vw;
+        height: 200vh; /* 故意超出屏幕 */
         overflow-y: scroll;
         overflow-x: hidden;
         -webkit-overflow-scrolling: touch;
-        pointer-events: none;
-        opacity: 0;
+        background: transparent;
     }
 
     .safari-scroll-content {
-        height: calc(100vh + 100px);
-        width: 1px;
+        height: 300vh; /* 确保有足够的滚动空间 */
+        width: 100%;
+        background: transparent;
     }
 
     .app-container {
@@ -63,21 +69,48 @@
         left: 0;
         width: 100vw;
         height: 100vh;
-        height: 100svh;
         background: var(--bg-image, linear-gradient(135deg, #1e3c72 0%, #2a5298 100%));
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
-        background-attachment: fixed;
         overflow: hidden;
-        pointer-events: auto;
+        z-index: 10;
     }
 
-    /* Safari特殊适配 */
+    /* iOS Safari专用适配 */
     @supports (-webkit-touch-callout: none) {
-        .app-container {
-            min-height: -webkit-fill-available;
+        html {
             height: -webkit-fill-available;
+        }
+        
+        body {
+            height: -webkit-fill-available;
+            min-height: -webkit-fill-available;
+        }
+        
+        .app-container {
+            height: -webkit-fill-available;
+            min-height: -webkit-fill-available;
+            /* 负margin抵消Safari的安全区域 */
+            margin-top: calc(-1 * env(safe-area-inset-top));
+            margin-bottom: calc(-1 * env(safe-area-inset-bottom));
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        /* 强制全屏显示 */
+        .safari-fullscreen-hack {
+            height: -webkit-fill-available;
+            min-height: -webkit-fill-available;
+        }
+    }
+
+    /* iPhone特殊适配 */
+    @media screen and (max-device-width: 428px) {
+        .app-container {
+            height: 100vh !important;
+            min-height: 100vh !important;
+            max-height: none !important;
         }
     }
 
@@ -783,12 +816,14 @@
     }
 </style>
 
+
 </head>
 <body>
-    <!-- Safari全屏触发器 -->
-    <div class="safari-scroll-trigger">
+    <!-- Safari终极全屏解决方案 -->
+    <div class="safari-fullscreen-hack">
         <div class="safari-scroll-content"></div>
     </div>
+
 
 <div class="app-container" id="appContainer">
     <div class="home-screen" id="homeScreen">
@@ -1071,38 +1106,61 @@
         initSafariFullscreen();
     }
 
-    // Safari全屏适配
+    // Safari全屏适配 - 终极方案
     function initSafariFullscreen() {
-        // 检测是否为Safari
-        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || 
+                         /iPad|iPhone|iPod/.test(navigator.userAgent);
         
         if (isSafari) {
-            const safariTrigger = document.querySelector('.safari-scroll-trigger');
+            const hack = document.querySelector('.safari-fullscreen-hack');
             
-            // 初始滚动触发Safari隐藏工具栏
-            setTimeout(() => {
-                safariTrigger.scrollTop = 1;
+            // 强制触发Safari全屏
+            function triggerSafariFullscreen() {
+                // 先滚动到底部
+                hack.scrollTop = hack.scrollHeight;
+                
                 setTimeout(() => {
-                    safariTrigger.scrollTop = 0;
-                }, 100);
-            }, 500);
-            
-            // 监听窗口大小变化，重新触发
-            window.addEventListener('resize', () => {
-                setTimeout(() => {
-                    safariTrigger.scrollTop = 1;
+                    // 再滚动到中间
+                    hack.scrollTop = hack.scrollHeight / 2;
+                    
                     setTimeout(() => {
-                        safariTrigger.scrollTop = 0;
+                        // 最后滚动到顶部
+                        hack.scrollTop = 1;
                     }, 100);
                 }, 100);
+            }
+            
+            // 页面加载后立即触发
+            setTimeout(triggerSafariFullscreen, 100);
+            
+            // 用户交互后触发
+            document.addEventListener('touchstart', triggerSafariFullscreen, { once: true });
+            document.addEventListener('click', triggerSafariFullscreen, { once: true });
+            
+            // 窗口大小变化时触发
+            window.addEventListener('resize', triggerSafariFullscreen);
+            
+            // 页面可见性变化时触发
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') {
+                    setTimeout(triggerSafariFullscreen, 100);
+                }
             });
             
-            // 定期微调触发Safari UI隐藏
+            // 定期强制触发（每5秒）
             setInterval(() => {
-                if (document.visibilityState === 'visible') {
-                    safariTrigger.scrollTop = safariTrigger.scrollTop === 0 ? 1 : 0;
+                if (document.visibilityState === 'visible' && 
+                    window.innerHeight < screen.height * 0.9) {
+                    triggerSafariFullscreen();
                 }
-            }, 3000);
+            }, 5000);
+            
+            // 监听滚动事件，保持工具栏隐藏
+            hack.addEventListener('scroll', () => {
+                if (hack.scrollTop === 0) {
+                    hack.scrollTop = 1;
+                }
+            });
         }
     }
 
@@ -1879,6 +1937,7 @@
         initApp();
     });
 </script>
+
 
 </body>
 </html>
