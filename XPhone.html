@@ -1941,15 +1941,13 @@
     }
 
     function setWallpaper(wallpaper) {
-        document.documentElement.style.setProperty('--bg-image', 
-        document.getElementById('appContainer').style.background = wallpaper;
+        document.getElementById('appContainer').style.setProperty('--bg-image', wallpaper);
         try {
             localStorage.setItem('xphone_wallpaper', wallpaper);
         } catch (error) {
             console.warn('保存壁纸失败');
         }
     }
-
 
     function updateAppIcon(event) {
         const file = event.target.files[0];
