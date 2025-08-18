@@ -32,7 +32,7 @@
         -webkit-tap-highlight-color: transparent;
     }
 
-    /* PWA全屏适配 + Safari终极解决方案 */
+    /* PWA全屏适配 + 统一背景解决方案 */
     html {
         height: 100%;
         height: 100vh;
@@ -40,6 +40,12 @@
         overflow: hidden;
         margin: 0;
         padding: 0;
+        /* 统一背景 */
+        background: var(--bg-image, linear-gradient(135deg, #1e3c72 0%, #2a5298 100%));
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
     }
 
     body {
@@ -49,26 +55,38 @@
         height: 100svh;
         margin: 0;
         padding: 0;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
         width: 100vw;
         overflow: hidden;
-        background: #000;
+        /* 统一背景继承 */
+        background: inherit;
+        background-attachment: fixed;
     }
 
     /* PWA独立应用模式检测和适配 */
     @media all and (display-mode: standalone) {
+        html, body {
+            height: 100vh !important;
+            min-height: 100vh !important;
+            /* PWA模式下强制填充整个屏幕 */
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        
         .app-container {
             height: 100vh !important;
-            padding-top: 0 !important;
-            margin-top: 0 !important;
+            min-height: 100vh !important;
+            padding: 0 !important;
+            margin: 0 !important;
         }
         
         .pwa-hint {
             display: none !important;
+        }
+
+        /* PWA模式下的所有界面都保持统一背景 */
+        .theme-screen, .settings-screen, .chat-app, .chat-screen {
+            background: rgba(0, 0, 0, 0.85) !important;
+            backdrop-filter: blur(20px) !important;
         }
     }
 
@@ -158,10 +176,8 @@
         left: 0;
         width: 100vw;
         height: 100vh;
-        background: var(--bg-image, linear-gradient(135deg, #1e3c72 0%, #2a5298 100%));
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
+        /* 移除背景，使用继承的背景 */
+        background: transparent;
         overflow: hidden;
         z-index: 10;
     }
@@ -170,6 +186,7 @@
     @supports (-webkit-touch-callout: none) {
         html {
             height: -webkit-fill-available;
+            min-height: -webkit-fill-available;
         }
         
         body {
@@ -259,26 +276,27 @@
         border: 1px solid rgba(255,255,255,0.1);
     }
     
-    /* 聊天应用界面 */
+    /* 聊天应用界面 - 统一背景 */
     .chat-app {
         display: none;
-        height: 100%;
-        background: rgba(0,0,0,0.95);
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(20px);
     }
 
     .chat-nav {
         height: 50px;
-        background: rgba(0,0,0,0.9);
+        background: rgba(0, 0, 0, 0.9);
         display: flex;
         align-items: center;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .nav-item {
         flex: 1;
         text-align: center;
         padding: 12px 0;
-        color: rgba(255,255,255,0.6);
+        color: rgba(255, 255, 255, 0.6);
         cursor: pointer;
         transition: all 0.3s ease;
         font-size: 16px;
@@ -290,7 +308,7 @@
     }
 
     .chat-list {
-        height: calc(100% - 50px);
+        height: calc(100vh - 50px);
         overflow-y: auto;
         padding: 10px 0;
     }
@@ -298,7 +316,7 @@
     .empty-state {
         text-align: center;
         padding: 60px 20px;
-        color: rgba(255,255,255,0.6);
+        color: rgba(255, 255, 255, 0.6);
     }
 
     .empty-state-icon {
@@ -310,13 +328,13 @@
         display: flex;
         align-items: center;
         padding: 15px 20px;
-        border-bottom: 1px solid rgba(255,255,255,0.05);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         cursor: pointer;
         transition: all 0.3s ease;
     }
 
     .chat-item:active {
-        background: rgba(255,255,255,0.1);
+        background: rgba(255, 255, 255, 0.1);
     }
 
     .chat-avatar {
@@ -345,20 +363,20 @@
     }
 
     .chat-preview {
-        color: rgba(255,255,255,0.6);
+        color: rgba(255, 255, 255, 0.6);
         font-size: 14px;
     }
 
-    /* 朋友圈界面 */
+    /* 朋友圈界面 - 统一背景 */
     .moments-list {
-        height: calc(100% - 50px);
+        height: calc(100vh - 50px);
         overflow-y: auto;
         padding: 10px 0;
     }
 
     .moment-item {
         padding: 20px;
-        border-bottom: 1px solid rgba(255,255,255,0.05);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .moment-header {
@@ -380,7 +398,7 @@
     }
 
     .moment-action {
-        color: rgba(255,255,255,0.6);
+        color: rgba(255, 255, 255, 0.6);
         cursor: pointer;
         font-size: 14px;
         transition: all 0.3s ease;
@@ -395,7 +413,7 @@
     }
 
     .moment-comments {
-        background: rgba(255,255,255,0.05);
+        background: rgba(255, 255, 255, 0.05);
         border-radius: 8px;
         padding: 10px;
         margin-top: 10px;
@@ -403,7 +421,7 @@
 
     .comment-item {
         padding: 5px 0;
-        color: rgba(255,255,255,0.8);
+        color: rgba(255, 255, 255, 0.8);
         font-size: 14px;
     }
 
@@ -413,15 +431,15 @@
     }
 
     .moment-time {
-        color: rgba(255,255,255,0.5);
+        color: rgba(255, 255, 255, 0.5);
         font-size: 12px;
     }
 
-    /* 个人资料界面 */
+    /* 个人资料界面 - 统一背景 */
     .profile-screen {
         display: none;
-        height: 100%;
-        background: rgba(0,0,0,0.95);
+        height: 100vh;
+        background: transparent;
     }
 
     .profile-content {
@@ -451,7 +469,7 @@
     }
 
     .profile-bio {
-        color: rgba(255,255,255,0.7);
+        color: rgba(255, 255, 255, 0.7);
         line-height: 1.6;
         margin-bottom: 30px;
     }
@@ -464,7 +482,7 @@
 
     .profile-btn {
         padding: 15px;
-        background: rgba(255,255,255,0.1);
+        background: rgba(255, 255, 255, 0.1);
         border: none;
         border-radius: 12px;
         color: white;
@@ -474,24 +492,25 @@
     }
 
     .profile-btn:active {
-        background: rgba(255,255,255,0.2);
+        background: rgba(255, 255, 255, 0.2);
     }
 
-    /* 聊天界面 */
+    /* 聊天界面 - 统一背景 */
     .chat-screen {
         display: none;
-        height: 100%;
-        background: rgba(0,0,0,0.95);
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(20px);
     }
 
     .chat-header {
         height: 60px;
-        background: rgba(0,0,0,0.9);
+        background: rgba(0, 0, 0, 0.9);
         display: flex;
         align-items: center;
         padding: 0 20px;
         color: white;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
     
     .back-btn {
@@ -511,7 +530,7 @@
     }
 
     .chat-messages {
-        height: calc(100% - 180px);
+        height: calc(100vh - 180px);
         overflow-y: auto;
         padding: 20px;
     }
@@ -610,32 +629,33 @@
         justify-content: center;
     }
 
-    /* 设置界面 */
+    /* 设置界面 - 统一背景 */
     .settings-screen {
         display: none;
-        height: 100%;
-        background: rgba(0,0,0,0.95);
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(20px);
     }
 
     .settings-header {
         height: 60px;
-        background: rgba(0,0,0,0.9);
+        background: rgba(0, 0, 0, 0.9);
         display: flex;
         align-items: center;
         padding: 0 20px;
         color: white;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .settings-content {
         padding: 20px;
-        height: calc(100% - 60px);
+        height: calc(100vh - 60px);
         overflow-y: auto;
         color: white;
     }
 
     .setting-item {
-        background: rgba(255,255,255,0.1);
+        background: rgba(255, 255, 255, 0.1);
         border-radius: 12px;
         padding: 15px;
         margin-bottom: 15px;
@@ -652,35 +672,36 @@
         padding: 10px;
         border: none;
         border-radius: 8px;
-        background: rgba(255,255,255,0.15);
+        background: rgba(255, 255, 255, 0.15);
         color: white;
         outline: none;
     }
 
     .setting-item input::placeholder, .setting-item textarea::placeholder {
-        color: rgba(255,255,255,0.6);
+        color: rgba(255, 255, 255, 0.6);
     }
 
-    /* 主题界面 */
+    /* 主题界面 - 统一背景 */
     .theme-screen {
         display: none;
-        height: 100%;
-        background: rgba(0,0,0,0.95);
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(20px);
     }
 
     .theme-header {
         height: 60px;
-        background: rgba(0,0,0,0.9);
+        background: rgba(0, 0, 0, 0.9);
         display: flex;
         align-items: center;
         padding: 0 20px;
         color: white;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .theme-content {
         padding: 20px;
-        height: calc(100% - 60px);
+        height: calc(100vh - 60px);
         overflow-y: auto;
         color: white;
     }
