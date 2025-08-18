@@ -40,7 +40,7 @@
         overflow: hidden;
         margin: 0;
         padding: 0;
-        /* 统一背景 */
+        /* 统一背景 - 修复壁纸显示问题 */
         background: var(--bg-image, linear-gradient(135deg, #1e3c72 0%, #2a5298 100%));
         background-size: cover;
         background-position: center;
@@ -98,6 +98,17 @@
             left: 0 !important;
             right: 0 !important;
             bottom: 0 !important;
+            /* 修复PWA模式下底部安全区域问题 */
+            padding-bottom: env(safe-area-inset-bottom) !important;
+        }
+        
+        /* 修复PWA模式下主屏幕底部空白 */
+        .home-screen {
+            height: 100% !important;
+            padding-bottom: calc(150px + env(safe-area-inset-bottom)) !important;
+            padding-top: calc(40px + env(safe-area-inset-top)) !important;
+            /* 确保内容不被底部安全区域遮挡 */
+            box-sizing: border-box !important;
         }
         
         .pwa-hint {
@@ -118,6 +129,9 @@
             left: 0 !important;
             width: 100vw !important;
             z-index: 100 !important;
+            /* 适配底部安全区域 */
+            padding-bottom: env(safe-area-inset-bottom) !important;
+            box-sizing: border-box !important;
         }
 
         /* PWA模式下的界面头部适配 */
@@ -135,23 +149,23 @@
 
         /* 调整内容区域高度 */
         .theme-content {
-            height: calc(100vh - 60px - env(safe-area-inset-top)) !important;
-            height: calc(100dvh - 60px - env(safe-area-inset-top)) !important;
+            height: calc(100vh - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+            height: calc(100dvh - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
         }
 
         .settings-content {
-            height: calc(100vh - 60px - env(safe-area-inset-top)) !important;
-            height: calc(100dvh - 60px - env(safe-area-inset-top)) !important;
+            height: calc(100vh - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+            height: calc(100dvh - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
         }
 
         .chat-list, .moments-list {
-            height: calc(100vh - 50px - env(safe-area-inset-top)) !important;
-            height: calc(100dvh - 50px - env(safe-area-inset-top)) !important;
+            height: calc(100vh - 50px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+            height: calc(100dvh - 50px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
         }
 
         .chat-messages {
-            height: calc(100vh - 180px - 60px - env(safe-area-inset-top)) !important;
-            height: calc(100dvh - 180px - 60px - env(safe-area-inset-top)) !important;
+            height: calc(100vh - 180px - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+            height: calc(100dvh - 180px - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
         }
 
         /* 底部输入区域适配 */
@@ -167,12 +181,6 @@
 
         .add-contact-btn {
             bottom: calc(100px + env(safe-area-inset-bottom)) !important;
-        }
-
-        /* 主屏幕适配 */
-        .home-screen {
-            padding-bottom: calc(150px + env(safe-area-inset-bottom)) !important;
-            padding-top: calc(40px + env(safe-area-inset-top)) !important;
         }
     }
 
@@ -1327,9 +1335,15 @@
             if (icons) state.appIcons = { ...state.appIcons, ...JSON.parse(icons) };
             if (config) state.config = { ...state.config, ...JSON.parse(config) };
             
-            // 修复壁纸加载
-            if (wallpaper) {
+            // 修复壁纸加载 - 确保在页面加载时应用壁纸
+            if (wallpaper && wallpaper !== 'null') {
+                console.log('加载保存的壁纸:', wallpaper);
                 setWallpaper(wallpaper);
+            } else {
+                console.log('没有找到保存的壁纸，使用默认背景');
+                // 确保默认背景正确设置
+                const defaultBg = 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)';
+                document.documentElement.style.setProperty('--bg-image', defaultBg);
             }
 
             updateProfileDisplay();
