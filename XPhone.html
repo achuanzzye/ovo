@@ -4,20 +4,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#1e3c72">
-    <title>XPhone</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
 
 
-    /* 完全填充屏幕，包括浏览器UI - 终极Safari适配 */
+<!-- PWA相关meta标签 - 终极Safari解决方案 -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="XPhone">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="XPhone">
+
+<!-- 主题颜色 -->
+<meta name="theme-color" content="#1e3c72">
+<meta name="msapplication-navbutton-color" content="#1e3c72">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<!-- 防止缓存 -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+<title>XPhone</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* PWA全屏适配 + Safari终极解决方案 */
     html {
         height: 100%;
         height: 100vh;
@@ -44,21 +59,95 @@
         background: #000;
     }
 
-    /* Safari终极全屏解决方案 */
+    /* PWA独立应用模式检测和适配 */
+    @media all and (display-mode: standalone) {
+        .app-container {
+            height: 100vh !important;
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+        }
+        
+        .pwa-hint {
+            display: none !important;
+        }
+    }
+
+    /* PWA提示框 */
+    .pwa-hint {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 15px;
+        border-radius: 12px;
+        font-size: 14px;
+        z-index: 1000;
+        text-align: center;
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        animation: slideDown 0.3s ease;
+    }
+
+    .pwa-hint.hidden {
+        animation: slideUp 0.3s ease forwards;
+    }
+
+    @keyframes slideDown {
+        from { transform: translateY(-100%); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        from { transform: translateY(0); opacity: 1; }
+        to { transform: translateY(-100%); opacity: 0; }
+    }
+
+    .pwa-hint-title {
+        font-weight: bold;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .pwa-hint-steps {
+        font-size: 12px;
+        opacity: 0.8;
+        line-height: 1.4;
+    }
+
+    .close-hint {
+        position: absolute;
+        top: 8px;
+        right: 12px;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+        opacity: 0.6;
+    }
+
+    /* Safari滚动hack - 作为备用方案 */
     .safari-fullscreen-hack {
         position: fixed;
         top: 0;
         left: 0;
         width: 100vw;
-        height: 200vh; /* 故意超出屏幕 */
+        height: 200vh;
         overflow-y: scroll;
         overflow-x: hidden;
         -webkit-overflow-scrolling: touch;
         background: transparent;
+        pointer-events: none;
+        z-index: -1;
     }
 
     .safari-scroll-content {
-        height: 300vh; /* 确保有足够的滚动空间 */
+        height: 300vh;
         width: 100%;
         background: transparent;
     }
@@ -91,26 +180,8 @@
         .app-container {
             height: -webkit-fill-available;
             min-height: -webkit-fill-available;
-            /* 负margin抵消Safari的安全区域 */
-            margin-top: calc(-1 * env(safe-area-inset-top));
-            margin-bottom: calc(-1 * env(safe-area-inset-bottom));
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
-        }
-        
-        /* 强制全屏显示 */
-        .safari-fullscreen-hack {
-            height: -webkit-fill-available;
-            min-height: -webkit-fill-available;
-        }
-    }
-
-    /* iPhone特殊适配 */
-    @media screen and (max-device-width: 428px) {
-        .app-container {
-            height: 100vh !important;
-            min-height: 100vh !important;
-            max-height: none !important;
         }
     }
 
@@ -819,11 +890,22 @@
 
 </head>
 <body>
-    <!-- Safari终极全屏解决方案 -->
-    <div class="safari-fullscreen-hack">
-        <div class="safari-scroll-content"></div>
+    <!-- PWA安装提示 -->
+    <div class="pwa-hint" id="pwaHint">
+        <button class="close-hint" onclick="closePwaHint()">×</button>
+        <div class="pwa-hint-title">
+            📱 获得完美全屏体验
+        </div>
+        <div class="pwa-hint-steps">
+            点击下方分享按钮 📤 → 选择"添加到主屏幕" → 享受无边框体验！
+        </div>
     </div>
 
+
+<!-- Safari滚动hack备用方案 -->
+<div class="safari-fullscreen-hack">
+    <div class="safari-scroll-content"></div>
+</div>
 
 <div class="app-container" id="appContainer">
     <div class="home-screen" id="homeScreen">
@@ -1103,7 +1185,65 @@
         renderMoments();
         updateClock();
         setInterval(updateClock, 1000);
-        initSafariFullscreen();
+        initPWA();
+    }
+
+    // PWA功能初始化
+    function initPWA() {
+        // 检测是否已经在PWA模式下运行
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                            window.navigator.standalone || 
+                            document.referrer.includes('android-app://');
+        
+        // 检测是否为移动设备上的Safari
+        const isMobileSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && 
+                              /Safari/.test(navigator.userAgent) && 
+                              !/CriOS|FxiOS|OPiOS|mercury/.test(navigator.userAgent);
+        
+        if (isStandalone) {
+            // 已经在PWA模式，隐藏提示
+            document.getElementById('pwaHint').style.display = 'none';
+            console.log('🎉 运行在PWA模式，完美全屏！');
+        } else if (isMobileSafari) {
+            // 在Safari中，显示PWA安装提示
+            showPwaHint();
+            // 同时尝试Safari全屏hack作为备用
+            initSafariFullscreen();
+        } else {
+            // 其他浏览器隐藏提示
+            document.getElementById('pwaHint').style.display = 'none';
+        }
+        
+        // 监听PWA安装事件
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            console.log('PWA可以安装');
+        });
+    }
+
+    // 显示PWA安装提示
+    function showPwaHint() {
+        const hint = document.getElementById('pwaHint');
+        hint.style.display = 'block';
+        
+        // 10秒后自动隐藏
+        setTimeout(() => {
+            if (hint.style.display !== 'none') {
+                hint.classList.add('hidden');
+                setTimeout(() => {
+                    hint.style.display = 'none';
+                }, 300);
+            }
+        }, 10000);
+    }
+
+    // 关闭PWA提示
+    function closePwaHint() {
+        const hint = document.getElementById('pwaHint');
+        hint.classList.add('hidden');
+        setTimeout(() => {
+            hint.style.display = 'none';
+        }, 300);
     }
 
     // Safari全屏适配 - 终极方案
