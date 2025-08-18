@@ -16,43 +16,69 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-    /* 完全填充屏幕，包括浏览器UI */
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
+    /* 完全填充屏幕，包括浏览器UI - Safari适配 */
     html {
         height: 100%;
+        height: 100vh;
+        height: 100svh;
+        overflow: hidden;
     }
 
     body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        height: 100%;
+        height: 100vh;
+        height: 100svh;
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
         width: 100vw;
-        height: 100vh;
         overflow: hidden;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    /* Safari全屏适配：创建可滚动区域触发Safari隐藏工具栏 */
+    .safari-scroll-trigger {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: calc(100% + 1px);
+        overflow-y: scroll;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        pointer-events: none;
+        opacity: 0;
+    }
+
+    .safari-scroll-content {
+        height: calc(100vh + 100px);
+        width: 1px;
     }
 
     .app-container {
-        /* 核心：使用 inset: 0 属性将元素固定在视口的四个角 */
         position: fixed;
-        inset: 0;
-
-        /* 背景图片样式 */
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        height: 100svh;
         background: var(--bg-image, linear-gradient(135deg, #1e3c72 0%, #2a5298 100%));
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
         background-attachment: fixed;
-
-        /* 确保容器本身没有滚动条 */
         overflow: hidden;
+        pointer-events: auto;
+    }
+
+    /* Safari特殊适配 */
+    @supports (-webkit-touch-callout: none) {
+        .app-container {
+            min-height: -webkit-fill-available;
+            height: -webkit-fill-available;
+        }
     }
 
     /* 主屏幕 */
@@ -759,13 +785,18 @@
 
 </head>
 <body>
-    <div class="app-container" id="appContainer">
-        <div class="home-screen" id="homeScreen">
-            <div class="time-widget">
-                <div class="time" id="currentTime"></div>
-                <div class="date" id="currentDate"></div>
-            </div>
+    <!-- Safari全屏触发器 -->
+    <div class="safari-scroll-trigger">
+        <div class="safari-scroll-content"></div>
+    </div>
 
+<div class="app-container" id="appContainer">
+    <div class="home-screen" id="homeScreen">
+        <div class="time-widget">
+            <div class="time" id="currentTime"></div>
+            <div class="date" id="currentDate"></div>
+        </div>
+        
         <div class="app-grid"></div>
 
         <div class="dock">
@@ -1037,6 +1068,42 @@
         renderMoments();
         updateClock();
         setInterval(updateClock, 1000);
+        initSafariFullscreen();
+    }
+
+    // Safari全屏适配
+    function initSafariFullscreen() {
+        // 检测是否为Safari
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        
+        if (isSafari) {
+            const safariTrigger = document.querySelector('.safari-scroll-trigger');
+            
+            // 初始滚动触发Safari隐藏工具栏
+            setTimeout(() => {
+                safariTrigger.scrollTop = 1;
+                setTimeout(() => {
+                    safariTrigger.scrollTop = 0;
+                }, 100);
+            }, 500);
+            
+            // 监听窗口大小变化，重新触发
+            window.addEventListener('resize', () => {
+                setTimeout(() => {
+                    safariTrigger.scrollTop = 1;
+                    setTimeout(() => {
+                        safariTrigger.scrollTop = 0;
+                    }, 100);
+                }, 100);
+            });
+            
+            // 定期微调触发Safari UI隐藏
+            setInterval(() => {
+                if (document.visibilityState === 'visible') {
+                    safariTrigger.scrollTop = safariTrigger.scrollTop === 0 ? 1 : 0;
+                }
+            }, 3000);
+        }
     }
 
     // 精简数据加载
