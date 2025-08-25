@@ -24,8 +24,9 @@
   --dock-height: 84px;
 }
 
+
 *{box-sizing:border-box}
-html,body{height:100%}
+html,body{height:100%; overflow-x:hidden; width:100%}
 
 /* ---------- 禁止选中文字、长按菜单、触控相关 ---------- */
 /* 允许输入框/textarea 可选文本，但页面其余不能选中 */
@@ -708,6 +709,37 @@ btnPing.addEventListener('click', ()=> ping('🐾 喵爪提醒：记得喝水喵
   render();
 })();
 
+/* 禁止双指缩放（两个手指）与双击放大（短时间两次 touchend） */
+(function(){
+  let lastTouch = 0;
+  document.addEventListener('touchstart', function(e){
+    if(e.touches && e.touches.length > 1){
+      e.preventDefault();
+    }
+  }, {passive:false});
+  document.addEventListener('touchend', function(e){
+    const now = Date.now();
+    if(now - lastTouch <= 300){
+      e.preventDefault();
+    }
+    lastTouch = now;
+  }, {passive:false});
+  // 屏蔽长按菜单
+  document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+})();
+
+/* 提示自动隐藏（5秒后隐藏；滚动时也隐藏） */
+(function(){
+  const hint = document.getElementById('hint');
+  let t = setTimeout(()=> hint.classList.add('hidden'), 5000);
+  const wrap = document.getElementById('wrap');
+  const hideHint = throttle(() => { 
+    hint.classList.add('hidden'); 
+    clearTimeout(t); 
+  }, 100);
+  wrap.addEventListener('scroll', hideHint);
+  hint.addEventListener('click', ()=> { hint.classList.add('hidden'); clearTimeout(t); });
+})();
 /* ================== 性能优化和内存管理 ================== */
 
 // 页面可见性变化时的性能优化
