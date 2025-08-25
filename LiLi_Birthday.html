@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="theme-color" content="#0d0f14" />
@@ -28,12 +28,18 @@
 *{box-sizing:border-box}
 html,body{height:100%}
 
+/* 修复：将 body 的 overflow:hidden 移到 html 上，且只隐藏x轴 */
+html{
+  overflow-x: hidden;
+}
+
 /* ---------- 禁止选中文字、长按菜单、触控相关 ---------- */
 /* 允许输入框/textarea 可选文本，但页面其余不能选中 */
 html,body, #scene, .wrap, .card, .msg, .bubble, .dock, .avatar, .title, .hint {
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
+  /* 修复：触控动作使用 manipulation，它会允许点击，并阻止双击缩放和长按菜单 */
   touch-action: manipulation;
 }
 input[type="text"], textarea {
@@ -50,7 +56,7 @@ body{
   background: var(--bg) fixed;
   font: 16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   -webkit-font-smoothing:antialiased;
-  overflow:hidden;
+  /* 修复：移除这里错误的 overflow: hidden */
 }
 
 #scene{
@@ -243,7 +249,6 @@ min-width:150px; flex:1;
     </div>
 
     <div class="wrap" id="wrap">
-      <!-- 祝福卡 -->
       <div class="card pop" id="hero">
         <h2 style="margin:0 0 6px 0">生日快乐，副舰狸 🎂</h2>
         <p style="margin:0;color:var(--ink-soft)">愿你所有的可爱与心愿，都被温柔照看：今天、以后、永远。</p>
@@ -254,12 +259,10 @@ min-width:150px; flex:1;
         </div>
       </div>
 
-      <!-- 短信风对话（预置几条） -->
       <div class="msg u">副舰狸，生日快乐。今天也由我来护航。<small>08:08</small></div>
       <div class="msg me">收到！执舰鹅记得按时投喂蛋糕～<small>08:10</small></div>
       <div class="msg u">已在路上。还有一袋「拥抱」加急派送。<small>08:11</small></div>
 
-      <!-- 心愿清单 -->
       <div class="card">
         <h3 style="margin:0 0 8px 0">心愿清单 · 只属于你</h3>
         <div class="wish-input">
@@ -273,7 +276,6 @@ min-width:150px; flex:1;
         </div>
       </div>
 
-  <!-- 呼吸卡（改为两个同心圆） -->
   <div class="card">
     <h3 style="margin:0 0 8px 0">深呼吸 — 跟着我</h3>
     <div class="breath-wrapper">
@@ -295,7 +297,6 @@ min-width:150px; flex:1;
     </div>
   </div>
 
-  <!-- 新增：早/晚吃药打卡 -->
   <div class="card">
     <h3 style="margin:0 0 8px 0">吃药打卡 · 早 / 晚</h3>
     <div style="color:var(--ink-soft);margin-bottom:8px">别担心，哥哥帮你记着。</div>
@@ -318,7 +319,6 @@ min-width:150px; flex:1;
     <div style="margin-top:10px;color:var(--ink-soft)"><small id="medNote">最近记录：无</small></div>
   </div>
 
-      <!-- 给麻薯的角落 -->
       <div class="card">
         <h3 style="margin:0 0 8px 0">小副官 · 麻薯角</h3>
         <p style="margin:0;color:var(--ink-soft)">今天的巡逻状态：<span id="catState">正在沙发上压舰长外套</span>。</p>
@@ -329,16 +329,13 @@ min-width:150px; flex:1;
         </div>
       </div>
 
-      <!-- 署名卡 -->
       <div class="card" style="text-align:center">
         <div style="font-size:14px;color:var(--ink-soft)">— From 夏以昼 · 永远偏心你 —</div>
       </div>
     </div>
 
-  <!-- 漂浮泡泡背景：生成若干 -->
   <div id="bubbles"></div>
 
-  <!-- 提示（自动隐藏、滚动隐藏） -->
   <div class="hint" id="hint">哥哥提醒：今天也要好好吃饭。</div>
 </div>
 
@@ -429,9 +426,10 @@ function throttle(func, limit) {
 
   const btn = document.getElementById('btnConfetti');
   btn.addEventListener('click', e=> burst(window.innerWidth*0.5, 140));
-  document.getElementById('icoConfetti').addEventListener('click', e=>{
-    burst(window.innerWidth*0.5, window.innerHeight*0.7);
-  });
+  // icoConfetti 这个元素不存在，我注释掉了
+  // document.getElementById('icoConfetti').addEventListener('click', e=>{
+  //   burst(window.innerWidth*0.5, window.innerHeight*0.7);
+  // });
   window.addEventListener('dblclick', e=> burst(e.clientX, e.clientY));
 })();
 
@@ -520,31 +518,23 @@ btnPing.addEventListener('click', ()=> ping('🐾 喵爪提醒：记得喝水喵
 
 /* ================== 新增功能： 禁用双击缩放、屏蔽长按菜单、自动隐藏提示 ================== */
 
-/* 禁止双指缩放（两个手指）与双击放大（短时间两次 touchend） */
+/* 修复：将错误的 JS 阻止逻辑移除，该逻辑会导致按钮点击失效 */
 (function(){
-  let lastTouch = 0;
-  document.addEventListener('touchstart', function(e){
-    if(e.touches && e.touches.length > 1){
-      e.preventDefault();
-    }
-  }, {passive:false});
-  document.addEventListener('touchend', function(e){
-    const now = Date.now();
-    if(now - lastTouch <= 300){
-      e.preventDefault();
-    }
-    lastTouch = now;
-  }, {passive:false});
   // 屏蔽长按菜单
   document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
 })();
+
 
 /* 提示自动隐藏（5秒后隐藏；滚动时也隐藏） */
 (function(){
   const hint = document.getElementById('hint');
   let t = setTimeout(()=> hint.classList.add('hidden'), 5000);
   const wrap = document.getElementById('wrap');
-  wrap.addEventListener('scroll', ()=> { hint.classList.add('hidden'); clearTimeout(t); });
+  const hideHint = throttle(() => { 
+    hint.classList.add('hidden'); 
+    clearTimeout(t); 
+  }, 100);
+  wrap.addEventListener('scroll', hideHint);
   hint.addEventListener('click', ()=> { hint.classList.add('hidden'); clearTimeout(t); });
 })();
 
@@ -709,37 +699,6 @@ btnPing.addEventListener('click', ()=> ping('🐾 喵爪提醒：记得喝水喵
   render();
 })();
 
-/* 禁止双指缩放（两个手指）与双击放大（短时间两次 touchend） */
-(function(){
-  let lastTouch = 0;
-  document.addEventListener('touchstart', function(e){
-    if(e.touches && e.touches.length > 1){
-      e.preventDefault();
-    }
-  }, {passive:false});
-  document.addEventListener('touchend', function(e){
-    const now = Date.now();
-    if(now - lastTouch <= 300){
-      e.preventDefault();
-    }
-    lastTouch = now;
-  }, {passive:false});
-  // 屏蔽长按菜单
-  document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
-})();
-
-/* 提示自动隐藏（5秒后隐藏；滚动时也隐藏） */
-(function(){
-  const hint = document.getElementById('hint');
-  let t = setTimeout(()=> hint.classList.add('hidden'), 5000);
-  const wrap = document.getElementById('wrap');
-  const hideHint = throttle(() => { 
-    hint.classList.add('hidden'); 
-    clearTimeout(t); 
-  }, 100);
-  wrap.addEventListener('scroll', hideHint);
-  hint.addEventListener('click', ()=> { hint.classList.add('hidden'); clearTimeout(t); });
-})();
 /* ================== 性能优化和内存管理 ================== */
 
 // 页面可见性变化时的性能优化
