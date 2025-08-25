@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>狸狸的生日礼物</title>
+  <!-- 小图标 favicon -->
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/616/616408.png" type="image/png">
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #ffe1ec, #d0f0ff);
+      font-family: "Microsoft YaHei", sans-serif;
+    }
+    .card {
+      background: #fff;
+      padding: 30px 50px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      animation: float 3s ease-in-out infinite;
+    }
+    .card h1 {
+      font-size: 28px;
+      color: #ff6fa5;
+    }
+    .card p {
+      font-size: 18px;
+      color: #333;
+    }
+    .cake {
+      font-size: 50px;
+      margin: 20px 0;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #ff6fa5;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #ff3e85;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="cake">🎂</div>
+    <h1>生日快乐，狸狸！</h1>
+    <p>虽然迟到了，但哥哥的礼物永远在路上。</p>
+    <button onclick="showMsg()">点我拆礼物</button>
+  </div>
+  <script>
+    function showMsg() {
+      alert("狸狸是世界上最可爱的狸狸！生日快乐~ 🎉");
+    }
+  </script>
+</body>
+</html>
