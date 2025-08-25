@@ -26,12 +26,13 @@
 
 
 *{box-sizing:border-box}
-html,body{height:100%}
-
-/* 修复：将 touch-action 设置为 none 来彻底禁止所有手势，特别是左右滑动 */
-html{
+/* 修复：将 overflow-x: hidden 和 touch-action: none 配合使用，彻底阻止左右滑动 */
+html,body{
+  height:100%;
+  overflow-x: hidden;
   touch-action: none;
 }
+
 
 /* ---------- 禁止选中文字、长按菜单、触控相关 ---------- */
 /* 允许输入框/textarea 可选文本，但页面其余不能选中 */
@@ -97,7 +98,6 @@ body{
 .wrap{
   position:relative; height:100%;
   padding: 10px 16px 20px; overflow:auto; scrollbar-width:none;
-  /* 修复: 在此容器上恢复y轴滚动 */
   touch-action: pan-y;
 }
 .wrap::-webkit-scrollbar{display:none}
@@ -479,7 +479,8 @@ document.querySelectorAll('[data-cat]').forEach(btn=>{
 
 /* ———— 执舰鹅模式 & 喵爪提醒 ———— */
 const btnMode = document.getElementById('btnMode');
-btnMode.addEventListener('click', ()=>{
+// 修复：改为touchstart事件监听，确保按钮响应
+btnMode.addEventListener('touchstart', ()=>{
   document.documentElement.style.setProperty('--bg','radial-gradient(1200px 800px at 30% 0%, #253043, #0a0d12 55%)');
   document.documentElement.style.setProperty('--accent','#b58cff');
   document.querySelector('.title small').innerHTML = '执舰鹅接管导航 <span class="badge">舰桥在线</span>';
@@ -487,6 +488,9 @@ btnMode.addEventListener('click', ()=>{
 });
 
 const btnPing = document.getElementById('btnPing');
+// 修复：改为touchstart事件监听，确保按钮响应
+btnPing.addEventListener('touchstart', ()=> ping('🐾 喵爪提醒：记得喝水喵～'));
+
 function ping(text){
   const n = document.createElement('div');
   n.textContent = text;
@@ -501,7 +505,7 @@ function ping(text){
   setTimeout(()=>{ n.style.transition='all .4s ease'; n.style.opacity='0'; n.style.transform='translateX(-50%) translateY(10px)'; }, 1600);
   setTimeout(()=> n.remove(), 2200);
 }
-btnPing.addEventListener('click', ()=> ping('🐾 喵爪提醒：记得喝水喵～'));
+
 
 /* ———— 小细节：首次加载的欢迎词 ———— */
 (function(){
