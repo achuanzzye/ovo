@@ -72,21 +72,16 @@ body{
   100%{ transform: translateY(0) translateX(0) }
 }
 
-/* 头部 */
-.header{
-  position:sticky; top:0; z-index:5; padding:10px 16px;
-  display:flex; align-items:center; gap:12px;
-}
+/* header 与 avatar（我们把 avatar 设为可点击） */
+.header{ position:sticky; top:0; z-index:5; padding:10px 16px; display:flex; align-items:center; gap:12px;}
 .avatar{
-  width:38px; height:38px; border-radius:12px;
-  background: var(--glass); backdrop-filter: blur(var(--blur));
-  display:grid; place-items:center; box-shadow: 0 4px 24px rgba(0,0,0,.25);
+  width:42px; height:42px; border-radius:12px; background: var(--glass);
+  backdrop-filter: blur(var(--blur)); display:grid; place-items:center;
+  box-shadow: 0 4px 24px rgba(0,0,0,.25); cursor:pointer;
 }
-.avatar span{font-size:20px}
-.title{
-  display:flex; flex-direction:column;
-}
-.title b{ font-size:16px; letter-spacing:.2px}
+.avatar span{ font-size:20px }
+.title{ display:flex; flex-direction:column; }
+.title b{ font-size:16px }
 .title small{ color:var(--ink-soft)}
 
 /* 卡片区 */
@@ -103,6 +98,34 @@ body{
   padding:16px; margin: 10px 0;
   box-shadow: 0 10px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.3);
 }
+
+/* 呼吸区： 两个同心圆（外圈有呼吸动画，内圈磨砂玻璃） */
+.breath-wrapper{ display:flex; gap:12px; align-items:center; }
+.breath-outer{
+  width:132px; height:132px; border-radius:999px; display:grid; place-items:center;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.04), rgba(255,255,255,0) 60%);
+  border:1px solid rgba(255,255,255,.06);
+  transition: transform 400ms ease, opacity 400ms ease;
+  transform-origin:center;
+  box-shadow: 0 18px 50px rgba(0,0,0,.36);
+}
+.breath-outer.pulse{ animation: breathPulse 3s ease-in-out infinite; }
+@keyframes breathPulse{
+  0%{ transform: scale(1); opacity: .9 }
+  50%{ transform: scale(1.18); opacity: .6 }
+  100%{ transform: scale(1); opacity: .9 }
+}
+
+/* 内圈：磨砂玻璃效果 */
+.breath-inner{
+  width:84px; height:84px; border-radius:999px; display:grid; place-items:center;
+  background: rgba(255,255,255,.06); backdrop-filter: blur(10px);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.15);
+}
+
+/* 状态文字 */
+.breath-meta{ color:var(--ink-soft); font-size:14px; margin-top:6px }
 
 /* 短信气泡（iOS风） */
 .msg{
@@ -209,12 +232,12 @@ button.ghost{
 </head>
 <body>
 <div id="scene">
-  <!-- 若在桌面上看，会出现一部“虚拟手机”的边框 -->
   <div class="phone">
-    <div class="status"></div>
-
     <div class="header">
-      <div class="avatar"><span>🐾</span></div>
+      <!-- 头像现在可点击并触发壁纸选择（见下方 JS） -->
+      <div class="avatar" id="avatarBtn" title="点击自定义壁纸">
+        <span>🐾</span>
+      </div>
       <div class="title">
         <b>给狸狸的生日小网页</b>
         <small>执舰鹅在线送达 <span class="badge">迟到也要到</span></small>
@@ -252,20 +275,26 @@ button.ghost{
         </div>
       </div>
 
-      <!-- 新增：深呼吸引导卡 -->
+            <!-- 呼吸卡（改为两个同心圆） -->
       <div class="card">
-        <h3 style="margin:0 0 8px 0">深呼吸引导 · 跟我一起</h3>
-        <div class="breath-card">
-          <div>
-            <div class="breath-circle" id="breathCircle"><strong id="breathTimer">3</strong></div>
-            <div class="breath-label" id="breathPhase">准备</div>
-          </div>
-          <div style="flex:1; min-width:160px">
-            <p style="margin:0;color:var(--ink-soft)">跟着节奏深吸——屏住——慢呼。你可以按「开始」后放松，界面会计时并提示。</p>
-            <div style="display:flex;gap:8px;margin-top:10px">
-              <button id="breathStart">开始</button>
-              <button class="ghost" id="breathStop">停止</button>
-              <button class="ghost" id="breathConfig">3/3/4</button>
+        <h3 style="margin:0 0 8px 0">深呼吸 — 跟着我</h3>
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+          <div class="breath-wrapper">
+            <div class="breath-outer" id="breathOuter">
+              <div class="breath-inner">
+                <strong id="breathTimer">3</strong>
+              </div>
+            </div>
+            <div style="min-width:160px">
+              <!-- 这里我替换成哥哥会说的话（沉静、掌控） -->
+              <p id="breathText" style="margin:0;color:var(--ink-soft)">
+                我在你耳边数呼吸：吸——慢慢来，别着急，呼——把不安都吐出去。
+              </p>
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <button id="breathStart">开始</button>
+                <button class="ghost" id="breathStop">停止</button>
+                <button class="ghost" id="breathPreset">3/3/4</button>
+              </div>
             </div>
           </div>
         </div>
@@ -274,7 +303,7 @@ button.ghost{
       <!-- 新增：早/晚吃药打卡 -->
       <div class="card">
         <h3 style="margin:0 0 8px 0">吃药打卡 · 早 / 晚</h3>
-        <div style="color:var(--ink-soft);margin-bottom:8px">记录你今天是否按时吃药。点击打卡会保存本地并记录时间。</div>
+        <div style="color:var(--ink-soft);margin-bottom:8px">别担心，哥哥帮你记着。</div>
         <div class="meds">
           <div class="med">
             <div><strong>早药</strong></div>
@@ -324,8 +353,12 @@ button.ghost{
   <div id="bubbles"></div>
 
   <!-- 提示（自动隐藏、滚动隐藏） -->
-  <div class="hint" id="hint">小技巧：加入主屏幕可以全屏运行哦</div>
+    <div class="hint" id="hint">提示：点左上角头像可以更换自定义壁纸。</div>
+  </div>
 </div>
+
+<!-- 隐藏的壁纸上传控件（avatar 点击触发） -->
+<input type="file" id="wallpaperInput" accept="image/*" style="display:none" />
 
 <canvas id="fx" style="position:fixed;inset:0;pointer-events:none;"></canvas>
 
@@ -430,7 +463,7 @@ button.ghost{
   txt.addEventListener('keydown', e=>{ if(e.key==='Enter') add.click() });
   clr.addEventListener('click', ()=>{ save([]); render(); ping('🧼 已清空'); });
   mock.addEventListener('click', ()=>{
-    const seeds = ['吃KFC疯狂星期四','把麻薯抱成小面包','换新壁纸＋液态玻璃','看一集Undead Girl・Murder Farce','和执舰鹅散步十分钟','做一杯冰陈皮茯苓饮'];
+    const seeds = ['吃KFC疯狂星期四','把麻薯抱成小面包','换新壁纸','看一集Undead Girl・Murder Farce','和执舰鹅散步十分钟','做一杯冰陈皮茯苓饮'];
     const pick = seeds[Math.floor(Math.random()*seeds.length)];
     txt.value = pick; add.click();
   });
@@ -473,7 +506,7 @@ btnMode.addEventListener('click', ()=>{
   document.documentElement.style.setProperty('--bg','radial-gradient(1200px 800px at 30% 0%, #253043, #0a0d12 55%)');
   document.documentElement.style.setProperty('--accent','#b58cff');
   document.querySelector('.title small').innerHTML = '执舰鹅接管导航 <span class="badge">舰桥在线</span>';
-  ping('🛡 执舰鹅模式已启用');
+  ping('🍎 执舰鹅模式已启用');
 });
 
 const btnPing = document.getElementById('btnPing');
@@ -531,81 +564,100 @@ btnPing.addEventListener('click', ()=> ping('🐾 喵爪提醒：记得喝水～
   hint.addEventListener('click', ()=> { hint.classList.add('hidden'); clearTimeout(t); });
 })();
 
-/* ================== 新增功能： 呼吸引导逻辑 ================== */
+/* 呼吸：同心圆控制与动画 */
 (function(){
-  const circle = document.getElementById('breathCircle');
-  const phase = document.getElementById('breathPhase');
-  const timer = document.getElementById('breathTimer');
+  const outer = document.getElementById('breathOuter');
+  const timerEl = document.getElementById('breathTimer');
+  const textEl = document.getElementById('breathText');
   const startBtn = document.getElementById('breathStart');
   const stopBtn = document.getElementById('breathStop');
-  const cfgBtn = document.getElementById('breathConfig');
+  const presetBtn = document.getElementById('breathPreset');
 
-  // 默认节奏： 吸3s，屏3s，呼4s
-  let config = { inhale:3, hold:3, exhale:4 };
+  // 默认节奏
+  let cfg = { inhale:3, hold:3, exhale:4 };
   let running = false;
-  let seq = []; // sequence of {phase, duration}
-  let idx = 0;
-  let stepTimeout = null;
+  let currentPhase = 0;
+  let intervalId = null;
+  let phaseSeq = ['吸气','屏住','呼气'];
 
-  function buildSeq(){
-    seq = [
-      {phase:'吸气', dur:config.inhale},
-      {phase:'屏住', dur:config.hold},
-      {phase:'呼气', dur:config.exhale}
-    ];
-  }
-  function renderConfigLabel(){
-    cfgBtn.textContent = `${config.inhale}/${config.hold}/${config.exhale}`;
-  }
-  function step(){
-    if(!running) return;
-    const cur = seq[idx % seq.length];
-    phase.textContent = cur.phase;
-    let remain = cur.dur;
-    timer.textContent = remain;
-    if(cur.phase==='吸气'){
-      circle.style.transform = 'scale(1.18)';
-    } else if(cur.phase==='屏住'){
-      circle.style.transform = 'scale(1.02)';
-    } else {
-      circle.style.transform = 'scale(0.86)';
-    }
-    stepTimeout = setInterval(()=>{
+  function runPhase(phase, dur){
+    timerEl.textContent = dur;
+    // 外圈节律动画：使用 class pulse 控制缩放（CSS 里定义）
+    outer.classList.add('pulse');
+    // 内圈不动，外圈做节奏（视觉）
+    let remain = dur;
+    intervalId = setInterval(()=>{
       remain--;
+      timerEl.textContent = remain>0?remain:0;
       if(remain<=0){
-        clearInterval(stepTimeout);
-        idx++;
-        step();
-      } else {
-        timer.textContent = remain;
+        clearInterval(intervalId);
+        outer.classList.remove('pulse');
+        currentPhase = (currentPhase+1) % 3;
+        if(running) next();
       }
-    }, 1000);
+    },1000);
   }
+  function next(){
+    const phase = currentPhase;
+    if(phase===0) document.getElementById('breathText').textContent = '我在你耳边数呼吸：吸——慢慢来，别着急。';
+    if(phase===1) document.getElementById('breathText').textContent = '屏住一会儿，我在这儿。';
+    if(phase===2) document.getElementById('breathText').textContent = '呼——把不安都吐出去。';
+    const dur = phase===0?cfg.inhale:(phase===1?cfg.hold:cfg.exhale);
+    runPhase(phase, dur);
+  }
+
   function start(){
     if(running) return;
-    running = true; idx = 0; buildSeq(); renderConfigLabel();
-    step();
+    running = true; currentPhase = 0; next();
   }
   function stop(){
-    running = false; phase.textContent='停止'; timer.textContent='0';
-    circle.style.transform = 'scale(1)';
-    clearInterval(stepTimeout);
+    running = false; clearInterval(intervalId); outer.classList.remove('pulse'); timerEl.textContent = '0';
   }
-
-  startBtn.addEventListener('click', ()=> start());
-  stopBtn.addEventListener('click', ()=> stop());
-  cfgBtn.addEventListener('click', ()=>{
-    // 快速切换三组预设： 3/3/4 -> 4/4/4 -> 4/2/6 -> 循环
-    if(config.inhale===3){ config = {inhale:4,hold:4,exhale:4}; }
-    else if(config.inhale===4 && config.hold===4){ config = {inhale:4,hold:2,exhale:6}; }
-    else { config = {inhale:3,hold:3,exhale:4}; }
-    renderConfigLabel();
+  startBtn.addEventListener('click', start);
+  stopBtn.addEventListener('click', stop);
+  presetBtn.addEventListener('click', ()=>{
+    if(cfg.inhale===3){ cfg = {inhale:4,hold:4,exhale:4}; presetBtn.textContent='4/4/4' }
+    else if(cfg.inhale===4 && cfg.hold===4){ cfg = {inhale:4,hold:2,exhale:6}; presetBtn.textContent='4/2/6' }
+    else { cfg = {inhale:3,hold:3,exhale:4}; presetBtn.textContent='3/3/4' }
     if(running){ stop(); start(); }
   });
-  renderConfigLabel();
 })();
 
-/* ================== 新增功能： 早/晚吃药打卡 ================== */
+/* ============== 壁纸上传（左上角头像点击） ============== */
+(function(){
+  const avatar = document.getElementById('avatarBtn');
+  const input = document.getElementById('wallpaperInput');
+  const wrap = document.getElementById('wrap');
+
+  // 点击头像弹出文件选择
+  avatar.addEventListener('click', ()=> input.click());
+
+  input.addEventListener('change', (e)=>{
+    const f = e.target.files && e.target.files[0];
+    if(!f) return;
+    const reader = new FileReader();
+    reader.onload = function(ev){
+      const url = ev.target.result;
+      // 我把壁纸绑定到 body 的背景变量，保持你原来样式不变
+      document.documentElement.style.setProperty('--bg', `url(${url}) center / cover no-repeat, linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.25))`);
+      localStorage.setItem('lili_wallpaper', url);
+      // 提示一下
+      const hint = document.getElementById('hint');
+      hint.textContent = '自定义壁纸已设为主屏背景';
+      setTimeout(()=> hint.classList.add('hidden'), 1800);
+    };
+    reader.readAsDataURL(f);
+  });
+
+  // 加载已保存的壁纸（如果有）
+  (function loadWall(){
+    const url = localStorage.getItem('lili_wallpaper');
+    if(url) document.documentElement.style.setProperty('--bg', `url(${url}) center / cover no-repeat, linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.25))`);
+  })();
+})();
+
+/* ============== 吃药打卡： 修复时间格式（修复 71/25 问题） ============== */
+/* 71/25 的原因：原代码缺少括号导致字符串拼接，变成 "..."+d.getMonth()+1 ，例如 "08:05 " + 7 + 1 -> "08:05 71"。我修正为 (d.getMonth()+1) 并格式化显示 */
 (function(){
   const KEY = 'lili_meds_v1';
   const morningBtn = document.getElementById('btnMorning');
@@ -614,29 +666,50 @@ btnPing.addEventListener('click', ()=> ping('🐾 喵爪提醒：记得喝水～
   const eveningState = document.getElementById('eveningState');
   const medNote = document.getElementById('medNote');
 
-  function load(){
-    try{ return JSON.parse(localStorage.getItem(KEY)) || {morning:null,evening:null} }catch(e){ return {morning:null,evening:null} }
-  }
+  function load(){ try{ return JSON.parse(localStorage.getItem(KEY)) || {morning:null,evening:null} }catch(e){ return {morning:null,evening:null} } }
   function save(obj){ localStorage.setItem(KEY, JSON.stringify(obj)); render(); }
+
   function fmt(t){
     if(!t) return '未打卡';
     const d = new Date(t);
-    return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0')+' '+d.getMonth()+1+'/'+d.getDate();
+    const HH = d.getHours().toString().padStart(2,'0');
+    const mm = d.getMinutes().toString().padStart(2,'0');
+    // 修复点：用 (d.getMonth()+1) 确保数字计算正确
+    return `${HH}:${mm} ${ (d.getMonth()+1) }/${ d.getDate() }`;
   }
+
   function render(){
     const s = load();
-    morningState.textContent = s.morning ? '已打卡 ' + fmt(s.morning) : '未打卡';
-    eveningState.textContent = s.evening ? '已打卡 ' + fmt(s.evening) : '未打卡';
+    morningState.textContent = s.morning ? ('已打卡 ' + fmt(s.morning)) : '未打卡';
+    eveningState.textContent = s.evening ? ('已打卡 ' + fmt(s.evening)) : '未打卡';
     const last = s.evening || s.morning;
-    medNote.textContent = last ? '最近记录：'+fmt(last) : '最近记录：无';
+    medNote.textContent = last ? ('最近记录：'+fmt(last)) : '最近记录：无';
   }
 
   morningBtn.addEventListener('click', ()=>{
-    const s = load(); s.morning = Date.now(); save(s); ping('🕘 早药已打卡'); });
+    const s = load(); s.morning = Date.now(); save(s);
+    ping('早上已打卡，乖。');
+  });
   eveningBtn.addEventListener('click', ()=>{
-    const s = load(); s.evening = Date.now(); save(s); ping('🕘 晚药已打卡'); });
+    const s = load(); s.evening = Date.now(); save(s);
+    ping('晚上已打卡，记得睡前整理药盒。');
+  });
   render();
 })();
+
+/* 小提示/吐司 */
+function ping(text){
+  const n = document.createElement('div');
+  n.textContent = text;
+  Object.assign(n.style,{ position:'fixed', left:'50%', bottom:'40px',
+    transform:'translateX(-50%)', padding:'10px 14px', borderRadius:'12px',
+    color:'var(--ink)', background:'rgba(255,255,255,.10)', border:'1px solid rgba(255,255,255,.16)',
+    zIndex:9999
+  });
+  document.body.appendChild(n);
+  setTimeout(()=>{ n.style.transition='all .4s'; n.style.opacity='0'; n.style.transform='translateX(-50%) translateY(10px)'; },1600);
+  setTimeout(()=> n.remove(),2200);
+}
 
 /* ================== 兼容性说明：输入框仍可选，长按菜单屏蔽，双击放大被拦截 ================== */
 
