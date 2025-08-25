@@ -181,11 +181,6 @@ border:1px solid rgba(255,255,255,.14); width:100%; max-width:100%;
 }
 .wish.done{ opacity:.6; text-decoration: line-through }
 
-/* 浮动底栏（液态玻璃Dock） — 已隐藏以保留行为但不显示 */
-.dock{
-display:none !important;
-}
-
 /* 顶部状态条模仿 */
 .status{
 position: fixed; inset: 0 0 auto 0; height: calc(env(safe-area-inset-top) + 10px); pointer-events:none;
@@ -236,10 +231,6 @@ background: linear-gradient(180deg,#c7f1d0,#a6e3b7); margin-left:8px
 <div id="scene">
   <div class="phone">
     <div class="header">
-      <!-- 头像现在可点击并触发壁纸选择（见下方 JS） -->
-      <div class="avatar" id="avatarBtn" title="点击自定义壁纸">
-        <span>🐾</span>
-      </div>
       <div class="title">
         <b>给狸狸的生日小网页</b>
         <small>执舰鹅在线送达 <span class="badge">迟到也要到</span></small>
@@ -341,14 +332,6 @@ background: linear-gradient(180deg,#c7f1d0,#a6e3b7); margin-left:8px
   </div>
 </div>
 
-<!-- Dock 保留在 DOM 但隐藏（视觉移除，保留绑定） -->
-<div class="dock" aria-hidden="true">
-  <div class="ico" id="icoChat" title="聊天"><span>💬</span></div>
-  <div class="ico" id="icoWish" title="心愿"><span>⭐</span></div>
-  <div class="ico" id="icoConfetti" title="烟花"><span>🎆</span></div>
-  <div class="ico" id="icoCat" title="麻薯"><span>🐱</span></div>
-</div>
-
 
   </div>
 
@@ -359,19 +342,12 @@ background: linear-gradient(180deg,#c7f1d0,#a6e3b7); margin-left:8px
   <!-- 提示（自动隐藏、滚动隐藏） -->
 
 
-<div class="hint" id="hint">提示：点左上角头像可以更换自定义壁纸。</div>
+<div class="hint" id="hint">哥哥提醒：涵涵今天也要开心。</div>
 
 
   </div>
 </div>
 
-<!-- 隐藏的壁纸上传控件（avatar 点击触发） -->
-
-<input type="file" id="wallpaperInput" accept="image/*" style="display:none" />
-
-<canvas id="fx" style="position:fixed;inset:0;pointer-events:none;"></canvas>
-
-<script>
 /* ================== 优化后的代码，修复卡顿和性能问题 ================== */
 
 // 防抖函数
@@ -600,28 +576,6 @@ document.querySelectorAll('[data-cat]').forEach(btn=>{
   }, 500));
 });
 
-/* ———— Dock 导航小动效（隐藏但保留） ———— */
-function setActive(id){
-  document.querySelectorAll('.dock .ico').forEach(i=>i.classList.remove('active'));
-  const el = document.getElementById(id);
-  if(el) el.classList.add('active');
-  document.getElementById('wrap').scrollTo({top:0,behavior:'smooth'});
-}
-const icoChat = document.getElementById('icoChat');
-if(icoChat) icoChat.onclick = ()=> setActive('icoChat');
-const icoWish = document.getElementById('icoWish');
-if(icoWish) icoWish.onclick = ()=> {
-  setActive('icoWish');
-  const card = [...document.querySelectorAll('.card')][1];
-  card?.scrollIntoView({behavior:'smooth',block:'start'});
-};
-const icoCat = document.getElementById('icoCat');
-if(icoCat) icoCat.onclick = ()=> {
-  setActive('icoCat');
-  const card = [...document.querySelectorAll('.card')][2];
-  card?.scrollIntoView({behavior:'smooth',block:'start'});
-};
-
 /* ———— 执舰鹅模式 & 喵爪提醒 ———— */
 const btnMode = document.getElementById('btnMode');
 btnMode.addEventListener('click', ()=>{
@@ -719,7 +673,6 @@ btnPing.addEventListener('click', ()=> ping('🐾 喵爪提醒：记得喝水～
     if (!running) return; // 防止意外启动
     
     timerEl.textContent = dur;
-    // 只使用透明度动画，不改变尺寸
     outer.classList.add('pulse');
     
     let remain = dur;
@@ -784,55 +737,6 @@ btnPing.addEventListener('click', ()=> ping('🐾 喵爪提醒：记得喝水～
     else { cfg = {inhale:3,hold:3,exhale:4}; presetBtn.textContent='3/3/4' }
     if(running){ stop(); setTimeout(start, 200); }
   });
-})();
-
-/* ============== 壁纸上传（左上角头像点击）- 修复背景固定问题 ============== */
-(function(){
-  const avatar = document.getElementById('avatarBtn');
-  const input = document.getElementById('wallpaperInput');
-
-  // 点击头像弹出文件选择
-  avatar.addEventListener('click', ()=> input.click());
-
-  input.addEventListener('change', (e)=>{
-    const f = e.target.files && e.target.files[0];
-    if(!f) return;
-    const reader = new FileReader();
-    reader.onload = function(ev){
-      const url = ev.target.result;
-      // 修复背景跟随滚动问题：使用 fixed attachment
-      document.documentElement.style.setProperty('--bg', 
-        `url(${url}) center / cover no-repeat fixed, linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.25))`
-      );
-      try {
-        localStorage.setItem('lili_wallpaper', url);
-      } catch(e) {
-        console.warn('Failed to save wallpaper:', e);
-      }
-      // 提示一下
-      const hint = document.getElementById('hint');
-      if (hint) {
-        hint.textContent = '自定义壁纸已设为主屏背景';
-        hint.classList.remove('hidden');
-        setTimeout(()=> hint.classList.add('hidden'), 1800);
-      }
-    };
-    reader.readAsDataURL(f);
-  });
-
-  // 加载已保存的壁纸（如果有）
-  (function loadWall(){
-    try {
-      const url = localStorage.getItem('lili_wallpaper');
-      if(url) {
-        document.documentElement.style.setProperty('--bg', 
-          `url(${url}) center / cover no-repeat fixed, linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.25))`
-        );
-      }
-    } catch(e) {
-      console.warn('Failed to load wallpaper:', e);
-    }
-  })();
 })();
 
 /* ============== 吃药打卡： 修复时间格式（修复 71/25 问题） ============== */
