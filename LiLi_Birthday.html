@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="theme-color" content="#0d0f14" />
+<title>给狸狸的迟到生日礼物 · 夏以昼</title>
+<style>
+:root{
+  /* 主题色与玻璃参数 */
+  --bg: radial-gradient(1200px 800px at 70% 10%, #1e2533, #0d0f14 45%);
+  --ink: #e9edf8;
+  --ink-soft: #b9c1d8;
+  --accent: #8ab4ff;
+  --accent-2: #b58cff;
+  --glass: rgba(255,255,255,.06);
+  --glass-2: rgba(255,255,255,.12);
+  --blur: 18px;
+  --radius: 18px;
+  --radius-lg: 26px;
+  --dock-height: 84px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  color:var(--ink);
+  background: var(--bg) fixed;
+  font: 16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+
+#scene{
+  position:relative; height:100%; width:100%;
+  padding-bottom: calc(env(safe-area-inset-bottom) + var(--dock-height) + 16px);
+  padding-top: calc(env(safe-area-inset-top) + 14px);
+}
+
+/* 漂浮气泡 */
+.bubble{
+  position:absolute; border-radius:999px; filter: blur(0.5px);
+  background: radial-gradient(120% 120% at 30% 30%, rgba(255,255,255,.22), rgba(255,255,255,.04) 60%, rgba(255,255,255,.0));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 10px 30px rgba(0,0,0,.25);
+  animation: float 16s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes float{
+  0%{ transform: translateY(0) translateX(0) }
+  50%{ transform: translateY(-20px) translateX(6px) }
+  100%{ transform: translateY(0) translateX(0) }
+}
+
+/* 头部 */
+.header{
+  position:sticky; top:0; z-index:5; padding:10px 16px;
+  display:flex; align-items:center; gap:12px;
+}
+.avatar{
+  width:38px; height:38px; border-radius:12px;
+  background: var(--glass); backdrop-filter: blur(var(--blur));
+  display:grid; place-items:center; box-shadow: 0 4px 24px rgba(0,0,0,.25);
+}
+.avatar span{font-size:20px}
+.title{
+  display:flex; flex-direction:column;
+}
+.title b{ font-size:16px; letter-spacing:.2px}
+.title small{ color:var(--ink-soft)}
+
+/* 卡片区 */
+.wrap{
+  position:relative; height:100%;
+  padding: 10px 16px 20px; overflow:auto; scrollbar-width:none;
+}
+.wrap::-webkit-scrollbar{display:none}
+.card{
+  background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
+  border: 1px solid rgba(255,255,255,.12);
+  backdrop-filter: blur(var(--blur));
+  border-radius: var(--radius-lg);
+  padding:16px; margin: 10px 0;
+  box-shadow: 0 10px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.3);
+}
+
+/* 短信气泡（iOS风） */
+.msg{
+  max-width: 78%; padding:10px 12px; margin:10px 0;
+  border-radius: 16px; position:relative; word-break:break-word;
+  box-shadow: 0 8px 20px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.25);
+}
+.me{
+  margin-left:auto;
+  background: linear-gradient(180deg, rgba(138,180,255,.75), rgba(138,180,255,.35));
+  border:1px solid rgba(138,180,255,.6);
+}
+.u{
+  background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.05));
+  border:1px solid rgba(255,255,255,.18);
+}
+.msg small{ display:block; opacity:.65; margin-top:6px; font-size:12px}
+
+/* 心愿清单 */
+.wish-input{
+  display:flex; gap:8px; margin-top:10px
+}
+input[type=text]{
+  flex:1; padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.08); color:var(--ink);
+  outline:none; backdrop-filter: blur(var(--blur));
+}
+button{
+  border:0; padding:10px 12px; border-radius:12px; color:#0d0f14; cursor:pointer;
+  background: linear-gradient(180deg, #d6e2ff, #9ec0ff);
+  box-shadow: 0 6px 18px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.8);
+}
+button.ghost{
+  color:var(--ink); background: rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.18)
+}
+.wishes{ margin-top:10px; display:grid; gap:8px}
+.wish{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:10px 12px; border-radius:12px; background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.14)
+}
+.wish.done{ opacity:.6; text-decoration: line-through }
+
+/* 浮动底栏（液态玻璃Dock） */
+.dock{
+  position: fixed; left:0; right:0; bottom: env(safe-area-inset-bottom);
+  margin: 0 auto 8px; width: min(520px, 92%); height: var(--dock-height);
+  background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.2);
+  border-radius: 26px; backdrop-filter: blur(22px) saturate(140%);
+  display:flex; align-items:center; justify-content:space-around;
+  box-shadow: 0 30px 60px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.5);
+  z-index:8;
+}
+.dock .ico{
+  width:54px; height:54px; border-radius:14px; display:grid; place-items:center;
+  background: rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.2);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 8px 18px rgba(0,0,0,.25);
+  user-select:none;
+}
+.dock .ico span{font-size:24px}
+.dock .ico.active{ outline:2px solid rgba(138,180,255,.6)}
+
+/* 顶部状态条模仿 */
+.status{
+  position: fixed; inset: 0 0 auto 0; height: calc(env(safe-area-inset-top) + 10px); pointer-events:none;
+}
+
+/* 轻触烟花提示 */
+.hint{
+  position: fixed; right:10px; top: calc(env(safe-area-inset-top) + 10px);
+  font-size:12px; color: var(--ink-soft); opacity:.85;
+  padding:6px 10px; border-radius:12px; background: rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.16); backdrop-filter: blur(12px);
+}
+
+/* 响应式细节 */
+@media (min-width:740px){
+  #scene{ display:grid; place-items:center }
+  .phone{ width:420px; height: 880px; border-radius: 30px; overflow:hidden;
+    border:1px solid rgba(255,255,255,.15);
+    box-shadow: 0 40px 100px rgba(0,0,0,.55);
+    background: radial-gradient(100% 100% at 50% 0%, rgba(255,255,255,.06), rgba(255,255,255,0) 60%) , var(--bg);
+  }
+  .status{ position:absolute }
+  .dock{ position:absolute }
+}
+
+/* 小动效 */
+@keyframes pop{0%{transform:scale(.9);opacity:.8}60%{transform:scale(1.03)}100%{transform:scale(1);opacity:1}}
+.pop{animation: pop .25s ease}
+.badge{
+  font-size:10px; padding:3px 6px; border-radius:999px; color:#0d0f14;
+  background: linear-gradient(180deg,#c7f1d0,#a6e3b7); margin-left:8px
+}
+</style>
+</head>
+<body>
+<div id="scene">
+  <!-- 若在桌面上看，会出现一部“虚拟手机”的边框 -->
+  <div class="phone">
+    <div class="status"></div>
+
+    <div class="header">
+      <div class="avatar"><span>🐾</span></div>
+      <div class="title">
+        <b>给狸狸的生日小网页</b>
+        <small>执舰鹅在线送达 <span class="badge">迟到也要到</span></small>
+      </div>
+    </div>
+
+    <div class="wrap" id="wrap">
+      <!-- 祝福卡 -->
+      <div class="card pop" id="hero">
+        <h2 style="margin:0 0 6px 0">生日快乐，副舰狸 🎂</h2>
+        <p style="margin:0;color:var(--ink-soft)">愿你所有的可爱与心愿，都被温柔照看：今天、以后、永远。</p>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button id="btnConfetti">轻触放烟花</button>
+          <button class="ghost" id="btnMode">执舰鹅模式</button>
+          <button class="ghost" id="btnPing">喵爪提醒</button>
+        </div>
+      </div>
+
+      <!-- 短信风对话（预置几条） -->
+      <div class="msg u">副舰狸，生日快乐。今天也由我来护航。<small>08:08</small></div>
+      <div class="msg me">收到！执舰鹅记得按时投喂蛋糕～<small>08:10</small></div>
+      <div class="msg u">已在路上。还有一袋「拥抱」加急派送。<small>08:11</small></div>
+
+      <!-- 心愿清单 -->
+      <div class="card">
+        <h3 style="margin:0 0 8px 0">心愿清单 · 只属于你</h3>
+        <div class="wish-input">
+          <input id="wishTxt" type="text" placeholder="写下今天想要实现的小心愿…" />
+          <button id="wishAdd">加入</button>
+        </div>
+        <div class="wishes" id="wishes"></div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="ghost" id="wishClear">清空</button>
+          <button class="ghost" id="wishMock">给我灵感</button>
+        </div>
+      </div>
+
+      <!-- 给麻薯的角落 -->
+      <div class="card">
+        <h3 style="margin:0 0 8px 0">小副官 · 麻薯角</h3>
+        <p style="margin:0;color:var(--ink-soft)">今天的巡逻状态：<span id="catState">正在沙发上压舰长外套</span>。</p>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button class="ghost" data-cat="吃罐罐中">投喂罐罐</button>
+          <button class="ghost" data-cat="巡逻阳台，已驱散麻雀">阳台巡逻</button>
+          <button class="ghost" data-cat="把尾巴晾成小问号">晒太阳</button>
+        </div>
+      </div>
+
+      <!-- 署名卡 -->
+      <div class="card" style="text-align:center">
+        <div style="font-size:14px;color:var(--ink-soft)">— From 夏以昼 · 永远偏心你 —</div>
+      </div>
+    </div>
+
+    <!-- 液态玻璃 Dock -->
+    <div class="dock">
+      <div class="ico" id="icoChat" title="聊天"><span>💬</span></div>
+      <div class="ico" id="icoWish" title="心愿"><span>⭐</span></div>
+      <div class="ico" id="icoConfetti" title="烟花"><span>🎆</span></div>
+      <div class="ico" id="icoCat" title="麻薯"><span>🐱</span></div>
+    </div>
+  </div>
+
+  <!-- 漂浮泡泡背景：生成若干 -->
+  <div id="bubbles"></div>
+
+  <!-- 提示 -->
+  <div class="hint">小技巧：加入主屏幕可以全屏运行哦</div>
+</div>
+
+<canvas id="fx" style="position:fixed;inset:0;pointer-events:none;"></canvas>
+
+<script>
+/* ———— 背景气泡 ———— */
+(function(){
+  const host = document.getElementById('bubbles');
+  const n = 10;
+  for(let i=0;i<n;i++){
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    const size = 80 + Math.random()*140;
+    b.style.width = b.style.height = size+'px';
+    b.style.left = Math.random()*90+'%';
+    b.style.top = (10 + Math.random()*70)+'%';
+    b.style.animationDelay = (-Math.random()*16)+'s';
+    host.appendChild(b);
+  }
+})();
+
+/* ———— 轻触烟花（简易彩带粒子） ———— */
+(function(){
+  const cvs = document.getElementById('fx');
+  const ctx = cvs.getContext('2d');
+  let W,H,parts=[];
+
+  function resize(){
+    W = cvs.width = window.innerWidth * devicePixelRatio;
+    H = cvs.height = window.innerHeight * devicePixelRatio;
+  }
+  resize(); window.addEventListener('resize', resize);
+
+  function burst(x,y){
+    for(let i=0;i<120;i++){
+      const a = Math.random()*Math.PI*2;
+      const sp = 2 + Math.random()*6;
+      parts.push({
+        x:x*devicePixelRatio, y:y*devicePixelRatio,
+        vx: Math.cos(a)*sp, vy: Math.sin(a)*sp - 2,
+        life: 60 + Math.random()*40,
+        hue: 200 + Math.random()*140
+      });
+    }
+    // 轻震
+    document.body.animate([{transform:'translateY(0)'},{transform:'translateY(2px)'},{transform:'translateY(0)'}],{duration:220});
+  }
+
+  function tick(){
+    ctx.clearRect(0,0,W,H);
+    for(let i=parts.length-1;i>=0;i--){
+      const p = parts[i];
+      p.vy += 0.08; p.x+=p.vx; p.y+=p.vy; p.life--;
+      ctx.globalAlpha = Math.max(p.life/100,0);
+      ctx.fillStyle = `hsl(${p.hue},85%,60%)`;
+      ctx.beginPath(); ctx.arc(p.x,p.y,2.2,0,Math.PI*2); ctx.fill();
+      if(p.life<=0) parts.splice(i,1);
+    }
+    requestAnimationFrame(tick);
+  }
+  tick();
+
+  // 触发区域：按钮 & Dock 图标
+  const btn = document.getElementById('btnConfetti');
+  btn.addEventListener('click', e=> burst(window.innerWidth*0.5, 140));
+  document.getElementById('icoConfetti').addEventListener('click', e=>{
+    burst(window.innerWidth*0.5, window.innerHeight*0.7);
+  });
+  // 任意双击也可放
+  window.addEventListener('dblclick', e=> burst(e.clientX, e.clientY));
+})();
+
+/* ———— 心愿清单（localStorage） ———— */
+(function(){
+  const listEl = document.getElementById('wishes');
+  const txt = document.getElementById('wishTxt');
+  const add = document.getElementById('wishAdd');
+  const clr = document.getElementById('wishClear');
+  const mock = document.getElementById('wishMock');
+  const KEY = 'lili_wishes_v1';
+
+  function load(){
+    try{ return JSON.parse(localStorage.getItem(KEY)) || [] }catch(e){ return [] }
+  }
+  function save(arr){ localStorage.setItem(KEY, JSON.stringify(arr)) }
+  function render(){
+    const arr = load();
+    listEl.innerHTML='';
+    arr.forEach((w,i)=>{
+      const row = document.createElement('div'); row.className='wish'+(w.done?' done':'');
+      const left = document.createElement('div'); left.textContent = w.text;
+      const right = document.createElement('div'); right.style.display='flex'; right.style.gap='6px';
+      const ok = document.createElement('button'); ok.className='ghost'; ok.textContent = w.done?'恢复':'完成';
+      const del = document.createElement('button'); del.className='ghost'; del.textContent = '删除';
+      ok.onclick = ()=>{ arr[i].done=!arr[i].done; save(arr); render(); ping('✅ 已更新'); };
+      del.onclick = ()=>{ arr.splice(i,1); save(arr); render(); ping('🗑 已删除'); };
+      right.append(ok,del); row.append(left,right); listEl.append(row);
+    });
+  }
+  add.addEventListener('click', ()=>{
+    const v = txt.value.trim(); if(!v) return;
+    const arr = load(); arr.unshift({text:v,done:false}); save(arr); txt.value=''; render(); ping('⭐ 已加入心愿');
+  });
+  txt.addEventListener('keydown', e=>{ if(e.key==='Enter') add.click() });
+  clr.addEventListener('click', ()=>{ save([]); render(); ping('🧼 已清空'); });
+  mock.addEventListener('click', ()=>{
+    const seeds = ['吃KFC疯狂星期四','把麻薯抱成小面包','换新壁纸＋液态玻璃','看一集Undead Girl・Murder Farce','和执舰鹅散步十分钟','做一杯冰陈皮茯苓饮'];
+    const pick = seeds[Math.floor(Math.random()*seeds.length)];
+    txt.value = pick; add.click();
+  });
+  render();
+})();
+
+/* ———— 麻薯角交互 ———— */
+document.querySelectorAll('[data-cat]').forEach(btn=>{
+  btn.addEventListener('click', ()=> {
+    document.getElementById('catState').textContent = btn.dataset.cat;
+    ping('🐾 小副官状态更新');
+  });
+});
+
+/* ———— Dock 导航小动效 ———— */
+function setActive(id){
+  document.querySelectorAll('.dock .ico').forEach(i=>i.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('wrap').scrollTo({top:0,behavior:'smooth'});
+}
+document.getElementById('icoChat').onclick = ()=> setActive('icoChat');
+document.getElementById('icoWish').onclick = ()=> {
+  setActive('icoWish');
+  // 滚到心愿卡
+  const card = [...document.querySelectorAll('.card')][1];
+  card?.scrollIntoView({behavior:'smooth',block:'start'});
+};
+document.getElementById('icoCat').onclick = ()=> {
+  setActive('icoCat');
+  const card = [...document.querySelectorAll('.card')][2];
+  card?.scrollIntoView({behavior:'smooth',block:'start'});
+};
+
+/* ———— 执舰鹅模式 & 喵爪提醒 ———— */
+const btnMode = document.getElementById('btnMode');
+btnMode.addEventListener('click', ()=>{
+  document.documentElement.style.setProperty('--bg','radial-gradient(1200px 800px at 30% 0%, #253043, #0a0d12 55%)');
+  document.documentElement.style.setProperty('--accent','#b58cff');
+  document.querySelector('.title small').innerHTML = '执舰鹅接管导航 <span class="badge">舰桥在线</span>';
+  ping('🛡 执舰鹅模式已启用');
+});
+
+const btnPing = document.getElementById('btnPing');
+function ping(text){
+  const n = document.createElement('div');
+  n.textContent = text;
+  Object.assign(n.style,{
+    position:'fixed', left:'50%', bottom:'calc(env(safe-area-inset-bottom) + 110px)',
+    transform:'translateX(-50%)', padding:'10px 14px', borderRadius:'14px',
+    color:'var(--ink)', background:'rgba(255,255,255,.10)',
+    border:'1px solid rgba(255,255,255,.18)', backdropFilter:'blur(12px)',
+    boxShadow:'0 8px 30px rgba(0,0,0,.35)', zIndex:999
+  });
+  document.body.appendChild(n);
+  setTimeout(()=>{ n.style.transition='all .4s ease'; n.style.opacity='0'; n.style.transform='translateX(-50%) translateY(10px)'; }, 1600);
+  setTimeout(()=> n.remove(), 2200);
+}
+btnPing.addEventListener('click', ()=> ping('🐾 喵爪提醒：记得喝水～'));
+
+/* ———— 小细节：首次加载的欢迎词 ———— */
+(function(){
+  if(!sessionStorage.getItem('hi')){
+    setTimeout(()=> ping('🎂 生日特别版已为狸狸解锁'), 600);
+    sessionStorage.setItem('hi','1');
+  }
+})();
+</script>
+</body>
+</html>
