@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="theme-color" content="#0a0a0c" />
+<title>给狸狸的生日礼物</title>
+<!-- 小图标 favicon -->
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/616/616408.png" type="image/png">
+<style>
+  :root{
+    --bg: radial-gradient(1200px 800px at 10% 10%, #2a2d4a 0%, #14161f 60%, #0b0c12 100%),
+          radial-gradient(900px 600px at 90% 80%, #1a3a50 0%, #0b0c12 70%);
+    --glass: rgba(255,255,255,.12);
+    --glass-strong: rgba(255,255,255,.18);
+    --border: rgba(255,255,255,.25);
+    --txt: #f5f7ff;
+    --sub: #b9c2ff;
+    --accent: #8ad0ff;
+    --pink: #ff9ad9;
+    --lime: #b9ffa8;
+    --gold: #ffd66b;
+  }
+  *{box-sizing:border-box}
+  html,body{
+    height:100%; margin:0; color:var(--txt); font-family: ui-rounded, "SF Pro Rounded","SF Pro Text","Helvetica Neue",Helvetica,Arial,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background: var(--bg); background-attachment: fixed; overflow: hidden;
+  }
+  .scene{
+    position: fixed; inset:0;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) calc(14px + env(safe-area-inset-bottom)) env(safe-area-inset-left);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px;
+  }
+  .card{
+    width:min(820px, 92vw); min-height: 62vh;
+    background: var(--glass);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 22px;
+    backdrop-filter: blur(18px) saturate(130%);
+    -webkit-backdrop-filter: blur(18px) saturate(130%);
+    box-shadow: 0 20px 60px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08);
+    position: relative; overflow: hidden;
+  }
+  .card::before{
+    content:""; position:absolute; inset:-40% -10% auto auto; width:60%; height:60%;
+    background: conic-gradient(from 210deg, #4cc9f0, #4895ef, #560bad, #b5179e, #f72585, #ffd166, #06d6a0, #4cc9f0);
+    filter: blur(40px) saturate(140%) opacity(.18); border-radius: 50%;
+    pointer-events: none;
+  }
+  header{
+    padding: 18px 22px 8px; display:flex; align-items:center; justify-content:space-between;
+  }
+  .ttl{
+    font-weight:800; letter-spacing:.3px; font-size: clamp(18px, 3.2vw, 24px);
+  }
+  .sub{
+    opacity:.85; font-size: 13px; color: var(--sub);
+  }
+  .grid{
+    display:grid; grid-template-columns: 1.1fr .9fr; gap:16px; padding: 0 18px 18px; align-items: stretch;
+  }
+  @media (max-width:860px){
+    .grid{ grid-template-columns: 1fr; gap:12px; }
+  }
+  .pane{
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 18px; padding: 14px; position: relative; overflow: hidden;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .pane h3{ margin:6px 6px 10px; font-size: 15px; font-weight:700; color: var(--accent); letter-spacing:.2px}
+  .cake{
+    display:flex; align-items:center; justify-content:center; height: 360px; position: relative;
+  }
+  .stage{ position:relative; width: 340px; height: 260px; }
+  .plate{
+    position:absolute; bottom:0; left:50%; transform: translateX(-50%);
+    width: 340px; height: 24px; background: linear-gradient(#bcd,#9ab);
+    border-radius: 12px/12px; box-shadow: 0 8px 24px rgba(0,0,0,.35), inset 0 2px 0 rgba(255,255,255,.4);
+  }
+  .cake-body{
+    position:absolute; bottom:24px; left:50%; transform: translateX(-50%);
+    width: 300px; height: 150px; background: linear-gradient(#ffe7f6,#ffd5ef);
+    border-radius: 20px; box-shadow: inset 0 -10px 20px rgba(255,255,255,.6), 0 14px 32px rgba(0,0,0,.25);
+  }
+  .cream{
+    position:absolute; inset:auto 0 150px 0; height:36px;
+    background: radial-gradient(circle at 16px 6px, #fff 0 10px, transparent 11px) 0 0/32px 100% repeat-x,
+                radial-gradient(circle at 32px 18px, #fff 0 12px, transparent 13px) 0 0/32px 100% repeat-x;
+    filter: drop-shadow(0 3px 0 rgba(255,255,255,.9));
+  }
+  .candle{
+    position:absolute; bottom: 172px; left:50%; transform: translateX(-50%);
+    width: 14px; height: 60px; background: repeating-linear-gradient(#fff, #fff 8px, #ffd1e8 8px, #ffd1e8 16px);
+    border-radius: 6px; box-shadow: inset 0 -2px 0 rgba(0,0,0,.08);
+  }
+  .flame{
+    position:absolute; top:-18px; left:50%; transform: translateX(-50%); width: 18px; height: 26px;
+    background: radial-gradient(ellipse at 50% 60%, #ffea85 0%, #ffbb2c 45%, rgba(255,141,0,.8) 60%, rgba(255,141,0,0) 70%);
+    border-radius: 50% 50% 60% 60%; filter: blur(.2px) drop-shadow(0 0 12px #ffc94a);
+    animation: flicker .12s infinite alternate;
+  }
+  @keyframes flicker{
+    from{ transform: translateX(-50%) scale(1) }
+    to{ transform: translateX(-50%) scale(1.08) }
+  }
+  .controls{ display:flex; gap:10px; flex-wrap:wrap; padding: 10px 6px 0 6px }
+  .btn{
+    background: rgba(255,255,255,.10); color: var(--txt); border: 1px solid rgba(255,255,255,.18);
+    border-radius: 12px; padding: 10px 14px; font-weight: 700; letter-spacing:.2px; cursor: pointer;
+    box-shadow: 0 8px 22px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.08);
+    transition: transform .06s ease, background .2s ease, border-color .2s ease;
+    user-select: none; -webkit-tap-highlight-color: transparent;
+  }
+  .btn:active{ transform: translateY(1px) scale(.99) }
+  .btn.primary{ background: linear-gradient(180deg, rgba(138,208,255,.25), rgba(138,208,255,.12));
+                border-color: rgba(138,208,255,.6); }
+  .btn.pink{ background: linear-gradient(180deg, rgba(255,154,217,.25), rgba(255,154,217,.12));
+             border-color: rgba(255,154,217,.6); }
+  .wish{
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .wish textarea{
+    width:100%; min-height:124px; resize: vertical;
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.16);
+    border-radius:14px; padding:12px; color:var(--txt); font-size:14px; line-height:1.45;
+    outline:none; box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center }
+  .hint{
+    font-size:12px; color:#cfe6ff; opacity:.9; line-height:1.3; padding: 0 6px 6px;
+  }
+  .footer{
+    width:min(820px,92vw); display:flex; align-items:center; justify-content:space-between; gap:10px;
+    color:var(--sub); font-size:12px; opacity:.9;
+  }
+  .tiny{
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 12px; padding: 8px 10px; display:flex; align-items:center; gap:8px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  /* 麻薯小猫（可拖拽） */
+  .mascot{
+    position:absolute; right:12px; bottom:12px; width:88px; height:88px; cursor: grab;
+    transition: filter .2s ease;
+  }
+  .mascot:active{ cursor: grabbing }
+  .mascot svg{ width:100%; height:100%; filter: drop-shadow(0 8px 20px rgba(0,0,0,.35)); }
+  .tip{
+    position:absolute; bottom:110px; right:6px; background: rgba(0,0,0,.45);
+    border:1px solid rgba(255,255,255,.18); padding:6px 9px; border-radius:10px; font-size:12px;
+    opacity:.95; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  }
+  /* 彩纸画布 */
+  #confetti{ position: fixed; inset:0; pointer-events:none }
+  /* 轻微入场 */
+  .pop{ animation: pop .4s ease }
+  @keyframes pop{ from{ transform:scale(.96); opacity:.6 } to{ transform:scale(1); opacity:1 } }
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div class="scene">
+  <div class="card pop" id="card">
+    <header>
+      <div>
+        <div class="ttl">🎂 生日快乐，狸狸！</div>
+        <div class="sub" id="subText">今天也要被喜欢包围（以及被麻薯监督）。</div>
+      </div>
+      <div class="tiny">🍎 夏以昼·液态玻璃特别款</div>
+    </header>
+
+    <div class="grid">
+      <!-- 左：蛋糕 -->
+      <section class="pane">
+        <h3>许愿蛋糕 · 长按吹蜡烛</h3>
+        <div class="cake" id="cakeArea">
+          <div class="stage" id="stage">
+            <div class="plate"></div>
+            <div class="cake-body"></div>
+            <div class="cream"></div>
+            <div class="candle" id="candle">
+              <div class="flame" id="flame"></div>
+            </div>
+          </div>
+        </div>
+        <div class="controls">
+          <button class="btn primary" id="relight">重新点燃</button>
+          <button class="btn pink" id="confettiBtn">放烟花彩带</button>
+          <button class="btn" id="night">切换夜景</button>
+        </div>
+        <div class="hint">提示：手机上“长按蜡烛”或按住空格键，就能把火吹灭；吹灭后自动放彩带。</div>
+      </section>
+
+      <!-- 右：愿望本 -->
+      <section class="pane">
+        <h3>狸狸的小愿望本</h3>
+        <div class="wish">
+          <textarea id="wish" placeholder="把今天的小心愿写给自己（仅保存在你的设备里）……"></textarea>
+          <div class="row">
+            <button class="btn primary" id="save">保存愿望</button>
+            <button class="btn" id="clear">清空</button>
+          </div>
+          <div class="hint" id="saveHint">尚未保存</div>
+        </div>
+        <div class="mascot" id="mascot" title="把我拖来拖去～">
+          <!-- 简笔麻薯（Q版猫猫） -->
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <defs>
+              <radialGradient id="g1" cx="50%" cy="40%" r="70%">
+                <stop offset="0%" stop-color="#fffdf7"/>
+                <stop offset="100%" stop-color="#efe9dc"/>
+              </radialGradient>
+            </defs>
+            <!-- 身体 -->
+            <ellipse cx="60" cy="70" rx="42" ry="30" fill="url(#g1)" stroke="#d9d2c6" stroke-width="2"/>
+            <!-- 耳朵 -->
+            <path d="M36 38 l-10 -16 16 6 z" fill="#efe9dc" stroke="#d9d2c6" stroke-width="2"/>
+            <path d="M84 38 l10 -16 -16 6 z" fill="#efe9dc" stroke="#d9d2c6" stroke-width="2"/>
+            <!-- 脸 -->
+            <circle cx="60" cy="52" r="22" fill="url(#g1)" stroke="#d9d2c6" stroke-width="2"/>
+            <!-- 眼睛 -->
+            <circle cx="50" cy="50" r="3.4" fill="#2b2b2b"/>
+            <circle cx="70" cy="50" r="3.4" fill="#2b2b2b"/>
+            <!-- 嘴 -->
+            <path d="M52 59 q8 6 16 0" stroke="#b68b7c" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <!-- 尾巴 -->
+            <path d="M92 74 q18 6 16 18 q-10 -4 -16 -8" fill="none" stroke="#d9d2c6" stroke-width="6" stroke-linecap="round"/>
+            <!-- 腮红 -->
+            <circle cx="46" cy="56" r="3.2" fill="#ffb3c6" opacity=".8"/>
+            <circle cx="74" cy="56" r="3.2" fill="#ffb3c6" opacity=".8"/>
+          </svg>
+        </div>
+        <div class="tip" id="mascotTip">长按蛋糕吹蜡烛｜拖动我</div>
+      </section>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="tiny">📎 长按空白处可“添加到主屏幕”，就像 App 一样打开。</div>
+    <div class="tiny" id="clock">—</div>
+  </div>
+</div>
+
+<script>
+  // ——— 实用函数 ———
+  const $ = s => document.querySelector(s);
+  const nowClock = () => {
+    const d = new Date();
+    const hh = String(d.getHours()).padStart(2,'0');
+    const mm = String(d.getMinutes()).padStart(2,'0');
+    return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()} ${hh}:${mm}`;
+  };
+
+  // ——— 文案 & 时刻问候 ———
+  const subText = $("#subText");
+  (function greeting(){
+    const h = new Date().getHours();
+    let t = "今天也要被喜欢包围（以及被麻薯监督）。";
+    if(h < 6) t = "凌晨好，夜航中的副舰狸。";
+    else if(h < 12) t = "早安！今天也要元气满满～";
+    else if(h < 18) t = "下午好，记得补充水分和伸伸腰。";
+    else t = "晚上好，给狸狸加一勺甜甜的月亮。";
+    subText.textContent = t;
+    $("#clock").textContent = nowClock();
+    setInterval(()=>$("#clock").textContent = nowClock(), 30*1000);
+  })();
+
+  // ——— 愿望本 ———
+  const wish = $("#wish");
+  const saveBtn = $("#save");
+  const clearBtn = $("#clear");
+  const saveHint = $("#saveHint");
+
+  const LS_KEY = "lili-bday-wish";
+  const saved = localStorage.getItem(LS_KEY);
+  if(saved){ wish.value = saved; saveHint.textContent = "已自动载入上次保存的愿望 ✓"; }
+
+  saveBtn.addEventListener("click", () => {
+    localStorage.setItem(LS_KEY, wish.value.trim());
+    saveHint.textContent = "保存成功 ✓";
+    pop();
+  });
+  clearBtn.addEventListener("click", () => {
+    localStorage.removeItem(LS_KEY);
+    wish.value = "";
+    saveHint.textContent = "已清空";
+  });
+
+  // ——— 蛋糕交互：长按吹蜡烛 ———
+  const flame = $("#flame");
+  const candle = $("#candle");
+  const cakeArea = $("#cakeArea");
+  const relight = $("#relight");
+  let blowing = false, holding = false, flamePower = 1;
+
+  const startHold = () => {
+    holding = true;
+    blowTick();
+  };
+  const endHold = () => {
+    holding = false;
+  };
+
+  const blowTick = () => {
+    if(!holding) return;
+    blowing = true;
+    flamePower = Math.max(0, flamePower - 0.06);
+    flame.style.transformOrigin = "50% 100%";
+    flame.style.transform = `translateX(-50%) scale(${.6 + .4*flamePower})`;
+    flame.style.filter = `blur(.2px) drop-shadow(0 0 ${6 + 10*flamePower}px #ffc94a)`;
+    flame.style.opacity = 0.25 + 0.75*flamePower;
+
+    if(flamePower <= 0){
+      // 吹灭
+      flame.style.display = "none";
+      holding = false; blowing = false;
+      burst(); // 放彩带
+      saveHint.textContent = "愿望已锁进蛋糕心脏里（彩带为证）";
+      return;
+    }
+    requestAnimationFrame(blowTick);
+  };
+
+  // 触摸/鼠标/键盘
+  candle.addEventListener("touchstart", e=>{ e.preventDefault(); startHold(); }, {passive:false});
+  candle.addEventListener("touchend", e=>{ e.preventDefault(); endHold(); }, {passive:false});
+  candle.addEventListener("mousedown", startHold);
+  window.addEventListener("mouseup", endHold);
+
+  // 空格键
+  window.addEventListener("keydown", (e)=>{
+    if(e.code === "Space" && !holding && flame.style.display !== "none"){ e.preventDefault(); startHold(); }
+  });
+  window.addEventListener("keyup", (e)=>{
+    if(e.code === "Space"){ e.preventDefault(); endHold(); }
+  });
+
+  relight.addEventListener("click", ()=>{
+    flamePower = 1; flame.style.display = "block";
+    flame.style.opacity = 1; flame.style.transform = "translateX(-50%) scale(1)";
+    pop();
+  });
+
+  // 夜景切换
+  const nightBtn = $("#night");
+  let darkExtra = false;
+  nightBtn.addEventListener("click", ()=>{
+    darkExtra = !darkExtra;
+    document.body.style.background = darkExtra
+      ? 'radial-gradient(1200px 800px at 20% 15%, #182033 0%, #0b0e18 60%, #06070c 100%), radial-gradient(900px 600px at 90% 80%, #0e2b3f 0%, #06070c 70%)'
+      : '';
+    pop();
+  });
+
+  // ——— 麻薯可拖拽 ———
+  const mascot = $("#mascot");
+  const tip = $("#mascotTip");
+  let drag = {active:false, dx:0, dy:0};
+
+  const startDrag = (x,y)=>{
+    const r = mascot.getBoundingClientRect();
+    drag.active = true; drag.dx = x - r.left; drag.dy = y - r.top;
+    mascot.style.transition = "none";
+  };
+  const moveDrag = (x,y)=>{
+    if(!drag.active) return;
+    const bounds = $("#card").getBoundingClientRect();
+    let nx = x - drag.dx - bounds.left, ny = y - drag.dy - bounds.top;
+    nx = Math.max(0, Math.min(bounds.width - mascot.offsetWidth, nx));
+    ny = Math.max(0, Math.min(bounds.height - mascot.offsetHeight, ny));
+    mascot.style.left = nx + "px"; mascot.style.top = ny + "px"; mascot.style.right = "auto"; mascot.style.bottom = "auto";
+  };
+  const endDrag = ()=>{ drag.active = false; mascot.style.transition = ""; };
+
+  mascot.addEventListener("mousedown",(e)=>startDrag(e.clientX,e.clientY));
+  window.addEventListener("mousemove",(e)=>moveDrag(e.clientX,e.clientY));
+  window.addEventListener("mouseup", endDrag);
+  mascot.addEventListener("touchstart",(e)=>{ const t=e.touches[0]; startDrag(t.clientX,t.clientY)},{passive:true});
+  window.addEventListener("touchmove",(e)=>{ const t=e.touches[0]; moveDrag(t.clientX,t.clientY) },{passive:true});
+  window.addEventListener("touchend", endDrag);
+
+  // 首次 3 秒后提示渐隐
+  setTimeout(()=> tip.style.display = "none", 3800);
+
+  // ——— 彩带烟花（简版） ———
+  const canvas = $("#confetti"); const ctx = canvas.getContext("2d");
+  let W, H, pieces = []; let raf;
+  function resize(){
+    W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener("resize", resize); resize();
+
+  function ConfettiPiece(){
+    this.x = Math.random()*W;
+    this.y = -20;
+    this.w = 6 + Math.random()*6;
+    this.h = 10 + Math.random()*14;
+    this.angle = Math.random()*Math.PI;
+    this.speed = 2 + Math.random()*3;
+    const colors = ["#ffd66b","#ff9ad9","#8ad0ff","#b9ffa8","#ffffff"];
+    this.color = colors[(Math.random()*colors.length)|0];
+    this.spin = (Math.random()*.2)+.01;
+    this.opacity = .9;
+  }
+  ConfettiPiece.prototype.update = function(){
+    this.y += this.speed;
+    this.angle += this.spin;
+    this.opacity -= .004;
+  }
+  function drawPiece(p){
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.angle);
+    ctx.globalAlpha = Math.max(0, p.opacity);
+    ctx.fillStyle = p.color;
+    ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+    ctx.restore();
+  }
+  function animate(){
+    ctx.clearRect(0,0,W,H);
+    pieces.forEach((p,i)=>{ p.update(); drawPiece(p); if(p.opacity<=0 || p.y>H+30) pieces.splice(i,1) });
+    raf = requestAnimationFrame(animate);
+  }
+  function burst(count=220){
+    for(let i=0;i<count;i++) pieces.push(new ConfettiPiece());
+    if(!raf) animate();
+    setTimeout(()=>{ if(pieces.length===0){ cancelAnimationFrame(raf); raf=null; } }, 3000);
+  }
+  $("#confettiBtn").addEventListener("click", ()=>{ burst(260); pop(); });
+
+  // 微动画
+  function pop(){
+    const el = $("#card");
+    el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop");
+  }
+
+  // ——— 进入动画：轻轻发亮一次 ———
+  setTimeout(()=>burst(80), 400);
+
+  // ——— 防止 iOS 橡皮筋超出露出壁纸（背景已固定），并兼容安全区——
+  // 已通过 viewport-fit=cover + env(safe-area-*) 处理，这里再禁止 body 滚动穿透：
+  document.addEventListener("touchmove", (e)=>{ if(!e.target.closest("textarea")) e.preventDefault(); }, {passive:false});
+</script>
+</body>
+</html>
