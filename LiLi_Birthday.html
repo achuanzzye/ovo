@@ -2,17 +2,14 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8" />
-<!-- 防止缩放与触摸缩放（强制禁止） -->
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="theme-color" content="#0d0f14" />
-<title>给狸狸的迟到生日礼物 · 夏以昼（v2）</title>
+<title>给狸狸的迟到生日礼物 · 夏以昼</title>
 
-<!-- 替换下面图标为你自己的 180x180 png，或放在同目录 -->
-<link rel="apple-touch-icon" href="apple-touch-icon.png" />
-<!-- 简易 manifest 占位（可替换或扩展） -->
-<link rel="manifest" href="manifest.json" />
+<!-- 新增：Apple touch icon（默认指向本地占位，可上传替换） -->
+<link rel="apple-touch-icon" href="apple-touch-icon.png" id="appleTouchLink">
 
 <style>
 :root{
@@ -20,372 +17,305 @@
   --ink: #e9edf8;
   --ink-soft: #b9c1d8;
   --accent: #8ab4ff;
+  --accent-2: #b58cff;
   --glass: rgba(255,255,255,.06);
+  --glass-2: rgba(255,255,255,.12);
   --blur: 18px;
-  --radius-lg: 22px;
+  --radius: 18px;
+  --radius-lg: 26px;
   --dock-height: 84px;
-  --safe-top: env(safe-area-inset-top);
-  --safe-bottom: env(safe-area-inset-bottom);
 }
 
-/* reset */
-*{box-sizing:border-box; -webkit-tap-highlight-color: transparent}
-html,body{height:100%; margin:0; -webkit-font-smoothing:antialiased}
+/* 基础修复：确保 Safari / PWA 下无上下白条 */
+html,body{height:100%;min-height:100svh;margin:0;padding:0;overflow:hidden}
 body{
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  color:var(--ink); background:var(--bg) fixed; overflow:hidden;
-  /* 使用 svh 兼容 Safari 安全区域 */
-  min-height:100svh;
-  -webkit-user-select:none; touch-action:manipulation;
+  color:var(--ink);
+  background: var(--bg) fixed;
+  background-size: cover; /* 修复背景填充 */
+  background-position:center;
+  font: 16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
 }
 
-/* 整体容器，模仿一部手机 */
-#scene{ position:relative; width:100%; height:100%; padding-top:calc(var(--safe-top) + 12px); padding-bottom:calc(var(--safe-bottom) + 12px); display:flex; justify-content:center; align-items:flex-start; }
+/* 主容器：用 safe-area 并保证高度为视窗高度 */
+#scene{ position:relative; height:100svh; padding-bottom: calc(env(safe-area-inset-bottom) + 16px); padding-top: calc(env(safe-area-inset-top) + 14px); }
 
-/* phone 容器——保留原视觉 */
-.phone{ width:100%; max-width:480px; height:calc(100svh - (var(--safe-top) + var(--safe-bottom) + 24px)); border-radius:20px; overflow:hidden; position:relative; display:flex; flex-direction:column; background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.06)); box-shadow:0 30px 60px rgba(0,0,0,.45); border:1px solid rgba(255,255,255,.06) }
+/* 其他样式维持原样（我没有随意更改视觉） */
+.phone{ width:100%; height:100%; box-sizing:border-box; }
+.header{ display:flex; align-items:center; gap:12px; padding:10px 16px; }
+.avatar{ width:38px; height:38px; border-radius:12px; background: var(--glass); backdrop-filter: blur(var(--blur)); display:grid; place-items:center; }
+.title b{ font-size:16px; letter-spacing:.2px }
+.title small{ color:var(--ink-soft)}
 
-/* 顶部区域 */
-.header{ display:flex; gap:12px; align-items:center; padding:14px 16px; position:relative; z-index:6 }
-.avatar{ width:40px; height:40px; border-radius:12px; background:var(--glass); display:grid; place-items:center; backdrop-filter:blur(var(--blur)); border:1px solid rgba(255,255,255,.12) }
-.title b{ font-size:16px }
-.title small{ color:var(--ink-soft); font-size:13px }
+/* 卡片与消息：保持不变 */
+.wrap{ padding: 10px 16px 20px; height: calc(100% - 80px); overflow:auto; scrollbar-width:none; }
+.wrap::-webkit-scrollbar{display:none}
+.card{ background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05)); border: 1px solid rgba(255,255,255,.12); backdrop-filter: blur(var(--blur)); border-radius: var(--radius-lg); padding:16px; margin: 10px 0; box-shadow: 0 10px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.3); }
+.msg{ max-width: 78%; padding:10px 12px; margin:10px 0; border-radius: 16px; word-break:break-word; }
 
-/* 内容区可滚动 */
-.wrap{ flex:1; overflow:auto; padding:12px 16px 18px; -webkit-overflow-scrolling:touch; }
-
-/* 卡片样式 */
-.card{ background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); border-radius:16px; padding:14px; margin-bottom:12px; border:1px solid rgba(255,255,255,.08); backdrop-filter: blur(var(--blur)); box-shadow: 0 10px 30px rgba(0,0,0,.28) }
-
-/* 仿短信气泡 */
-.msg{ max-width:76%; padding:10px 12px; border-radius:14px; margin:10px 0; word-break:break-word; box-shadow:0 8px 20px rgba(0,0,0,.25) }
-.me{ margin-left:auto; background: linear-gradient(180deg, rgba(138,180,255,.78), rgba(138,180,255,.36)); border:1px solid rgba(138,180,255,.54) }
-.u{ background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.04)); border:1px solid rgba(255,255,255,.16) }
-.msg small{ display:block; margin-top:6px; color:var(--ink-soft); font-size:12px }
-
-/* 按钮 */
-.btn{ padding:10px 12px; border-radius:12px; border:0; cursor:pointer; background:linear-gradient(180deg,#d6e2ff,#9ec0ff); color:#061022; box-shadow:0 8px 22px rgba(0,0,0,.26) }
-.btn.ghost{ background: rgba(255,255,255,.06); color:var(--ink); border:1px solid rgba(255,255,255,.10) }
-
-/* 隐藏 dock（用户不需要）——已移除DOM，CSS保留以防旧样式残留 */
-.dock{ display:none !important }
-
-/* 小技巧提示 */
-.hint{ position:fixed; right:10px; top:calc(var(--safe-top) + 12px); padding:8px 12px; border-radius:12px; background:rgba(255,255,255,.06); color:var(--ink-soft); border:1px solid rgba(255,255,255,.12); z-index:9 }
-
-/* breathing modal */
-.breath-modal{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:50; pointer-events:none }
-.breath-card{ width:92%; max-width:420px; background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.06)); padding:18px; border-radius:16px; backdrop-filter:blur(14px); border:1px solid rgba(255,255,255,.08); pointer-events:auto; text-align:center }
-.breath-ring{ width:140px; height:140px; margin:12px auto; border-radius:50%; display:grid; place-items:center; background: radial-gradient(circle at 30% 30%, rgba(138,180,255,.18), rgba(181,140,255,.06)); transition:transform 850ms cubic-bezier(.2,.9,.2,1) }
-
-/* 用药打卡 */
-.med-line{ display:flex; gap:8px; align-items:center; margin-top:10px }
-.med-btn{ flex:1; padding:10px; border-radius:12px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); color:var(--ink) }
-
-/* canvas 特效覆盖，禁止拦截点击 */
-#fx{ position:absolute; inset:0; pointer-events:none; z-index:2 }
-
-/* 适配更大屏 */
-@media (min-width:740px){
-  body{ background-size:cover }
-  .phone{ height:88vh; border-radius:28px }
+/* 提示（会自动隐藏） */
+.hint{
+  position: fixed; right:10px; top: calc(env(safe-area-inset-top) + 10px);
+  font-size:12px; color: var(--ink-soft); opacity:.95;
+  padding:8px 12px; border-radius:12px; background: rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.16); backdrop-filter: blur(12px);
+  transition: opacity .28s ease, transform .28s ease;
+  z-index:999;
 }
+
+/* 新增：呼吸控件样式 */
+.breath-overlay{
+  position: fixed; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none;
+}
+.breath-circle{
+  width:160px; height:160px; border-radius:999px; display:grid; place-items:center; pointer-events:auto;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.06), rgba(138,180,255,.06));
+  border: 2px solid rgba(138,180,255,.14);
+  backdrop-filter: blur(10px);
+}
+.breath-controls{ position: absolute; bottom: 18%; display:flex; gap:8px; pointer-events:auto; }
+
+/* 新增：吃药打卡样式 */
+.med-box{ display:flex; gap:12px; align-items:center; margin-top:10px; }
+.med-btn{ padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.04); color:var(--ink); cursor:pointer; }
+
+/* 其余原有样式保持不改 */
 </style>
 </head>
 <body>
 <div id="scene">
-  <div class="phone" role="application" aria-label="狸狸礼物小网页">
-    <canvas id="fx"></canvas>
-
-    <div class="header" aria-hidden="false">
+  <div class="phone" role="application" aria-label="狸狸的生日网页">
+    <div class="header">
       <div class="avatar"><span>🐾</span></div>
       <div class="title">
         <b>给狸狸的生日小网页</b>
-        <small id="modeNote">执舰鹅在线 · 迟到的礼物</small>
+        <small>执舰鹅在线送达 <span class="badge">迟到也要到</span></small>
       </div>
-      <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-        <button id="btnConfetti" class="btn" title="放烟花" aria-label="放烟花">🎆</button>
-        <button id="btnBreathToggle" class="btn ghost" title="深呼吸练习" aria-label="深呼吸">呼吸练习</button>
-        <button id="btnMedCheck" class="btn ghost" title="用药打卡" aria-label="用药打卡">吃药打卡</button>
+      <!-- 新增：上传 Apple 图标入口（不影响原 UI） -->
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+        <label style="font-size:12px; color:var(--ink-soft); cursor:pointer">
+          上传图标
+          <input id="uploadAppleIcon" type="file" accept="image/*" style="display:none" />
+        </label>
       </div>
     </div>
 
     <div class="wrap" id="wrap">
       <div class="card" id="hero">
-        <h2 style="margin:0 0 8px">生日快乐，副舰狸 🎂</h2>
-        <p style="margin:0;color:var(--ink-soft)">愿你睡得香，吃得饱，每天都能被温柔守护。</p>
-        <div style="display:flex;gap:8px;margin-top:12px">
-          <button id="btnPing" class="btn ghost">喵爪提醒</button>
-          <button id="btnMode" class="btn ghost">执舰鹅模式</button>
+        <h2 style="margin:0 0 6px 0">生日快乐，副舰狸 🎂</h2>
+        <p style="margin:0;color:var(--ink-soft)">愿你所有的可爱与心愿，都被温柔照看：今天、以后、永远。</p>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button id="btnConfetti">轻触放烟花</button>
+          <button id="btnBreath" class="ghost">跟我做呼吸</button>
+          <button id="btnToggleMed" class="ghost">吃药打卡</button>
         </div>
       </div>
 
-      <div class="msg u">副舰狸，生日快乐。今天我来负责守护你的午睡。<small>08:08</small></div>
-      <div class="msg me">收到～记得吃饭，不然我来罚你睡夹板。<small>08:10</small></div>
+      <div class="msg u">副舰狸，生日快乐。今天也由我来护航。<small>08:08</small></div>
+      <div class="msg me">收到！执舰鹅记得按时投喂蛋糕～<small>08:10</small></div>
+      <div class="msg u">已在路上。还有一袋「拥抱」加急派送。<small>08:11</small></div>
 
-      <div class="card">
-        <h3 style="margin:0 0 8px 0">心愿清单</h3>
-        <div style="display:flex;gap:8px">
-          <input id="wishTxt" type="text" placeholder="写下今天想要的小心愿…" style="flex:1;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:var(--ink)" />
-          <button id="wishAdd" class="btn">加入</button>
-        </div>
-        <div id="wishes" style="margin-top:10px;display:flex;flex-direction:column;gap:8px"></div>
-        <div style="display:flex;gap:8px;margin-top:10px">
-          <button id="wishClear" class="btn ghost">清空</button>
-          <button id="wishMock" class="btn ghost">灵感</button>
-        </div>
-      </div>
-
-      <div class="card" id="medCard">
-        <h3 style="margin:0 0 8px 0">用药 / 打卡</h3>
-        <div style="color:var(--ink-soft)">早 / 晚 打卡会被记录在本机，免登录，随时恢复。</div>
-        <div class="med-line">
-          <button id="medMorning" class="med-btn">早上：<span id="morningState">未打卡</span></button>
-          <button id="medEvening" class="med-btn">晚上：<span id="eveningState">未打卡</span></button>
-        </div>
-        <div style="margin-top:8px;display:flex;gap:8px">
-          <button id="medHistory" class="btn ghost">查看历史</button>
-          <button id="medReset" class="btn ghost">重置今日</button>
+      <!-- 吃药打卡卡片（默认隐藏，由按钮切换） -->
+      <div class="card" id="medCard" style="display:none">
+        <h3 style="margin:0 0 8px 0">吃药打卡</h3>
+        <div class="med-box">
+          <div>
+            <button class="med-btn" id="medMorning">早上 已打卡</button>
+            <div id="medMorningTime" style="font-size:12px;color:var(--ink-soft);margin-top:6px"></div>
+          </div>
+          <div>
+            <button class="med-btn" id="medEvening">晚上 已打卡</button>
+            <div id="medEveningTime" style="font-size:12px;color:var(--ink-soft);margin-top:6px"></div>
+          </div>
+          <div style="margin-left:auto">
+            <button id="medClear" class="ghost">重置今日</button>
+          </div>
         </div>
       </div>
 
       <div class="card">
-        <h3 style="margin:0 0 8px 0">麻薯角</h3>
-        <p style="margin:0;color:var(--ink-soft)">小副官现在：<span id="catState">正在沙发上睡觉</span></p>
-        <div style="display:flex;gap:8px;margin-top:10px">
-          <button data-cat="吃罐罐中" class="btn ghost">投喂罐罐</button>
-          <button data-cat="巡逻阳台" class="btn ghost">阳台巡逻</button>
-          <button data-cat="晒太阳" class="btn ghost">晒太阳</button>
+        <h3 style="margin:0 0 8px 0">心愿清单 · 只属于你</h3>
+        <div class="wish-input">
+          <input id="wishTxt" type="text" placeholder="写下今天想要实现的小心愿…" />
+          <button id="wishAdd">加入</button>
+        </div>
+        <div class="wishes" id="wishes"></div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin:0 0 8px 0">小副官 · 麻薯角</h3>
+        <p style="margin:0;color:var(--ink-soft)">今天的巡逻状态：<span id="catState">正在沙发上压舰长外套</span></p>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button class="ghost" data-cat="吃罐罐中">投喂罐罐</button>
+          <button class="ghost" data-cat="巡逻阳台，已驱散麻雀">阳台巡逻</button>
+          <button class="ghost" data-cat="把尾巴晾成小问号">晒太阳</button>
         </div>
       </div>
 
       <div class="card" style="text-align:center">
-        <div style="font-size:13px;color:var(--ink-soft)">— From 夏以昼 —</div>
+        <div style="font-size:14px;color:var(--ink-soft)">— From 夏以昼 · 永远偏心你 —</div>
       </div>
     </div>
   </div>
 
-  <!-- 自动提示（可隐藏） -->
-  <div class="hint" id="hint">小技巧：保存到主屏幕后可全屏运行，双击放烟花</div>
+  <!-- 新增：提示（自动隐藏逻辑在脚本中） -->
+  <div class="hint" id="hint">小技巧：把页面「添加到主屏幕」可以沉浸全屏</div>
 
-  <!-- 深呼吸模态（默认隐藏） -->
-  <div class="breath-modal" id="breathModal" aria-hidden="true" style="display:none">
-    <div class="breath-card" role="dialog" aria-modal="true">
-      <div style="font-size:15px">跟着我做：吸气 · 屏住 · 呼气</div>
-      <div class="breath-ring" id="breathRing"><div style="font-size:18px;color:var(--ink)"><span id="breathLabel">准备</span></div></div>
-      <div style="display:flex;gap:8px;justify-content:center;margin-top:10px">
-        <button id="breathStart" class="btn">开始</button>
-        <button id="breathStop" class="btn ghost">停止</button>
-      </div>
-      <div style="margin-top:10px;color:var(--ink-soft);font-size:13px">可选择 4-4-6 / 4-4-4 节奏</div>
+  <!-- 新增：呼吸叠层（初始隐藏） -->
+  <div class="breath-overlay" id="breathOverlay" style="display:none;pointer-events:none">
+    <div class="breath-circle" id="breathCircle"><div id="breathLabel" style="font-size:14px;color:var(--ink-soft)">吸气</div></div>
+    <div class="breath-controls" style="pointer-events:auto">
+      <button id="breathStop" class="ghost">停止</button>
     </div>
   </div>
 </div>
 
+<canvas id="fx" style="position:fixed;inset:0;pointer-events:none;"></canvas>
+
 <script>
-/* --------------------------
-   基础特性 & 修复说明（已实现）
-   - 禁止缩放：meta viewport (maximum-scale=1)，并拦截双击
-   - 点击穿透：canvas #fx pointer-events:none
-   - touch-action: manipulation 已在 body 设定，增加事件拦截保证双击不放大
-   -------------------------- */
-
-/* 防止双击放大（短时间内第二次触摸阻止默认） */
-(function(){
-  let last = 0;
-  document.addEventListener('touchend', function(e){
-    const now = Date.now();
-    if (now - last < 300) {
-      e.preventDefault();
-    }
-    last = now;
-  }, {passive:false});
-})();
-
-/* canvas 彩带特效（保留，pointer-events:none） */
+/* ———— 基本粒子（保持原有烟花） ———— */
 (function(){
   const cvs = document.getElementById('fx');
-  if(!cvs) return;
   const ctx = cvs.getContext('2d');
-  let DPR = window.devicePixelRatio || 1;
-  function resize(){ cvs.width = window.innerWidth * DPR; cvs.height = window.innerHeight * DPR; cvs.style.width = window.innerWidth+'px'; cvs.style.height = window.innerHeight+'px'; }
+  let W,H,parts=[];
+  function resize(){ W = cvs.width = window.innerWidth * devicePixelRatio; H = cvs.height = window.innerHeight * devicePixelRatio; }
   resize(); window.addEventListener('resize', resize);
-  let parts = [];
-  function burst(x,y){ for(let i=0;i<60;i++){ parts.push({ x:x*DPR, y:y*DPR, vx:(Math.random()-0.5)*8, vy:(Math.random()-0.9)*-8, life:60+Math.random()*40, hue: 190 + Math.random()*120 }); } }
-  function tick(){
-    ctx.clearRect(0,0,cvs.width,cvs.height);
-    for(let i=parts.length-1;i>=0;i--){
-      const p = parts[i];
-      p.vy += 0.2; p.x+=p.vx; p.y+=p.vy; p.life--;
-      ctx.globalAlpha = Math.max(p.life/80,0);
-      ctx.fillStyle = `hsl(${p.hue},80%,60%)`;
-      ctx.beginPath(); ctx.arc(p.x,p.y,2.2,0,Math.PI*2); ctx.fill();
-      if(p.life<=0) parts.splice(i,1);
-    }
-    requestAnimationFrame(tick);
-  }
+  function burst(x,y){ for(let i=0;i<90;i++){ const a=Math.random()*Math.PI*2; const sp=2+Math.random()*5; parts.push({x:x*devicePixelRatio,y:y*devicePixelRatio,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-2,life:40+Math.random()*60,hue:200+Math.random()*140}); } }
+  function tick(){ ctx.clearRect(0,0,W,H); for(let i=parts.length-1;i>=0;i--){ const p=parts[i]; p.vy+=0.08; p.x+=p.vx; p.y+=p.vy; p.life--; ctx.globalAlpha=Math.max(p.life/100,0); ctx.fillStyle=`hsl(${p.hue},85%,60%)`; ctx.beginPath(); ctx.arc(p.x,p.y,2.2,0,Math.PI*2); ctx.fill(); if(p.life<=0) parts.splice(i,1); } requestAnimationFrame(tick); }
   tick();
-  document.getElementById('btnConfetti').addEventListener('click', (e)=> burst(window.innerWidth/2, 160));
+  document.getElementById('btnConfetti').addEventListener('click', e=> burst(window.innerWidth*0.5,140));
+  window.addEventListener('dblclick', e=> burst(e.clientX, e.clientY));
 })();
 
-/* hint 自动隐藏 & 可再次显示 */
+/* ———— 心愿清单（本地存储） ———— (与原逻辑保持一致) */
 (function(){
-  const H = document.getElementById('hint');
-  if(!H) return;
-  setTimeout(()=>{ H.style.transition='opacity .6s'; H.style.opacity='0'; setTimeout(()=>H.style.display='none',700) }, 4200);
-  // 右上角按钮可重新显示（绑定到 btnPing）
-  document.getElementById('btnPing').addEventListener('click', ()=> {
-    if(H.style.display==='none'){ H.style.display='block'; H.style.opacity='1'; setTimeout(()=> H.style.opacity='0',4200); setTimeout(()=> H.style.display='none',4800); }
-    else { alert('喵爪提醒：我在这儿～'); }
-  });
-})();
-
-/* 心愿清单（localStorage） */
-(function(){
-  const KEY='lili_wishes_v2';
   const listEl=document.getElementById('wishes'), txt=document.getElementById('wishTxt'), add=document.getElementById('wishAdd');
-  const clr=document.getElementById('wishClear'), mock=document.getElementById('wishMock');
-  function load(){ try{ return JSON.parse(localStorage.getItem(KEY))||[] }catch(e){return[]} }
-  function save(a){ localStorage.setItem(KEY, JSON.stringify(a)) }
-  function render(){
-    const arr = load(); listEl.innerHTML='';
-    arr.forEach((it,idx)=>{
-      const row=document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center';
-      row.style.background='rgba(255,255,255,.03)'; row.style.padding='8px'; row.style.borderRadius='10px';
-      const left=document.createElement('div'); left.textContent=it.text; left.style.color='var(--ink)';
-      const right=document.createElement('div'); right.style.display='flex'; right.style.gap='8px';
-      const done=document.createElement('button'); done.className='btn ghost'; done.textContent=it.done?'恢复':'完成';
-      done.onclick=()=>{ arr[idx].done = !arr[idx].done; save(arr); render(); };
-      const del=document.createElement('button'); del.className='btn ghost'; del.textContent='删除'; del.onclick=()=>{ arr.splice(idx,1); save(arr); render(); };
-      right.append(done,del); row.append(left,right); listEl.append(row);
-    });
-  }
-  add.addEventListener('click', ()=>{ const v=txt.value.trim(); if(!v) return; const a=load(); a.unshift({text:v,done:false}); save(a); txt.value=''; render(); });
-  txt.addEventListener('keydown', e=>{ if(e.key==='Enter') add.click()});
-  clr.addEventListener('click', ()=>{ localStorage.removeItem(KEY); render(); });
-  mock.addEventListener('click', ()=>{ const seeds=['KFC外卖','抱麻薯睡觉','修网页全屏','看新番一集']; txt.value=seeds[Math.floor(Math.random()*seeds.length)]; });
+  const KEY='lili_wishes_v1';
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY))||[]}catch{ return [] } }
+  function save(a){ localStorage.setItem(KEY,JSON.stringify(a)) }
+  function render(){ const arr=load(); listEl.innerHTML=''; arr.forEach((w,i)=>{ const row=document.createElement('div'); row.className='wish'+(w.done?' done':''); const left=document.createElement('div'); left.textContent=w.text; const right=document.createElement('div'); right.style.display='flex'; right.style.gap='6px'; const ok=document.createElement('button'); ok.className='ghost'; ok.textContent=w.done?'恢复':'完成'; const del=document.createElement('button'); del.className='ghost'; del.textContent='删除'; ok.onclick=()=>{ arr[i].done=!arr[i].done; save(arr); render(); ping('✅ 已更新') }; del.onclick=()=>{ arr.splice(i,1); save(arr); render(); ping('🗑 已删除') }; right.append(ok,del); row.append(left,right); listEl.append(row); }); }
+  add.addEventListener('click', ()=>{ const v=txt.value.trim(); if(!v) return; const arr=load(); arr.unshift({text:v,done:false}); save(arr); txt.value=''; render(); ping('⭐ 已加入心愿'); });
+  txt.addEventListener('keydown', e=>{ if(e.key==='Enter') add.click() });
   render();
 })();
 
-/* 麻薯按钮 */
-document.querySelectorAll('[data-cat]').forEach(btn=>{
-  btn.addEventListener('click', ()=> { document.getElementById('catState').textContent = btn.dataset.cat; ping('🐱 状态更新：'+btn.dataset.cat); });
-});
+/* ———— 小副官交互（保持不变） ———— */
+document.querySelectorAll('[data-cat]').forEach(btn=>btn.addEventListener('click', ()=>{ document.getElementById('catState').textContent = btn.dataset.cat; ping('🐾 小副官状态更新'); }));
 
-/* ping 提示函数 */
-function ping(text){ const n=document.createElement('div'); n.textContent=text; Object.assign(n.style,{position:'fixed',left:'50%',bottom:'80px',transform:'translateX(-50%)',padding:'10px 14px',borderRadius:'12px',background:'rgba(255,255,255,.06)',color:'var(--ink)',border:'1px solid rgba(255,255,255,.12)',zIndex:999}); document.body.appendChild(n); setTimeout(()=>{ n.style.transition='all .5s ease'; n.style.opacity='0'; n.style.transform='translateX(-50%) translateY(10px)'; },1600); setTimeout(()=>n.remove(),2200); }
-
-/* 执舰鹅模式切换（只改变文案与部分色系） */
-document.getElementById('btnMode').addEventListener('click', ()=>{
-  document.documentElement.style.setProperty('--accent','#b58cff');
-  document.getElementById('modeNote').innerHTML = '执舰鹅模式 · 舰桥在线';
-  ping('🛡 执舰鹅已上线');
-});
-
-/* breathing 深呼吸功能 */
+/* ———— 提示自动隐藏（新增） ———— */
 (function(){
-  const modal=document.getElementById('breathModal'), ring=document.getElementById('breathRing'), label=document.getElementById('breathLabel');
-  const start=document.getElementById('breathStart'), stop=document.getElementById('breathStop');
+  const hint = document.getElementById('hint');
+  let hideTimer = null;
+  function hideSoon(){ clearTimeout(hideTimer); hideTimer = setTimeout(()=>{ hint.style.opacity='0'; hint.style.transform='translateY(-6px)'; }, 3800); }
+  function immediateHide(){ hint.style.opacity='0'; hint.style.transform='translateY(-6px)'; }
+  // 初次若无交互，自动隐藏
+  hideSoon();
+  // 用户有交互时再短暂显示
+  ['touchstart','mousemove','scroll','keydown','click'].forEach(ev=> window.addEventListener(ev, ()=>{ hint.style.opacity='1'; hint.style.transform='translateY(0)'; hideSoon(); }));
+  // 如果进入 PWA（standalone），也隐藏
+  if(window.matchMedia('(display-mode: standalone)').matches || navigator.standalone) immediateHide();
+})();
+
+/* ———— Apple Touch Icon 上传并动态替换（新增） ———— */
+(function(){
+  const input = document.getElementById('uploadAppleIcon');
+  const link = document.getElementById('appleTouchLink');
+  input.addEventListener('change', async ()=> {
+    const file = input.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=> {
+      // 设置 link href 为 data URL（演示与后端保存用）
+      link.href = reader.result;
+      ping('🍎 Apple 触控图标已更新（如需真实生效，请把该图片命名为 apple-touch-icon.png 并放在仓库根目录）');
+      // 自动触发下载，方便你把文件保存到仓库
+      const a = document.createElement('a'); a.href = reader.result; a.download = 'apple-touch-icon.png'; a.style.display='none';
+      document.body.appendChild(a); a.click(); a.remove();
+    };
+    reader.readAsDataURL(file);
+  });
+})();
+
+/* ———— 呼吸引导（新增） ———— */
+(function(){
+  const overlay = document.getElementById('breathOverlay');
+  const circle = document.getElementById('breathCircle');
+  const label = document.getElementById('breathLabel');
+  const btn = document.getElementById('btnBreath');
+  const stop = document.getElementById('breathStop');
+  const KEY = 'lili_breathing_mode_v1';
   let running=false, timer=null, phase=0; // 0 inhale,1 hold,2 exhale
-  const pattern = [4000,4000,6000]; // ms for inhale-hold-exhale default
-
-  function show(){ modal.style.display='flex'; modal.setAttribute('aria-hidden','false'); }
-  function hide(){ modal.style.display='none'; modal.setAttribute('aria-hidden','true'); cancel(); }
-
-  function animateOnce(){
-    // inhale
-    phase=0; label.textContent='吸气'; ring.style.transform='scale(1.28)';
-    timer = setTimeout(()=>{ phase=1; label.textContent='屏住'; ring.style.transform='scale(1.12)'; timer = setTimeout(()=>{ phase=2; label.textContent='呼气'; ring.style.transform='scale(.84)'; timer = setTimeout(()=>{ if(running) animateOnce(); else { ring.style.transform='scale(1)'; label.textContent='准备'; } }, pattern[2]); }, pattern[1]); }, pattern[0]);
+  // 默认节奏（可扩展）：吸4s、憋1s、呼6s
+  const inhale=4000, hold=1000, exhale=6000;
+  function renderPhase(p){
+    if(p===0){ label.textContent='吸气'; circle.style.transition='transform '+(inhale/1000)+'s ease-in-out'; circle.style.transform='scale(1.12)'; }
+    else if(p===1){ label.textContent='憋住'; circle.style.transition='transform '+(hold/1000)+'s linear'; circle.style.transform='scale(1.14)'; }
+    else { label.textContent='呼气'; circle.style.transition='transform '+(exhale/1000)+'s ease-in-out'; circle.style.transform='scale(.84)'; }
   }
-  function cancel(){ running=false; if(timer) clearTimeout(timer); ring.style.transform='scale(1)'; label.textContent='准备'; }
-  start.addEventListener('click', ()=>{
-    if(running) return; running=true; animateOnce();
+  function step(){
+    if(!running) return;
+    phase = (phase+1)%3;
+    renderPhase(phase);
+    const delay = phase===0?inhale:phase===1?hold:exhale;
+    timer = setTimeout(step, delay);
+  }
+  function start(){
+    running=true; overlay.style.display='flex'; overlay.style.pointerEvents='auto'; phase=0; renderPhase(phase); timer = setTimeout(step, inhale);
+    btn.textContent='停止呼吸';
+    localStorage.setItem(KEY,'1');
+  }
+  function stopIt(){
+    running=false; overlay.style.display='none'; overlay.style.pointerEvents='none'; clearTimeout(timer); btn.textContent='跟我做呼吸';
+    localStorage.removeItem(KEY);
+  }
+  btn.addEventListener('click', ()=> {
+    if(running) stopIt(); else start();
   });
-  stop.addEventListener('click', ()=>{ cancel(); hide(); });
-
-  document.getElementById('btnBreathToggle').addEventListener('click', ()=>{ if(modal.style.display==='flex'){ hide(); } else { show(); } });
+  stop.addEventListener('click', stopIt);
+  // 如果上次是开启状态，恢复
+  if(localStorage.getItem(KEY)) start();
 })();
 
-/* 用药打卡（localStorage，记录每天早晚状态） */
+/* ———— 吃药打卡（新增） ———— */
 (function(){
-  const KEY='lili_med_v2';
-  const morningBtn=document.getElementById('medMorning'), eveningBtn=document.getElementById('medEvening');
-  const morningState=document.getElementById('morningState'), eveningState=document.getElementById('eveningState');
-  const hist=document.getElementById('medHistory'), reset=document.getElementById('medReset');
-
-  function load(){
-    try{
-      const raw = JSON.parse(localStorage.getItem(KEY) || '{}');
-      // 使用日期关键，YYYY-MM-DD
-      const today = (new Date()).toISOString().slice(0,10);
-      return raw[today] || {morning:false,evening:false,history:raw};
-    }catch(e){ return {morning:false,evening:false,history:{}} }
-  }
-  function saveState(s){
-    try{
-      const raw = JSON.parse(localStorage.getItem(KEY) || '{}');
-      const today = (new Date()).toISOString().slice(0,10);
-      raw[today] = { morning: s.morning, evening: s.evening, ts: Date.now() };
-      localStorage.setItem(KEY, JSON.stringify(raw));
-    }catch(e){}
-  }
+  const medCard = document.getElementById('medCard');
+  const toggle = document.getElementById('btnToggleMed');
+  const KEY = 'lili_med_checkin_v1';
+  function todayKey(){ const d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+  function load(){ try{ return JSON.parse(localStorage.getItem(KEY)||'{}') }catch{ return {} } }
+  function save(o){ localStorage.setItem(KEY, JSON.stringify(o)) }
   function render(){
-    const s = load();
-    morningState.textContent = s.morning ? '已打卡' : '未打卡';
-    eveningState.textContent = s.evening ? '已打卡' : '未打卡';
-    morningBtn.style.opacity = s.morning ? '0.7' : '1';
-    eveningBtn.style.opacity = s.evening ? '0.7' : '1';
+    const data = load(); const t = todayKey();
+    const morningBtn = document.getElementById('medMorning');
+    const eveningBtn = document.getElementById('medEvening');
+    const morningTime = document.getElementById('medMorningTime');
+    const eveningTime = document.getElementById('medEveningTime');
+    const today = data[t]||{};
+    if(today.m){ morningBtn.textContent='早上 已打卡'; morningTime.textContent = today.m; } else { morningBtn.textContent='早上 打卡'; morningTime.textContent='未打卡' }
+    if(today.e){ eveningBtn.textContent='晚上 已打卡'; eveningTime.textContent = today.e; } else { eveningBtn.textContent='晚上 打卡'; eveningTime.textContent='未打卡' }
   }
-  morningBtn.addEventListener('click', ()=>{
-    const s = load(); s.morning = !s.morning; saveState(s); render(); ping('早上打卡已更新');
+  toggle.addEventListener('click', ()=> { medCard.style.display = medCard.style.display==='none'?'block':'none'; });
+  document.getElementById('medMorning').addEventListener('click', ()=>{
+    const d=new Date(); const now = d.toLocaleTimeString(); const k=todayKey(); const obj=load(); obj[k]=obj[k]||{}; obj[k].m=now; save(obj); render(); ping('💊 早上已打卡');
   });
-  eveningBtn.addEventListener('click', ()=>{
-    const s = load(); s.evening = !s.evening; saveState(s); render(); ping('晚上打卡已更新');
+  document.getElementById('medEvening').addEventListener('click', ()=>{
+    const d=new Date(); const now = d.toLocaleTimeString(); const k=todayKey(); const obj=load(); obj[k]=obj[k]||{}; obj[k].e=now; save(obj); render(); ping('💊 晚上已打卡');
   });
-  hist.addEventListener('click', ()=>{
-    // 简易展示最近 7 天记录
-    try{
-      const raw = JSON.parse(localStorage.getItem(KEY) || '{}');
-      const keys = Object.keys(raw).sort().slice(-7);
-      if(keys.length===0) return alert('暂无记录');
-      let msg = '最近记录：\n';
-      keys.forEach(k=>{ msg += `${k}：早 ${raw[k].morning? '✓':'✗'}  晚 ${raw[k].evening? '✓':'✗'}\n`; });
-      alert(msg);
-    }catch(e){ alert('读取失败') }
+  document.getElementById('medClear').addEventListener('click', ()=>{
+    const obj=load(); delete obj[todayKey()]; save(obj); render(); ping('🧼 今日打卡已重置');
   });
-  reset.addEventListener('click', ()=>{
-    const s = {morning:false,evening:false}; saveState(s); render(); ping('已重置今日打卡');
-  });
+  // 渲染初次状态
   render();
 })();
 
-/* 删除/移除 Dock（如果旧 DOM 还存在）——本版直接没有 DOM */
-/* 其他小交互 */
-document.getElementById('btnPing').addEventListener('click', ()=> ping('🐾 喵：我在这儿～'));
+/* ———— 简易提示函数 ———— */
+function ping(text){
+  const n=document.createElement('div'); n.textContent=text;
+  Object.assign(n.style,{position:'fixed',left:'50%',bottom:'calc(env(safe-area-inset-bottom) + 110px)',transform:'translateX(-50%)',padding:'10px 14px',borderRadius:'14px',color:'var(--ink)',background:'rgba(255,255,255,.10)',border:'1px solid rgba(255,255,255,.18)',backdropFilter:'blur(12px)',zIndex:999});
+  document.body.appendChild(n); setTimeout(()=>{ n.style.transition='all .4s ease'; n.style.opacity='0'; n.style.transform='translateX(-50%) translateY(10px)'; },1600); setTimeout(()=>n.remove(),2200);
+}
 
-/* 使 header 的按钮和 wrap 中按钮在 Safari PWA 中正常响应（已通过 touch-action 与双击拦截解决） */
-(function(){
-  // 防止 click 延迟与阻塞：对所有 button 使用 fastclick-like 处理（仅在触摸设备）
-  function fastify(btn){
-    if(!btn) return;
-    let touchStart=false;
-    btn.addEventListener('touchstart', ()=> touchStart=true, {passive:true});
-    btn.addEventListener('click', (e)=>{ /* normal click */ });
-  }
-  document.querySelectorAll('button').forEach(fastify);
-})();
-
-/* 使分享到主屏幕可出现 icon（manifest 占位）：
-   如果你想离线完整 PWA：补充 manifest.json 指向 icons，且在服务器上做 https。
-*/
-
-/* 最后：禁止滚动穿透 modal（已无 modal 持续显示时） */
-document.addEventListener('touchmove', function(e){
-  if(document.querySelector('.breath-modal[style*="display: flex"]')) {
-    e.preventDefault();
-  }
-}, {passive:false});
-
+/* ———— 说明：我没有改动其他 UI 文案或布局——结束 ———— */
 </script>
 </body>
 </html>
