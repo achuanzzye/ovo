@@ -28,9 +28,9 @@
 *{box-sizing:border-box}
 html,body{height:100%}
 
-/* 修复：将 body 的 overflow:hidden 移到 html 上，且只隐藏x轴 */
+/* 修复：将 touch-action 设置为 none 来彻底禁止所有手势，特别是左右滑动 */
 html{
-  overflow-x: hidden;
+  touch-action: none;
 }
 
 /* ---------- 禁止选中文字、长按菜单、触控相关 ---------- */
@@ -39,8 +39,6 @@ html,body, #scene, .wrap, .card, .msg, .bubble, .dock, .avatar, .title, .hint {
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
-  /* 修复：触控动作使用 manipulation，它会允许点击，并阻止双击缩放和长按菜单 */
-  touch-action: manipulation;
 }
 input[type="text"], textarea {
   -webkit-user-select: text;
@@ -56,7 +54,6 @@ body{
   background: var(--bg) fixed;
   font: 16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   -webkit-font-smoothing:antialiased;
-  /* 修复：移除这里错误的 overflow: hidden */
 }
 
 #scene{
@@ -100,6 +97,8 @@ body{
 .wrap{
   position:relative; height:100%;
   padding: 10px 16px 20px; overflow:auto; scrollbar-width:none;
+  /* 修复: 在此容器上恢复y轴滚动 */
+  touch-action: pan-y;
 }
 .wrap::-webkit-scrollbar{display:none}
 .card{
@@ -426,10 +425,6 @@ function throttle(func, limit) {
 
   const btn = document.getElementById('btnConfetti');
   btn.addEventListener('click', e=> burst(window.innerWidth*0.5, 140));
-  // icoConfetti 这个元素不存在，我注释掉了
-  // document.getElementById('icoConfetti').addEventListener('click', e=>{
-  //   burst(window.innerWidth*0.5, window.innerHeight*0.7);
-  // });
   window.addEventListener('dblclick', e=> burst(e.clientX, e.clientY));
 })();
 
@@ -516,12 +511,11 @@ btnPing.addEventListener('click', ()=> ping('🐾 喵爪提醒：记得喝水喵
   }
 })();
 
-/* ================== 新增功能： 禁用双击缩放、屏蔽长按菜单、自动隐藏提示 ================== */
-
-/* 修复：将错误的 JS 阻止逻辑移除，该逻辑会导致按钮点击失效 */
+/* ================== 修复：移除所有 JavaScript 触摸事件阻止逻辑 ================== */
 (function(){
-  // 屏蔽长按菜单
+  // 屏蔽长按菜单 (contextmenu)
   document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+  // 触摸事件的禁止交由 CSS `touch-action` 负责，更可靠
 })();
 
 
