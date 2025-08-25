@@ -614,7 +614,7 @@ btnPing.addEventListener('click', ()=> ping('🐾 喵爪提醒：记得喝水～
   }
   function next(){
     const phase = currentPhase;
-    if(phase===0) document.getElementById('breathText').textContent = '我在你耳边数呼吸：吸——慢慢来，别着急。';
+    if(phase===0) document.getElementById('breathText').textContent = '吸——慢慢来，别着急。';
     if(phase===1) document.getElementById('breathText').textContent = '屏住一会儿，我在这儿。';
     if(phase===2) document.getElementById('breathText').textContent = '呼——把不安都吐出去。';
     const dur = phase===0?cfg.inhale:(phase===1?cfg.hold:cfg.exhale);
