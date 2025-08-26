@@ -26,19 +26,21 @@
 
 
 *{box-sizing:border-box}
-/* 修复：将 overflow-x: hidden 和 touch-action: none 配合使用，彻底阻止左右滑动 */
+
+/* 修复：移除 touch-action:none，使用 overflow-x:hidden 确保横向滑动被阻止 */
 html,body{
   height:100%;
   overflow-x: hidden;
-  touch-action: none;
+  /* 修复：使用 user-select: none 解决 iOS 双击位移问题 */
+  user-select: none;
+  -webkit-user-select: none;
+  background-color: #0d0f14; /* 修复：防止顶部闪烁白边 */
 }
 
 
 /* ---------- 禁止选中文字、长按菜单、触控相关 ---------- */
 /* 允许输入框/textarea 可选文本，但页面其余不能选中 */
 html,body, #scene, .wrap, .card, .msg, .bubble, .dock, .avatar, .title, .hint {
-  -webkit-user-select: none;
-  user-select: none;
   -webkit-touch-callout: none;
 }
 input[type="text"], textarea {
@@ -141,9 +143,10 @@ border:1px solid rgba(255,255,255,.08);
 box-shadow: inset 0 1px 0 rgba(255,255,255,.15);
 }
 
-/* 呼吸文字区域：确保不会影响圆形布局 */
+/* 修复：给呼吸文本容器固定高度，防止按钮跳动 */
 .breath-meta{
-color:var(–ink-soft); font-size:14px; margin-top:6px; flex:1; min-width:160px;
+  color:var(–ink-soft); font-size:14px; margin-top:6px; flex:1; min-width:160px;
+  min-height: 48px;
 }
 
 /* 短信气泡（iOS风） */
@@ -276,7 +279,7 @@ min-width:150px; flex:1;
       </div>
 
   <div class="card">
-    <h3 style="margin:0 0 8px 0">深呼吸 — 跟着我</h3>
+    <h3 style="margin:0 0 8px 0">深呼吸 · 跟着我</h3>
     <div class="breath-wrapper">
       <div class="breath-outer" id="breathOuter">
         <div class="breath-inner">
@@ -316,6 +319,9 @@ min-width:150px; flex:1;
       </div>
     </div>
     <div style="margin-top:10px;color:var(--ink-soft)"><small id="medNote">最近记录：无</small></div>
+    <div style="margin-top:16px;">
+      <button id="btnNotify" style="width:100%">开启吃药提醒通知</button>
+    </div>
   </div>
 
       <div class="card">
@@ -519,7 +525,6 @@ function ping(text){
 (function(){
   // 屏蔽长按菜单 (contextmenu)
   document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
-  // 触摸事件的禁止交由 CSS `touch-action` 负责，更可靠
 })();
 
 
@@ -623,7 +628,7 @@ function ping(text){
   });
 })();
 
-/* ============== 吃药打卡： 修复时间格式（修复 71/25 问题） ============== */
+/* ================== 吃药打卡：修复每日重置逻辑 & 增加通知功能 ================== */
 (function(){
   const KEY = 'lili_meds_v1';
   const morningBtn = document.getElementById('btnMorning');
@@ -631,11 +636,22 @@ function ping(text){
   const morningState = document.getElementById('morningState');
   const eveningState = document.getElementById('eveningState');
   const medNote = document.getElementById('medNote');
+  const btnNotify = document.getElementById('btnNotify');
 
   function load(){ 
     try{ 
       const data = localStorage.getItem(KEY);
-      return data ? JSON.parse(data) : {morning:null,evening:null};
+      const today = new Date().toDateString();
+      if(data){
+        const obj = JSON.parse(data);
+        // 修复: 检查日期是否为今天，不是则清空
+        if(new Date(obj.lastVisit).toDateString() !== today){
+          localStorage.removeItem(KEY);
+          return {morning:null,evening:null, lastVisit: today};
+        }
+        return obj;
+      }
+      return {morning:null,evening:null, lastVisit: today};
     }catch(e){ 
       console.warn('Failed to load meds:', e);
       return {morning:null,evening:null};
@@ -644,6 +660,7 @@ function ping(text){
   
   function save(obj){ 
     try {
+      obj.lastVisit = new Date().toDateString();
       localStorage.setItem(KEY, JSON.stringify(obj)); 
       render();
     } catch(e) {
@@ -658,7 +675,6 @@ function ping(text){
     const mm = d.getMinutes().toString().padStart(2,'0');
     const MM = (d.getMonth()+1).toString().padStart(2,'0');
     const DD = d.getDate().toString().padStart(2,'0');
-    // 修复格式问题
     return `${HH}:${mm} ${MM}/${DD}`;
   }
 
@@ -692,6 +708,45 @@ function ping(text){
       save(s);
       ping('晚上已打卡，记得睡前整理药盒。');
     }, 1000));
+  }
+
+  // 新增：通知功能
+  function sendMedNotification(timeOfDay) {
+      if (Notification.permission === 'granted') {
+          const title = '💊 哥哥提醒：吃药时间到啦';
+          let body = '';
+          if (timeOfDay === 'morning') {
+              body = '早上9点，记得吃药哦，今天的可爱燃料已补给。';
+          } else if (timeOfDay === 'evening') {
+              body = '晚上9点，别忘了吃药。早点休息，哥哥在梦里陪你。';
+          }
+          new Notification(title, { body: body });
+      } else {
+          console.warn('Notification permission not granted.');
+      }
+  }
+  
+  // 新增：请求通知权限
+  if (btnNotify) {
+    btnNotify.addEventListener('click', () => {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          ping('已开启吃药提醒，哥哥会准时提醒你。');
+          // 每天定时检查
+          setInterval(() => {
+            const now = new Date();
+            const currentHour = now.getHours();
+            if (currentHour === 9 && now.getMinutes() === 0) {
+              sendMedNotification('morning');
+            } else if (currentHour === 21 && now.getMinutes() === 0) {
+              sendMedNotification('evening');
+            }
+          }, 60000); // 每分钟检查一次
+        } else {
+          ping('你拒绝了通知权限，无法开启提醒。');
+        }
+      });
+    });
   }
   
   render();
