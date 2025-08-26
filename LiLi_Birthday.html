@@ -68,6 +68,11 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 
+/* 修复：重新阻止横向滑动 */
+html,body{
+  overflow-x: hidden;
+}
+
 #scene{
   position:relative; height:100%; width:100%;
   padding-bottom: calc(env(safe-area-inset-bottom) + var(--dock-height) + 16px);
