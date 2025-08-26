@@ -24,30 +24,34 @@
   --dock-height: 84px;
 }
 
-
 *{box-sizing:border-box}
 
-/* 修复：重新添加 touch-action: none 来彻底禁用双击手势，同时增加 body 高度确保背景填充 */
-html{
-  height:100%;
-  touch-action: none;
-  overflow-x: hidden;
+/* ============================ 修复 iOS PWA 全屏沉浸问题 ============================ */
+/* 在 PWA 模式下强制所有元素填满屏幕，解决跳动和白边问题 */
+@media all and (display-mode: standalone) {
+    html, body {
+        height: 100dvh !important;
+        height: 100vh !important;
+        overflow-x: hidden !important;
+        user-select: none !important;
+        background-color: #0d0f14 !important;
+    }
+    
+    /* 强制内容填满整个屏幕，并使用安全区域进行内边距 */
+    #scene {
+        height: 100% !important;
+        padding-top: calc(env(safe-area-inset-top) + 14px) !important;
+        padding-bottom: calc(env(safe-area-inset-bottom) + var(--dock-height) + 16px) !important;
+    }
 }
-body{
-  height:100%;
-  overflow-x: hidden;
-  background-color: #0d0f14; /* 修复：防止顶部闪烁白边 */
-  background-image: var(--bg);
-  background-attachment: fixed;
-  font: 16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  -webkit-font-smoothing:antialiased;
-  -webkit-user-select: none;
-  user-select: none;
+/* ================================================================================= */
+
+
+/* ---------- 禁止选中文字、长按菜单、触控相关 ---------- */
+/* 允许输入框/textarea 可选文本，但页面其余不能选中 */
+html,body, #scene, .wrap, .card, .msg, .bubble, .dock, .avatar, .title, .hint {
   -webkit-touch-callout: none;
 }
-
-
-/* 允许输入框/textarea 可选文本 */
 input[type="text"], textarea {
   -webkit-user-select: text;
   user-select: text;
@@ -56,6 +60,14 @@ input[type="text"], textarea {
 }
 
 /* ---------- 基本视觉 ---------- */
+body{
+  margin:0;
+  color:var(--ink);
+  background: var(--bg) fixed;
+  font: 16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+
 #scene{
   position:relative; height:100%; width:100%;
   padding-bottom: calc(env(safe-area-inset-bottom) + var(--dock-height) + 16px);
@@ -97,7 +109,6 @@ input[type="text"], textarea {
 .wrap{
   position:relative; height:100%;
   padding: 10px 16px 20px; overflow:auto; scrollbar-width:none;
-  /* 修复：局部恢复垂直滑动，确保手势流畅 */
   touch-action: pan-y;
 }
 .wrap::-webkit-scrollbar{display:none}
