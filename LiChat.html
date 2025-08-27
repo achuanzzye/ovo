@@ -1,0 +1,1936 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+<!-- PWA相关meta标签 -->
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="狸狸聊天器">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="狸狸聊天器">
+
+<!-- 主题颜色 -->
+
+<meta name="theme-color" content="#1e3c72">
+<meta name="msapplication-navbutton-color" content="#1e3c72">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<!-- 防止缓存 -->
+
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+<title>狸狸聊天器</title>
+<style>
+    :root {
+        --bg-image: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        --header-blur-bg: rgba(25, 28, 36, 0.8);
+        --dock-bg: rgba(30, 30, 30, 0.7);
+        --text-primary: #ffffff;
+        --text-secondary: #a7a7b0;
+        --active-blue: #0A84FF;
+        --avatar-border: #555555;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* PWA完美全屏 + 沉浸式状态栏 */
+    html {
+        height: 100%;
+        height: 100vh;
+        height: 100dvh; 
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        background: var(--bg-image);
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        height: 100%;
+        height: 100vh;
+        height: 100dvh;
+        margin: 0;
+        padding: 0;
+        width: 100vw;
+        overflow: hidden;
+        background: inherit;
+        background-attachment: fixed;
+        color: var(--text-primary);
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    body::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* PWA独立应用模式 */
+    @media all and (display-mode: standalone) {
+        html, body, .app-container {
+            height: 100vh !important;
+            height: 100dvh !important;
+            min-height: 100vh !important;
+            min-height: 100dvh !important;
+            max-height: 100vh !important;
+            max-height: 100dvh !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+    }
+
+    .app-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        background: transparent;
+        overflow: hidden;
+        z-index: 10;
+    }
+
+/* 修复 iOS Safari 底部安全区域问题 */
+    html {
+        padding-bottom: env(safe-area-inset-bottom) !important;
+    }
+
+    .home-screen {
+        height: 100% !important;
+        padding-bottom: calc(150px + env(safe-area-inset-bottom)) !important;
+        padding-top: calc(40px + env(safe-area-inset-top)) !important;
+        box-sizing: border-box !important;
+    }
+
+/* 统一调整所有界面的高度 */
+    .theme-screen, .settings-screen, .chat-app, .chat-screen {
+        height: 100% !important; 
+        padding-bottom: 0 !important;
+    }
+
+/* 统一处理所有界面的头部和底部，内容区自适应 */
+    .theme-header, .settings-header, .chat-header, .chat-nav {
+        padding-top: env(safe-area-inset-top) !important;
+        box-sizing: border-box !important;
+    }
+
+    .chat-input-area {
+        padding-bottom: env(safe-area-inset-bottom) !important;
+        box-sizing: border-box !important;
+    }
+
+/* 调整内容区域高度 */
+    .theme-content, .settings-content, .chat-list, .moments-list, .chat-messages {
+        height: calc(100% - var(--header-height, 60px) - var(--footer-height, 0px)) !important;
+    }
+
+/* Dock适配 */
+    .dock {
+        bottom: calc(20px + env(safe-area-inset-bottom)) !important;
+    }
+}
+
+
+/* 非PWA模式下的适配 */
+@media not all and (display-mode: standalone) {
+    /* iOS Safari特殊处理 */
+    @supports (-webkit-touch-callout: none) {
+        html {
+            height: -webkit-fill-available;
+            min-height: -webkit-fill-available;
+        }
+        
+        body {
+            height: -webkit-fill-available;
+            min-height: -webkit-fill-available;
+        }
+        
+        .app-container {
+            height: -webkit-fill-available;
+            min-height: -webkit-fill-available;
+        }
+    }
+}
+
+/* PWA提示框 */
+.pwa-hint {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 14px;
+    z-index: 1000;
+    text-align: center;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: slideDown 0.3s ease;
+}
+
+.pwa-hint.hidden {
+    animation: slideUp 0.3s ease forwards;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(0); opacity: 1; }
+    to { transform: translateY(-100%); opacity: 0; }
+}
+
+.pwa-hint-title {
+    font-weight: bold;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.pwa-hint-steps {
+    font-size: 12px;
+    opacity: 0.8;
+    line-height: 1.4;
+}
+
+.close-hint {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.app-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    /* 移除背景，使用继承的背景 */
+    background: transparent;
+    overflow: hidden;
+    z-index: 10;
+}
+
+/* iOS Safari专用适配 */
+@supports (-webkit-touch-callout: none) {
+    html {
+        height: -webkit-fill-available;
+        min-height: -webkit-fill-available;
+    }
+    
+    body {
+        height: -webkit-fill-available;
+        min-height: -webkit-fill-available;
+    }
+    
+    .app-container {
+        height: -webkit-fill-available;
+        min-height: -webkit-fill-available;
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+}
+
+/* 主屏幕 */
+.home-screen {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    /* 完全填充，考虑安全区域 */
+    padding: calc(40px + env(safe-area-inset-top)) 20px calc(150px + env(safe-area-inset-bottom)) 20px;
+}
+
+/* 时间显示 */
+.time-widget {
+    text-align: center;
+    color: white;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    font-weight: 300;
+}
+.time-widget .time {
+    font-size: 80px;
+    letter-spacing: -2px;
+    line-height: 1;
+}
+.time-widget .date {
+    font-size: 18px;
+    margin-top: 10px;
+}
+
+/* 应用图标 */
+.app-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.app-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    color: white;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+}
+
+.app-icon:active {
+    transform: scale(0.95);
+}
+
+/* Dock栏 */
+.dock {
+    position: fixed;
+    bottom: calc(20px + env(safe-area-inset-bottom));
+    left: 20px;
+    right: 20px;
+    height: 80px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(20px);
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+    /* =================================
+       XChat 新 UI 样式
+    ================================= */
+    
+    /* 统一页面容器 */
+    .x-page {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        width: 100%;
+        background: transparent;
+    }
+    
+    /* 统一顶栏样式 */
+    .x-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        height: calc(56px + env(safe-area-inset-top));
+        padding-top: calc(12px + env(safe-area-inset-top));
+        z-index: 100;
+        transition: background-color 0.3s ease;
+        background-color: transparent; /* 默认透明 */
+    }
+    
+    /* 顶栏滚动模糊效果 */
+    .x-header.scrolled {
+        background-color: var(--header-blur-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+    
+    .x-header-title {
+        font-size: 28px;
+        font-weight: 700;
+        position: absolute;
+        left: 16px;
+        bottom: 12px;
+    }
+    
+    .x-header-button {
+        background: none;
+        border: none;
+        color: var(--text-primary);
+        font-size: 28px;
+        cursor: pointer;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .x-header .back-btn {
+        font-size: 24px;
+        font-weight: bold;
+    }
+    
+    /* 统一内容列表区域 */
+    .x-content-list {
+        flex: 1;
+        overflow-y: auto;
+        padding-top: calc(56px + env(safe-area-inset-top)); /* 为顶栏留出空间 */
+        padding-bottom: calc(90px + env(safe-area-inset-bottom)); /* 为底栏留出空间 */
+    }
+    .x-content-list::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* 联系人列表项 */
+    .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 16px;
+        cursor: pointer;
+    }
+    
+    .contact-avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background-color: #333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        background-size: cover;
+        background-position: center;
+        flex-shrink: 0;
+    }
+    
+    .contact-info {
+        border-bottom: 1px solid rgba(84, 84, 88, 0.65);
+        padding: 8px 0;
+        flex-grow: 1;
+    }
+    
+    .contact-item:last-child .contact-info {
+        border-bottom: none;
+    }
+    
+    .contact-name {
+        font-size: 17px;
+        font-weight: 500;
+    }
+    
+    .contact-status {
+        font-size: 15px;
+        color: var(--text-secondary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* 悬浮底栏 */
+    .floating-dock {
+        position: fixed;
+        bottom: calc(16px + env(safe-area-inset-bottom));
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100% - 32px);
+        max-width: 400px;
+        height: 64px;
+        background-color: var(--dock-bg);
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        border-radius: 32px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        z-index: 1000;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .dock-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        font-size: 10px;
+        padding: 4px;
+        border-radius: 16px; /* for potential tap feedback */
+    }
+    
+    .dock-icon-placeholder {
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px; /* for emoji */
+    }
+    
+    .dock-label {
+        padding: 2px 10px;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .dock-item.active .dock-label {
+        background-color: var(--active-blue);
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    /* “我” 标签的特殊样式 */
+    .dock-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background-color: #555;
+        background-size: cover;
+        background-position: center;
+        border: 2px solid transparent; /* 默认无边框 */
+        transition: border-color 0.3s ease;
+    }
+
+    .dock-item.active .dock-avatar {
+        border-color: var(--avatar-border);
+    }
+    
+    .dock-item.active .dock-label {
+        background-color: transparent; /* “我”标签激活时，文字无背景 */
+        color: var(--text-primary);
+    }
+
+/* 设置界面 */
+.settings-screen {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(20px);
+    z-index: 1000;
+}
+
+.settings-header {
+    height: calc(60px + env(safe-area-inset-top));
+    padding-top: env(safe-area-inset-top);
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    padding-right: 20px;
+    color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.settings-content {
+    padding: 20px;
+    height: calc(100vh - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    height: calc(100dvh - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    overflow-y: auto;
+    color: white;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+}
+
+.setting-item {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.setting-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.setting-item input, .setting-item select, .setting-item textarea {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    outline: none;
+}
+
+.setting-item input::placeholder, .setting-item textarea::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* 主题界面 */
+.theme-screen {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(20px);
+    z-index: 1000;
+}
+
+.theme-header {
+    height: calc(60px + env(safe-area-inset-top));
+    padding-top: env(safe-area-inset-top);
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    padding-right: 20px;
+    color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.theme-content {
+    padding: 20px;
+    height: calc(100vh - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    height: calc(100dvh - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    overflow-y: auto;
+    color: white;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+}
+
+.theme-section {
+    margin-bottom: 30px;
+}
+
+.theme-section-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.file-input-wrapper {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    background: #007AFF;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.file-input-wrapper:active {
+    transform: scale(0.95);
+}
+
+.file-input-wrapper input[type="file"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+/* 模态框 */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.modal-content {
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 30px;
+    width: 100%;
+    max-width: 400px;
+    color: #333;
+}
+
+.modal-header {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.modal-input, .modal-textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    outline: none;
+}
+
+.modal-textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.modal-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.modal-btn.cancel {
+    background: #f8f9fa;
+    color: #6c757d;
+}
+
+.modal-btn.confirm {
+    background: #007AFF;
+    color: white;
+}
+
+.modal-btn:active {
+    transform: scale(0.95);
+}
+
+/* 特殊消息样式 */
+.special-message {
+    border-radius: 12px;
+    padding: 15px;
+    margin: 10px 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    color: white;
+}
+
+.special-message.image { background: linear-gradient(135deg, #74b9ff, #0984e3); }
+.special-message.voice { background: linear-gradient(135deg, #fd79a8, #e84393); }
+.special-message.link { background: linear-gradient(135deg, #55a3ff, #3742fa); }
+.special-message.money { background: linear-gradient(135deg, #ffeaa7, #fdcb6e); color: #2d3436; }
+
+.special-message-header {
+    font-weight: bold;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 加载动画 */
+.loading {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* 添加联系人按钮 */
+.add-contact-btn {
+    position: fixed;
+    bottom: 100px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 28px;
+    background: #007AFF;
+    color: white;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,123,255,0.4);
+    transition: all 0.3s ease;
+}
+
+.add-contact-btn:active {
+    transform: scale(0.9);
+}
+
+.avatar-upload {
+    position: relative;
+    display: inline-block;
+}
+
+.avatar-upload input[type="file"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.data-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.data-btn {
+    flex: 1;
+    padding: 12px;
+    background: rgba(255,255,255,0.1);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.data-btn:active {
+    background: rgba(255,255,255,0.2);
+}
+
+
+</style>
+
+
+</head>
+<body>
+    <!-- PWA安装提示 -->
+    <div class="pwa-hint" id="pwaHint">
+        <button class="close-hint" onclick="closePwaHint()">×</button>
+        <div class="pwa-hint-title">
+            📱 获得完美全屏体验
+        </div>
+        <div class="pwa-hint-steps">
+            点击下方分享按钮 📤 → 选择"添加到主屏幕" → 享受无边框体验！
+        </div>
+    </div>
+
+<div class="app-container" id="appContainer">
+    <div class="home-screen" id="homeScreen">
+        <div class="time-widget">
+            <div class="time" id="currentTime"></div>
+            <div class="date" id="currentDate"></div>
+        </div>
+
+    <div class="app-grid"></div>
+
+    <div class="dock">
+        <div class="app-icon" id="chat-app-icon" onclick="openChatApp()">💬</div>
+        <div class="app-icon" id="settings-app-icon" onclick="openSettings()">⚙️</div>
+        <div class="app-icon" id="theme-app-icon" onclick="openTheme()">🎨</div>
+    </div>
+</div>
+
+<div class="chat-app" id="chatApp">
+    
+    <div class="x-page" id="chatsPage" style="display: none;">
+        </div>
+
+    <div class="x-page" id="contactsPage">
+        <div class="x-header" id="contactsHeader">
+             <button class="x-header-button back-btn" onclick="goHome()">&#10094;</button>
+             <h1 class="x-header-title">联系人</h1>
+             <button class="x-header-button add-btn" onclick="openAddContactModal()">+</button>
+        </div>
+        <div class="x-content-list" id="contactsListContainer">
+             </div>
+    </div>
+
+    <div class="x-page" id="momentsPage" style="display: none;">
+        </div>
+
+    <div class="x-page" id="profilePage" style="display: none;">
+         </div>
+    
+    <div class="floating-dock">
+        <button class="dock-item" onclick="switchTab('chats')">
+            <span class="dock-icon-placeholder">💬</span>
+            <span class="dock-label">消息</span>
+        </button>
+        <button class="dock-item active" onclick="switchTab('contacts')">
+            <span class="dock-icon-placeholder">👥</span>
+            <span class="dock-label">联系人</span>
+        </button>
+        <button class="dock-item" onclick="switchTab('moments')">
+            <span class="dock-icon-placeholder">🌟</span>
+            <span class="dock-label">朋友圈</span>
+        </button>
+        <button class="dock-item" onclick="switchTab('me')">
+            <div class="dock-avatar" id="dockProfileAvatar"></div>
+            <span class="dock-label">我</span>
+        </button>
+    </div>
+</div>
+
+<div class="settings-screen" id="settingsScreen">
+    <div class="settings-header">
+        <button class="back-btn" onclick="goHome()">←</button>
+        <div>API设置</div>
+    </div>
+    <div class="settings-content">
+        <div class="setting-item">
+            <label class="setting-label">API服务商</label>
+            <select id="apiProvider" onchange="updateApiSettings()">
+                <option value="openai">OpenAI</option>
+                <option value="claude">Claude</option>
+                <option value="custom">自定义</option>
+            </select>
+        </div>
+        <div class="setting-item">
+            <label class="setting-label">API地址</label>
+            <input type="text" id="apiUrl" placeholder="https://api.openai.com/v1/chat/completions">
+        </div>
+        <div class="setting-item">
+            <label class="setting-label">API密钥</label>
+            <input type="password" id="apiKey" placeholder="输入你的API密钥">
+        </div>
+        <div class="setting-item">
+            <label class="setting-label">默认模型</label>
+            <input type="text" id="modelName" placeholder="gpt-3.5-turbo">
+        </div>
+        <div class="setting-item">
+            <button onclick="saveSettings()" style="width: 100%; padding: 12px; background: #007AFF; color: white; border: none; border-radius: 8px; cursor: pointer;">保存设置</button>
+        </div>
+    </div>
+</div>
+
+<div class="theme-screen" id="themeScreen">
+    <div class="theme-header">
+        <button class="back-btn" onclick="goHome()">←</button>
+        <div>主题</div>
+    </div>
+    <div class="theme-content">
+        <div class="theme-section">
+            <div class="theme-section-title">壁纸</div>
+            <div class="file-input-wrapper">
+                <input type="file" id="wallpaperFile" accept="image/*" onchange="uploadWallpaper(event)">
+                上传自定义壁纸
+            </div>
+            <p style="color: rgba(255,255,255,0.6); margin-top: 15px;">选择一张图片作为XPhone的壁纸</p>
+        </div>
+        <div class="theme-section">
+            <div class="theme-section-title">应用图标</div>
+            <label class="setting-label">选择应用</label>
+            <select class="modal-input" id="iconAppSelect">
+                <option value="chat">XChat</option>
+                <option value="settings">设置</option>
+                <option value="theme">主题</option>
+            </select>
+            <label class="setting-label">上传图标</label>
+            <div class="file-input-wrapper" style="width: 100%; margin: 0;">
+                <input type="file" id="iconImageFile" accept="image/*" onchange="updateAppIcon(event)">
+                选择图片
+            </div>
+            <button onclick="saveCustomIcon()" style="width: 100%; padding: 12px; background: #007AFF; color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 20px;">保存图标</button>
+        </div>
+    </div>
+</div>
+
+
+</div>
+
+<div class="modal" id="addContactModal">
+    <div class="modal-content">
+        <div class="modal-header">添加AI联系人</div>
+        <div class="modal-body">
+            <input type="text" class="modal-input" id="contactName" placeholder="联系人姓名">
+            <div class="avatar-upload" style="margin-bottom: 15px;">
+                <div style="width: 60px; height: 60px; border-radius: 30px; background: linear-gradient(135deg, #007AFF, #5AC8FA); margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; background-size: cover; background-position: center;" id="newContactAvatar">🤖</div>
+                <input type="file" accept="image/*" onchange="updateContactAvatar(event)" style="position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer;">
+            </div>
+            <textarea class="modal-textarea" id="contactPrompt" placeholder="个性化prompt，描述这个AI的特点和回答风格..."></textarea>
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+            <button class="modal-btn confirm" onclick="addContact()">添加</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="editProfileModal">
+    <div class="modal-content">
+        <div class="modal-header">编辑个人资料</div>
+        <div class="modal-body">
+            <input type="text" class="modal-input" id="editProfileName" placeholder="您的昵称">
+            <textarea class="modal-textarea" id="editProfileBio" placeholder="个人简介..."></textarea>
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+            <button class="modal-btn confirm" onclick="saveProfile()">保存</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="commentModal">
+    <div class="modal-content">
+        <div class="modal-header">发表评论</div>
+        <div class="modal-body">
+            <textarea class="modal-textarea" id="commentInput" placeholder="写下你的评论..."></textarea>
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+            <button class="modal-btn confirm" onclick="postComment()">发表</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="imageModal">
+    <div class="modal-content">
+        <div class="modal-header">📸 发送图片</div>
+        <div class="modal-body">
+            <input type="text" class="modal-input" id="imageTitle" placeholder="图片标题">
+            <textarea class="modal-textarea" id="imageDesc" placeholder="请描述这张图片的内容..."></textarea>
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+            <button class="modal-btn confirm" onclick="sendImage()">发送</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="voiceModal">
+    <div class="modal-content">
+        <div class="modal-header">🎤 发送语音</div>
+        <div class="modal-body">
+            <input type="text" class="modal-input" id="voiceDuration" placeholder="语音时长（秒）">
+            <textarea class="modal-textarea" id="voiceContent" placeholder="请输入要发送的语音内容..."></textarea>
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+            <button class="modal-btn confirm" onclick="sendVoice()">发送</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="linkModal">
+    <div class="modal-content">
+        <div class="modal-header">🔗 分享链接</div>
+        <div class="modal-body">
+            <input type="text" class="modal-input" id="linkTitle" placeholder="链接标题">
+            <input type="text" class="modal-input" id="linkUrl" placeholder="链接地址">
+            <textarea class="modal-textarea" id="linkDesc" placeholder="链接描述..."></textarea>
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+            <button class="modal-btn confirm" onclick="sendLink()">发送</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="moneyModal">
+    <div class="modal-content">
+        <div class="modal-header">💰 转账红包</div>
+        <div class="modal-body">
+            <input type="number" class="modal-input" id="moneyAmount" placeholder="转账金额">
+            <input type="text" class="modal-input" id="moneyNote" placeholder="转账备注">
+            <select class="modal-input" id="moneyType">
+                <option value="transfer">转账</option>
+                <option value="redpack">红包</option>
+            </select>
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+            <button class="modal-btn confirm" onclick="sendMoney()">发送</button>
+        </div>
+    </div>
+</div>
+
+<input type="file" id="importFile" accept=".json" style="display: none;" onchange="handleImportFile(event)">
+
+<script>
+    // 精简全局状态管理
+    const state = {
+        currentContact: null,
+        currentTab: 'chats',
+        currentMomentId: null,
+        contacts: [],
+        messages: {},
+        moments: [],
+        profile: { name: '我', bio: '这个人很懒，什么都没有留下...', avatar: '😊' },
+        appIcons: { chat: '💬', settings: '⚙️', theme: '🎨' },
+        config: { apiProvider: 'openai', apiUrl: 'https://api.openai.com/v1/chat/completions', apiKey: '', modelName: 'gpt-3.5-turbo' }
+    };
+
+    // 初始化
+    function initApp() {
+        loadData();
+        renderChatList();
+        renderMoments();
+        updateClock();
+        setInterval(updateClock, 1000);
+        initPWA();
+    }
+
+    // PWA功能初始化
+    function initPWA() {
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                             window.navigator.standalone || 
+                             document.referrer.includes('android-app://');
+    
+        if (isStandalone) {
+            document.getElementById('pwaHint').style.display = 'none';
+            console.log('🎉 运行在PWA模式，完美全屏！');
+        } else {
+            showPwaHint();
+        }
+    
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            console.log('PWA可以安装');
+        });
+    }
+
+
+    // 显示PWA安装提示
+    function showPwaHint() {
+        const hint = document.getElementById('pwaHint');
+        hint.style.display = 'block';
+        
+        // 10秒后自动隐藏
+        setTimeout(() => {
+            if (hint.style.display !== 'none') {
+                hint.classList.add('hidden');
+                setTimeout(() => {
+                    hint.style.display = 'none';
+                }, 300);
+            }
+        }, 10000);
+    }
+
+    // 关闭PWA提示
+    function closePwaHint() {
+        const hint = document.getElementById('pwaHint');
+        hint.classList.add('hidden');
+        setTimeout(() => {
+            hint.style.display = 'none';
+        }, 300);
+    }
+
+    // 精简数据加载 + 壁纸修复
+    function loadData() {
+        try {
+            const profile = localStorage.getItem('xphone_profile');
+            const contacts = localStorage.getItem('xphone_contacts');
+            const messages = localStorage.getItem('xphone_messages');
+            const moments = localStorage.getItem('xphone_moments');
+            const icons = localStorage.getItem('xphone_icons');
+            const config = localStorage.getItem('xphone_config');
+            const wallpaper = localStorage.getItem('xphone_wallpaper');
+
+            if (profile) state.profile = JSON.parse(profile);
+            if (contacts) state.contacts = JSON.parse(contacts);
+            if (messages) state.messages = JSON.parse(messages);
+            if (moments) state.moments = JSON.parse(moments);
+            if (icons) state.appIcons = { ...state.appIcons, ...JSON.parse(icons) };
+            if (config) state.config = { ...state.config, ...JSON.parse(config) };
+            
+            // 修复壁纸加载 - 确保在页面加载时应用壁纸
+            if (wallpaper && wallpaper !== 'null') {
+                console.log('加载保存的壁纸:', wallpaper);
+                setWallpaper(wallpaper);
+            } else {
+                console.log('没有找到保存的壁纸，使用默认背景');
+                // 确保默认背景正确设置
+                const defaultBg = 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)';
+                document.documentElement.style.setProperty('--bg-image', defaultBg);
+            }
+
+            updateProfileDisplay();
+            updateAppIconDisplay();
+            updateSettingsUI();
+        } catch (error) {
+            console.warn('数据加载失败', error);
+        }
+    }
+
+    // 时间显示 - 不显示年份
+    function updateClock() {
+        const now = new Date();
+        const time = now.toTimeString().slice(0, 5);
+        const options = { month: 'long', day: 'numeric', weekday: 'long' };
+        const date = now.toLocaleDateString('zh-CN', options);
+        
+        const timeElement = document.getElementById('currentTime');
+        const dateElement = document.getElementById('currentDate');
+        
+        if (timeElement) timeElement.textContent = time;
+        if (dateElement) dateElement.textContent = date;
+    }
+
+    // 更新个人资料显示
+    function updateProfileDisplay() {
+        const avatarEl = document.getElementById('profileAvatar');
+        const nameEl = document.getElementById('profileName');
+        const bioEl = document.getElementById('profileBio');
+        
+        if (avatarEl) {
+            if (state.profile.avatar.startsWith('data:image')) {
+                avatarEl.style.backgroundImage = `url(${state.profile.avatar})`;
+                avatarEl.textContent = '';
+            } else {
+                avatarEl.style.backgroundImage = '';
+                avatarEl.textContent = state.profile.avatar;
+            }
+        }
+        
+        if (nameEl) nameEl.textContent = state.profile.name;
+        if (bioEl) bioEl.textContent = state.profile.bio;
+    }
+
+    // 更新应用图标显示 - 只支持图片，默认emoji
+    function updateAppIconDisplay() {
+        Object.keys(state.appIcons).forEach(app => {
+            const iconEl = document.getElementById(app + '-app-icon');
+            if (iconEl) {
+                if (typeof state.appIcons[app] === 'object' && state.appIcons[app].image) {
+                    iconEl.style.backgroundImage = `url(${state.appIcons[app].image})`;
+                    iconEl.textContent = '';
+                } else {
+                    iconEl.style.backgroundImage = '';
+                    const defaultEmojis = { chat: '💬', settings: '⚙️', theme: '🎨' };
+                    iconEl.textContent = defaultEmojis[app] || '📱';
+                }
+            }
+        });
+    }
+
+    // 界面切换
+    function goHome() {
+        hideAllScreens();
+        document.getElementById('homeScreen').style.display = 'flex';
+    }
+
+    function openChatApp() {
+        hideAllScreens();
+        document.getElementById('chatApp').style.display = 'block';
+        switchTab('chats');
+    }
+
+    function openSettings() {
+        hideAllScreens();
+        document.getElementById('settingsScreen').style.display = 'block';
+    }
+
+    function openTheme() {
+        hideAllScreens();
+        document.getElementById('themeScreen').style.display = 'block';
+    }
+
+    function backToChatApp() {
+        hideAllScreens();
+        document.getElementById('chatApp').style.display = 'block';
+    }
+
+    function hideAllScreens() {
+        const screens = ['homeScreen', 'chatApp', 'chatScreen', 'settingsScreen', 'themeScreen'];
+        screens.forEach(screen => {
+            document.getElementById(screen).style.display = 'none';
+        });
+    }
+
+    function switchTab(tab) {
+        state.currentTab = tab;
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        
+        const tabs = ['chats', 'contacts', 'moments', 'me'];
+        const activeIndex = tabs.indexOf(tab);
+        if (activeIndex !== -1) {
+            document.querySelectorAll('.nav-item')[activeIndex].classList.add('active');
+        }
+        
+        document.getElementById('chatList').style.display = tab === 'chats' ? 'block' : 'none';
+        document.getElementById('momentsList').style.display = tab === 'moments' ? 'block' : 'none';
+        document.getElementById('profileScreen').style.display = tab === 'me' ? 'block' : 'none';
+        document.getElementById('addContactBtn').style.display = (tab === 'chats' || tab === 'contacts') ? 'block' : 'none';
+    }
+
+    // 联系人管理
+    function renderChatList() {
+        const chatList = document.getElementById('chatList');
+        
+        if (state.contacts.length === 0) {
+            chatList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">💬</div><div>还没有联系人</div><div>点击右下角"+"添加AI朋友吧</div></div>';
+            return;
+        }
+        
+        chatList.innerHTML = '';
+        state.contacts.forEach(contact => {
+            const messages = state.messages[contact.id] || [];
+            const lastMessage = messages[messages.length - 1];
+            
+            const chatItem = document.createElement('div');
+            chatItem.className = 'chat-item';
+            chatItem.onclick = () => openChat(contact);
+            
+            const avatarStyle = contact.avatar && contact.avatar.startsWith('data:image') 
+                ? `background-image: url(${contact.avatar}); color: transparent;`
+                : '';
+            
+            chatItem.innerHTML = `
+                <div class="chat-avatar" style="${avatarStyle}">${contact.avatar && !contact.avatar.startsWith('data:image') ? contact.avatar : ''}</div>
+                <div class="chat-info">
+                    <div class="chat-name">${contact.name}</div>
+                    <div class="chat-preview">${lastMessage ? (lastMessage.text.length > 20 ? lastMessage.text.substring(0, 20) + '...' : lastMessage.text) : '暂无消息'}</div>
+                </div>
+            `;
+            
+            chatList.appendChild(chatItem);
+        });
+    }
+
+    function openAddContactModal() {
+        document.getElementById('newContactAvatar').textContent = '🤖';
+        document.getElementById('newContactAvatar').style.backgroundImage = '';
+        document.getElementById('addContactModal').style.display = 'flex';
+    }
+
+    function updateContactAvatar(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const avatar = document.getElementById('newContactAvatar');
+                avatar.style.backgroundImage = `url(${e.target.result})`;
+                avatar.textContent = '';
+                avatar.dataset.avatarData = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function addContact() {
+        const name = document.getElementById('contactName').value.trim();
+        const prompt = document.getElementById('contactPrompt').value.trim();
+        const avatarEl = document.getElementById('newContactAvatar');
+        
+        if (!name || !prompt) {
+            alert('请填写联系人姓名和个性化prompt');
+            return;
+        }
+        
+        const avatar = avatarEl.dataset.avatarData || '🤖';
+        
+        const contact = {
+            id: 'contact-' + Date.now(),
+            name: name,
+            avatar: avatar,
+            prompt: prompt
+        };
+        
+        state.contacts.push(contact);
+        state.messages[contact.id] = [];
+        
+        saveData();
+        generateWelcomeMoment(contact);
+        renderChatList();
+        renderMoments();
+        closeModal();
+    }
+
+    // 朋友圈管理
+    function generateWelcomeMoment(contact) {
+        const welcomeTexts = [
+            '很高兴加入这个大家庭！期待与大家的交流 😊',
+            '新人报到！请多多关照 ✨',
+            'Hello everyone! 我是新来的AI助手 👋',
+            '刚刚加入，希望能和大家成为好朋友 🎉',
+            '第一次发朋友圈，有点紧张呢 😅'
+        ];
+        
+        const moment = {
+            id: 'moment-' + Date.now(),
+            contactId: contact.id,
+            contactName: contact.name,
+            contactAvatar: contact.avatar,
+            content: welcomeTexts[Math.floor(Math.random() * welcomeTexts.length)],
+            timestamp: Date.now(),
+            likes: [],
+            comments: []
+        };
+        
+        state.moments.unshift(moment);
+        saveData();
+    }
+
+    function renderMoments() {
+        const momentsList = document.getElementById('momentsList');
+        
+        if (state.moments.length === 0) {
+            momentsList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🌟</div><div>朋友圈还很安静</div><div>添加AI朋友开始互动吧</div></div>';
+            return;
+        }
+        
+        momentsList.innerHTML = '';
+        state.moments.forEach(moment => {
+            const momentDiv = document.createElement('div');
+            momentDiv.className = 'moment-item';
+            
+            const avatarStyle = moment.contactAvatar && moment.contactAvatar.startsWith('data:image') 
+                ? `background-image: url(${moment.contactAvatar}); color: transparent;`
+                : '';
+            
+            const isLiked = moment.likes.includes('user');
+            const timeStr = new Date(moment.timestamp).toLocaleString();
+            
+            momentDiv.innerHTML = `
+                <div class="moment-header">
+                    <div class="chat-avatar" style="${avatarStyle}">${moment.contactAvatar && !moment.contactAvatar.startsWith('data:image') ? moment.contactAvatar : ''}</div>
+                    <div class="chat-info">
+                        <div class="chat-name">${moment.contactName}</div>
+                    </div>
+                </div>
+                <div class="moment-content">${moment.content}</div>
+                <div class="moment-actions">
+                    <span class="moment-action ${isLiked ? 'liked' : ''}" onclick="toggleLike('${moment.id}')">
+                        ${isLiked ? '❤️' : '🤍'} ${moment.likes.length}
+                    </span>
+                    <span class="moment-action" onclick="openCommentModal('${moment.id}')">
+                        💬 ${moment.comments.length}
+                    </span>
+                </div>
+                ${moment.comments.length > 0 ? renderComments(moment.comments) : ''}
+                <div class="moment-time">${timeStr}</div>
+            `;
+            
+            momentsList.appendChild(momentDiv);
+        });
+    }
+
+    function renderComments(comments) {
+        const commentsHtml = comments.map(comment => 
+            `<div class="comment-item"><span class="comment-author">${comment.author}:</span> ${comment.content}</div>`
+        ).join('');
+        return `<div class="moment-comments">${commentsHtml}</div>`;
+    }
+
+    function toggleLike(momentId) {
+        const moment = state.moments.find(m => m.id === momentId);
+        if (!moment) return;
+        
+        const userIndex = moment.likes.indexOf('user');
+        if (userIndex > -1) {
+            moment.likes.splice(userIndex, 1);
+        } else {
+            moment.likes.push('user');
+        }
+        
+        saveData();
+        renderMoments();
+    }
+
+    function openCommentModal(momentId) {
+        state.currentMomentId = momentId;
+        document.getElementById('commentModal').style.display = 'flex';
+    }
+
+    function postComment() {
+        const content = document.getElementById('commentInput').value.trim();
+        if (!content) return;
+        
+        const moment = state.moments.find(m => m.id === state.currentMomentId);
+        if (!moment) return;
+        
+        moment.comments.push({
+            author: state.profile.name,
+            content: content,
+            timestamp: Date.now()
+        });
+        
+        saveData();
+        renderMoments();
+        closeModal();
+    }
+
+    // 聊天功能
+    function openChat(contact) {
+        state.currentContact = contact;
+        hideAllScreens();
+        document.getElementById('chatScreen').style.display = 'block';
+        document.getElementById('chatTitle').textContent = contact.name;
+        loadChatMessages();
+    }
+
+    function loadChatMessages() {
+        const messagesContainer = document.getElementById('chatMessages');
+        messagesContainer.innerHTML = '';
+        
+        const messages = state.messages[state.currentContact.id] || [];
+        messages.forEach(msg => {
+            addMessage(msg.text, msg.sender, msg.isHtml);
+        });
+    }
+
+    function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const message = input.value.trim();
+        
+        if (!message || !state.currentContact) return;
+        
+        if (!state.config.apiKey) {
+            addMessage('请先在设置中配置API密钥！', 'ai');
+            return;
+        }
+        
+        addMessage(message, 'user');
+        saveMessage(message, 'user');
+        input.value = '';
+        
+        const sendIcon = document.getElementById('sendIcon');
+        sendIcon.innerHTML = '<div class="loading"></div>';
+        
+        callAI(message).then(response => {
+            addMessage(response, 'ai');
+            saveMessage(response, 'ai');
+        }).catch(error => {
+            const errorMsg = '抱歉，AI服务暂时不可用：' + error.message;
+            addMessage(errorMsg, 'ai');
+            saveMessage(errorMsg, 'ai');
+        }).finally(() => {
+            sendIcon.innerHTML = '➤';
+        });
+    }
+
+    function addMessage(text, sender, isHtml = false) {
+        const messagesContainer = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}`;
+        
+        const bubbleDiv = document.createElement('div');
+        bubbleDiv.className = 'message-bubble';
+        
+        if (isHtml) {
+            bubbleDiv.innerHTML = text;
+        } else {
+            bubbleDiv.textContent = text;
+        }
+        
+        messageDiv.appendChild(bubbleDiv);
+        messagesContainer.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function saveMessage(text, sender, isHtml = false) {
+        if (!state.messages[state.currentContact.id]) {
+            state.messages[state.currentContact.id] = [];
+        }
+        
+        state.messages[state.currentContact.id].push({
+            text: text,
+            sender: sender,
+            isHtml: isHtml,
+            timestamp: Date.now()
+        });
+        
+        saveData();
+        renderChatList();
+    }
+
+    async function callAI(message) {
+        const contact = state.currentContact;
+        const requestBody = {
+            model: state.config.modelName,
+            messages: [
+                { role: 'system', content: contact.prompt },
+                { role: 'user', content: message }
+            ],
+            max_tokens: 1000,
+            temperature: 0.7
+        };
+
+        if (state.config.apiProvider === 'claude') {
+            requestBody.max_tokens = 1000;
+            requestBody.messages = [{ role: 'user', content: message }];
+            requestBody.system = contact.prompt;
+        }
+
+        const response = await fetch(state.config.apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${state.config.apiKey}`,
+                ...(state.config.apiProvider === 'claude' && { 'anthropic-version': '2023-06-01' })
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+            throw new Error(`API请求失败: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (state.config.apiProvider === 'claude') {
+            return data.content[0].text;
+        } else {
+            return data.choices[0].message.content;
+        }
+    }
+
+    // 特殊消息发送
+    function sendImage() {
+        const title = document.getElementById('imageTitle').value.trim();
+        const desc = document.getElementById('imageDesc').value.trim();
+        
+        if (!desc) {
+            alert('请输入图片描述');
+            return;
+        }
+        
+        const imageMsg = createSpecialMessage('image', '📸 ' + (title || '图片'), desc);
+        addMessage(imageMsg, 'user', true);
+        saveMessage(imageMsg, 'user', true);
+        closeModal();
+        
+        setTimeout(() => {
+            addMessage('好的，我收到了你发送的图片信息。', 'ai');
+            saveMessage('好的，我收到了你发送的图片信息。', 'ai');
+        }, 1000);
+    }
+
+    function sendVoice() {
+        const duration = document.getElementById('voiceDuration').value.trim();
+        const content = document.getElementById('voiceContent').value.trim();
+        
+        if (!content) {
+            alert('请输入语音内容');
+            return;
+        }
+        
+        const voiceMsg = createSpecialMessage('voice', '🎤 语音消息', `时长: ${duration || '未知'}秒<br>内容: ${content}`);
+        addMessage(voiceMsg, 'user', true);
+        saveMessage(voiceMsg, 'user', true);
+        closeModal();
+        
+        setTimeout(() => {
+            const response = '我收到了你的语音消息：' + content;
+            addMessage(response, 'ai');
+            saveMessage(response, 'ai');
+        }, 1000);
+    }
+
+    function sendLink() {
+        const title = document.getElementById('linkTitle').value.trim();
+        const url = document.getElementById('linkUrl').value.trim();
+        const desc = document.getElementById('linkDesc').value.trim();
+        
+        if (!title || !url) {
+            alert('请输入链接标题和地址');
+            return;
+        }
+        
+        const linkMsg = createSpecialMessage('link', '🔗 ' + title, `链接: ${url}<br>${desc ? '描述: ' + desc : ''}`);
+        addMessage(linkMsg, 'user', true);
+        saveMessage(linkMsg, 'user', true);
+        closeModal();
+        
+        setTimeout(() => {
+            const response = '感谢分享链接：' + title + '，我已经记录了这个信息。';
+            addMessage(response, 'ai');
+            saveMessage(response, 'ai');
+        }, 1000);
+    }
+
+    function sendMoney() {
+        const amount = document.getElementById('moneyAmount').value.trim();
+        const note = document.getElementById('moneyNote').value.trim();
+        const type = document.getElementById('moneyType').value;
+        
+        if (!amount) {
+            alert('请输入转账金额');
+            return;
+        }
+        
+        const typeText = type === 'redpack' ? '红包' : '转账';
+        const moneyMsg = createSpecialMessage('money', `💰 ${typeText}`, `金额: ¥${amount}<br>${note ? '备注: ' + note : ''}`);
+        addMessage(moneyMsg, 'user', true);
+        saveMessage(moneyMsg, 'user', true);
+        closeModal();
+        
+        setTimeout(() => {
+            const response = `收到你的${typeText}：¥${amount}，谢谢！${note ? '备注：' + note : ''}`;
+            addMessage(response, 'ai');
+            saveMessage(response, 'ai');
+        }, 1000);
+    }
+
+    function createSpecialMessage(type, header, content) {
+        return `<div class="special-message ${type}">
+            <div class="special-message-header">${header}</div>
+            <div>${content}</div>
+        </div>`;
+    }
+
+    // 个人资料
+    function openEditProfileModal() {
+        document.getElementById('editProfileName').value = state.profile.name;
+        document.getElementById('editProfileBio').value = state.profile.bio;
+        document.getElementById('editProfileModal').style.display = 'flex';
+    }
+
+    function saveProfile() {
+        state.profile.name = document.getElementById('editProfileName').value.trim() || '我';
+        state.profile.bio = document.getElementById('editProfileBio').value.trim() || '这个人很懒，什么都没有留下...';
+        
+        saveData();
+        updateProfileDisplay();
+        closeModal();
+    }
+
+    function updateProfileAvatar(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                state.profile.avatar = e.target.result;
+                saveData();
+                updateProfileDisplay();
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // 设置管理
+    function updateSettingsUI() {
+        const elements = ['apiProvider', 'apiUrl', 'apiKey', 'modelName'];
+        elements.forEach(id => {
+            const el = document.getElementById(id);
+            if (el && state.config[id]) el.value = state.config[id];
+        });
+    }
+
+    function updateApiSettings() {
+        const provider = document.getElementById('apiProvider').value;
+        const urlInput = document.getElementById('apiUrl');
+        const modelInput = document.getElementById('modelName');
+        
+        if (provider === 'openai') {
+            urlInput.value = 'https://api.openai.com/v1/chat/completions';
+            modelInput.value = 'gpt-3.5-turbo';
+        } else if (provider === 'claude') {
+            urlInput.value = 'https://api.anthropic.com/v1/messages';
+            modelInput.value = 'claude-3-sonnet-20240229';
+        }
+    }
+
+    function saveSettings() {
+        state.config.apiProvider = document.getElementById('apiProvider').value;
+        state.config.apiUrl = document.getElementById('apiUrl').value;
+        state.config.apiKey = document.getElementById('apiKey').value;
+        state.config.modelName = document.getElementById('modelName').value;
+        
+        saveData();
+        
+        const btn = event.target;
+        const originalText = btn.textContent;
+        btn.textContent = '保存成功！';
+        btn.style.background = '#28a745';
+        setTimeout(() => {
+            btn.textContent = originalText;
+            btn.style.background = '#007AFF';
+        }, 2000);
+    }
+
+    // 主题功能
+    function uploadWallpaper(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imageUrl = e.target.result;
+                setWallpaper(`url(${imageUrl})`);
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function setWallpaper(wallpaper) {
+        document.documentElement.style.setProperty('--bg-image', wallpaper);
+    
+        try {
+            localStorage.setItem('xphone_wallpaper', wallpaper);
+        } catch (error) {
+            console.warn('保存壁纸失败');
+        }
+    }
+
+
+    function updateAppIcon(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const app = document.getElementById('iconAppSelect').value;
+                state.appIcons[app] = { image: e.target.result };
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function saveCustomIcon() {
+        saveData();
+        updateAppIconDisplay();
+        goHome();
+    }
+
+    // 数据管理
+    function saveData() {
+        try {
+            localStorage.setItem('xphone_profile', JSON.stringify(state.profile));
+            localStorage.setItem('xphone_contacts', JSON.stringify(state.contacts));
+            localStorage.setItem('xphone_messages', JSON.stringify(state.messages));
+            localStorage.setItem('xphone_moments', JSON.stringify(state.moments));
+            localStorage.setItem('xphone_icons', JSON.stringify(state.appIcons));
+            localStorage.setItem('xphone_config', JSON.stringify(state.config));
+        } catch (error) {
+            console.warn('保存数据失败', error);
+        }
+    }
+
+    function exportData() {
+        const exportData = {
+            version: '1.0',
+            timestamp: Date.now(),
+            ...state,
+            wallpaper: localStorage.getItem('xphone_wallpaper')
+        };
+        
+        const dataStr = JSON.stringify(exportData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `xphone_backup_${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        alert('数据导出成功！');
+    }
+
+    function importData() {
+        document.getElementById('importFile').click();
+    }
+
+    function handleImportFile(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const importData = JSON.parse(e.target.result);
+                
+                if (!importData.version) {
+                    throw new Error('无效的备份文件格式');
+                }
+                
+                if (!confirm('导入数据将覆盖当前所有数据，是否继续？')) {
+                    return;
+                }
+                
+                // 导入数据
+                Object.keys(state).forEach(key => {
+                    if (importData[key]) state[key] = importData[key];
+                });
+                
+                if (importData.wallpaper) {
+                    localStorage.setItem('xphone_wallpaper', importData.wallpaper);
+                }
+                
+                saveData();
+                initApp();
+                alert('数据导入成功！');
+                
+            } catch (error) {
+                alert('导入失败：' + error.message);
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    // 模态框控制
+    function openImageModal() { document.getElementById('imageModal').style.display = 'flex'; }
+    function openVoiceModal() { document.getElementById('voiceModal').style.display = 'flex'; }
+    function openLinkModal() { document.getElementById('linkModal').style.display = 'flex'; }
+    function openMoneyModal() { document.getElementById('moneyModal').style.display = 'flex'; }
+
+    function closeModal() {
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.style.display = 'none';
+        });
+        document.querySelectorAll('.modal-input, .modal-textarea').forEach(input => {
+            input.value = '';
+        });
+    }
+
+    // 事件处理
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    }
+
+    // 点击模态框外部关闭
+    document.addEventListener('click', function(event) {
+        if (event.target.classList.contains('modal')) {
+            closeModal();
+        }
+    });
+
+    // 阻止滚动穿透
+    document.addEventListener('touchmove', function(event) {
+        if (document.querySelector('.modal[style*="flex"]')) {
+            event.preventDefault();
+        }
+    }, { passive: false });
+
+    // 初始化应用
+    window.addEventListener('load', function() {
+        initApp();
+    });
+</script>
+
+</body>
+</html>
