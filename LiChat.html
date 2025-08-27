@@ -27,16 +27,6 @@
 
 <title>狸狸聊天器</title>
 <style>
-    :root {
-        --bg-image: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-        --header-blur-bg: rgba(25, 28, 36, 0.8);
-        --dock-bg: rgba(30, 30, 30, 0.7);
-        --text-primary: #ffffff;
-        --text-secondary: #a7a7b0;
-        --active-blue: #0A84FF;
-        --avatar-border: #555555;
-    }
-
     * {
         margin: 0;
         padding: 0;
@@ -44,65 +34,57 @@
         -webkit-tap-highlight-color: transparent;
     }
 
-    /* PWA完美全屏 + 沉浸式状态栏 */
-    html {
-        height: 100%;
-        height: 100vh;
-        height: 100dvh; 
-        overflow: hidden;
-        margin: 0;
-        padding: 0;
-        background: var(--bg-image);
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-    }
 
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        height: 100%;
-        height: 100vh;
-        height: 100dvh;
-        margin: 0;
-        padding: 0;
-        width: 100vw;
-        overflow: hidden;
-        background: inherit;
-        background-attachment: fixed;
-        color: var(--text-primary);
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-    }
+/* PWA完美全屏 + 沉浸式状态栏 */
+html {
+    height: 100%;
+    height: 100vh;
+    height: 100dvh; 
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    /* 统一背景 */
+    background: var(--bg-image, linear-gradient(135deg, #1e3c72 0%, #2a5298 100%));
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
 
-    body::-webkit-scrollbar {
-        display: none;
-    }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    height: 100%;
+    height: 100vh;
+    height: 100dvh;
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    overflow: hidden;
+    /* 统一背景继承 */
+    background: inherit;
+    background-attachment: fixed;
+    /* 强制隐藏滚动条 */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
 
-    /* PWA独立应用模式 */
-    @media all and (display-mode: standalone) {
-        html, body, .app-container {
-            height: 100vh !important;
-            height: 100dvh !important;
-            min-height: 100vh !important;
-            min-height: 100dvh !important;
-            max-height: 100vh !important;
-            max-height: 100dvh !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-    }
+body::-webkit-scrollbar {
+    display: none;
+}
 
-    .app-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        height: 100dvh;
-        background: transparent;
-        overflow: hidden;
-        z-index: 10;
+/* PWA独立应用模式 */
+@media all and (display-mode: standalone) {
+/* 强制所有顶层元素填满屏幕 */
+    html, body, .app-container {
+        height: 100vh !important;
+        height: 100dvh !important;
+        min-height: 100vh !important;
+        min-height: 100dvh !important;
+        max-height: 100vh !important;
+        max-height: 100dvh !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        padding-bottom: env(safe-area-inset-bottom) !important;
     }
 
 /* 修复 iOS Safari 底部安全区域问题 */
@@ -334,201 +316,213 @@
     border: 1px solid rgba(255,255,255,0.1);
 }
 
-    /* =================================
-       XChat 新 UI 样式
-    ================================= */
-    
-    /* 统一页面容器 */
-    .x-page {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        width: 100%;
-        background: transparent;
-    }
-    
-    /* 统一顶栏样式 */
-    .x-header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 16px;
-        height: calc(56px + env(safe-area-inset-top));
-        padding-top: calc(12px + env(safe-area-inset-top));
-        z-index: 100;
-        transition: background-color 0.3s ease;
-        background-color: transparent; /* 默认透明 */
-    }
-    
-    /* 顶栏滚动模糊效果 */
-    .x-header.scrolled {
-        background-color: var(--header-blur-bg);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-    }
-    
-    .x-header-title {
-        font-size: 28px;
-        font-weight: 700;
-        position: absolute;
-        left: 16px;
-        bottom: 12px;
-    }
-    
-    .x-header-button {
-        background: none;
-        border: none;
-        color: var(--text-primary);
-        font-size: 28px;
-        cursor: pointer;
-        width: 44px;
-        height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .x-header .back-btn {
-        font-size: 24px;
-        font-weight: bold;
-    }
-    
-    /* 统一内容列表区域 */
-    .x-content-list {
-        flex: 1;
-        overflow-y: auto;
-        padding-top: calc(56px + env(safe-area-inset-top)); /* 为顶栏留出空间 */
-        padding-bottom: calc(90px + env(safe-area-inset-bottom)); /* 为底栏留出空间 */
-    }
-    .x-content-list::-webkit-scrollbar {
-        display: none;
-    }
+/* 聊天应用界面 */
+.chat-app {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(20px);
+    z-index: 1000;
+}
 
-    /* 联系人列表项 */
-    .contact-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 8px 16px;
-        cursor: pointer;
-    }
-    
-    .contact-avatar {
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        background-color: #333;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        background-size: cover;
-        background-position: center;
-        flex-shrink: 0;
-    }
-    
-    .contact-info {
-        border-bottom: 1px solid rgba(84, 84, 88, 0.65);
-        padding: 8px 0;
-        flex-grow: 1;
-    }
-    
-    .contact-item:last-child .contact-info {
-        border-bottom: none;
-    }
-    
-    .contact-name {
-        font-size: 17px;
-        font-weight: 500;
-    }
-    
-    .contact-status {
-        font-size: 15px;
-        color: var(--text-secondary);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+.chat-nav {
+    height: calc(50px + env(safe-area-inset-top));
+    padding-top: env(safe-area-inset-top);
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
 
-    /* 悬浮底栏 */
-    .floating-dock {
-        position: fixed;
-        bottom: calc(16px + env(safe-area-inset-bottom));
-        left: 50%;
-        transform: translateX(-50%);
-        width: calc(100% - 32px);
-        max-width: 400px;
-        height: 64px;
-        background-color: var(--dock-bg);
-        backdrop-filter: blur(25px);
-        -webkit-backdrop-filter: blur(25px);
-        border-radius: 32px;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        z-index: 1000;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .dock-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 2px;
-        background: none;
-        border: none;
-        color: var(--text-secondary);
-        cursor: pointer;
-        font-size: 10px;
-        padding: 4px;
-        border-radius: 16px; /* for potential tap feedback */
-    }
-    
-    .dock-icon-placeholder {
-        width: 28px;
-        height: 28px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px; /* for emoji */
-    }
-    
-    .dock-label {
-        padding: 2px 10px;
-        border-radius: 12px;
-        transition: all 0.3s ease;
-    }
-    
-    .dock-item.active .dock-label {
-        background-color: var(--active-blue);
-        color: var(--text-primary);
-        font-weight: 600;
-    }
+.nav-item {
+    flex: 1;
+    text-align: center;
+    padding: 12px 0;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+}
 
-    /* “我” 标签的特殊样式 */
-    .dock-avatar {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background-color: #555;
-        background-size: cover;
-        background-position: center;
-        border: 2px solid transparent; /* 默认无边框 */
-        transition: border-color 0.3s ease;
-    }
+.nav-item.active {
+    color: white;
+    border-bottom: 2px solid #007AFF;
+}
 
-    .dock-item.active .dock-avatar {
-        border-color: var(--avatar-border);
-    }
-    
-    .dock-item.active .dock-label {
-        background-color: transparent; /* “我”标签激活时，文字无背景 */
-        color: var(--text-primary);
-    }
+.chat-list {
+    height: calc(100vh - 50px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    height: calc(100dvh - 50px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    overflow-y: auto;
+    padding: 10px 0;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+}
+
+/* 朋友圈界面 */
+.moments-list {
+    height: calc(100vh - 50px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    height: calc(100dvh - 50px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    overflow-y: auto;
+    padding: 10px 0;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+}
+
+/* 个人资料界面 */
+.profile-screen {
+    display: none;
+    height: calc(100vh - 50px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    height: calc(100dvh - 50px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    background: transparent;
+    overflow-y: auto;
+    padding-bottom: calc(env(safe-area-inset-bottom));
+}
+
+/* 聊天界面 */
+.chat-screen {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(20px);
+    z-index: 1000;
+}
+
+.chat-header {
+    height: calc(60px + env(safe-area-inset-top));
+    padding-top: env(safe-area-inset-top);
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    padding-right: 20px;
+    color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.back-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    margin-right: 15px;
+    padding: 5px;
+}
+
+.chat-title {
+    flex: 1;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.chat-messages {
+    height: calc(100vh - 180px - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    height: calc(100dvh - 180px - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.message {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: flex-start;
+}
+
+.message.user {
+    flex-direction: row-reverse;
+}
+
+.message-bubble {
+    max-width: 70%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    word-wrap: break-word;
+}
+
+.message.user .message-bubble {
+    background: #007AFF;
+    color: white;
+    border-bottom-right-radius: 6px;
+}
+
+.message.ai .message-bubble {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border-bottom-left-radius: 6px;
+}
+
+.chat-input-area {
+    height: 120px;
+    background: rgba(0,0,0,0.9);
+    padding: 10px 20px;
+}
+
+.chat-tools {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.tool-btn {
+    flex: 1;
+    height: 36px;
+    border: none;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: all 0.3s ease;
+}
+
+.tool-btn:active {
+    background: rgba(255,255,255,0.25);
+}
+
+.chat-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.chat-input input {
+    flex: 1;
+    height: 36px;
+    border: none;
+    border-radius: 18px;
+    padding: 0 15px;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    outline: none;
+}
+
+.chat-input input::placeholder {
+    color: rgba(255,255,255,0.6);
+}
+
+.send-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 18px;
+    background: #007AFF;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
 /* 设置界面 */
 .settings-screen {
@@ -831,7 +825,6 @@
 
 </style>
 
-
 </head>
 <body>
     <!-- PWA安装提示 -->
@@ -852,6 +845,7 @@
             <div class="date" id="currentDate"></div>
         </div>
 
+
     <div class="app-grid"></div>
 
     <div class="dock">
@@ -862,43 +856,70 @@
 </div>
 
 <div class="chat-app" id="chatApp">
-    
-    <div class="x-page" id="chatsPage" style="display: none;">
-        </div>
-
-    <div class="x-page" id="contactsPage">
-        <div class="x-header" id="contactsHeader">
-             <button class="x-header-button back-btn" onclick="goHome()">&#10094;</button>
-             <h1 class="x-header-title">联系人</h1>
-             <button class="x-header-button add-btn" onclick="openAddContactModal()">+</button>
-        </div>
-        <div class="x-content-list" id="contactsListContainer">
-             </div>
+    <div class="chat-nav">
+        <div class="nav-item active" onclick="switchTab('chats')">消息</div>
+        <div class="nav-item" onclick="switchTab('contacts')">联系人</div>
+        <div class="nav-item" onclick="switchTab('moments')">朋友圈</div>
+        <div class="nav-item" onclick="switchTab('me')">我</div>
     </div>
 
-    <div class="x-page" id="momentsPage" style="display: none;">
+    <div class="chat-list" id="chatList">
+        <div class="empty-state">
+            <div class="empty-state-icon">💬</div>
+            <div>还没有联系人</div>
+            <div>点击右下角"+"添加AI朋友吧</div>
         </div>
+    </div>
 
-    <div class="x-page" id="profilePage" style="display: none;">
-         </div>
-    
-    <div class="floating-dock">
-        <button class="dock-item" onclick="switchTab('chats')">
-            <span class="dock-icon-placeholder">💬</span>
-            <span class="dock-label">消息</span>
-        </button>
-        <button class="dock-item active" onclick="switchTab('contacts')">
-            <span class="dock-icon-placeholder">👥</span>
-            <span class="dock-label">联系人</span>
-        </button>
-        <button class="dock-item" onclick="switchTab('moments')">
-            <span class="dock-icon-placeholder">🌟</span>
-            <span class="dock-label">朋友圈</span>
-        </button>
-        <button class="dock-item" onclick="switchTab('me')">
-            <div class="dock-avatar" id="dockProfileAvatar"></div>
-            <span class="dock-label">我</span>
-        </button>
+    <div class="moments-list" id="momentsList" style="display: none;">
+        <div class="empty-state">
+            <div class="empty-state-icon">🌟</div>
+            <div>朋友圈还很安静</div>
+            <div>添加AI朋友开始互动吧</div>
+        </div>
+    </div>
+
+    <div class="profile-screen" id="profileScreen" style="display: none;">
+        <div class="profile-content">
+            <div class="avatar-upload">
+                <div class="profile-avatar" id="profileAvatar">😊</div>
+                <input type="file" accept="image/*" onchange="updateProfileAvatar(event)">
+            </div>
+            <div class="profile-name" id="profileName">我</div>
+            <div class="profile-bio" id="profileBio">这个人很懒，什么都没有留下...</div>
+            
+            <div class="profile-actions">
+                <button class="profile-btn" onclick="openEditProfileModal()">编辑个人资料</button>
+                <div class="data-actions">
+                    <button class="data-btn" onclick="exportData()">导出数据</button>
+                    <button class="data-btn" onclick="importData()">导入数据</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="add-contact-btn" onclick="openAddContactModal()" id="addContactBtn">+</button>
+</div>
+
+<div class="chat-screen" id="chatScreen">
+    <div class="chat-header">
+        <button class="back-btn" onclick="backToChatApp()">←</button>
+        <div class="chat-title" id="chatTitle">AI助手</div>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-area">
+        <div class="chat-tools">
+            <button class="tool-btn" onclick="openImageModal()">🖼️</button>
+            <button class="tool-btn" onclick="openVoiceModal()">🎤</button>
+            <button class="tool-btn" onclick="openLinkModal()">🔗</button>
+            <button class="tool-btn" onclick="openMoneyModal()">💰</button>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="输入消息..." onkeypress="handleKeyPress(event)">
+            <button class="send-btn" onclick="sendMessage()">
+                <span id="sendIcon">➤</span>
+            </button>
+        </div>
     </div>
 </div>
 
