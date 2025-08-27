@@ -317,265 +317,213 @@ body::-webkit-scrollbar {
     border: 1px solid rgba(255,255,255,0.1);
 }
 
-/* iOS 26风格 ChatApp 样式重构 */
-
-/* 顶部导航 */
-.chat-nav-ios26 {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  background: rgba(255,255,255,0.0); /* 默认透明 */
-  transition: background 0.3s, backdrop-filter 0.3s;
-  height: 56px;
-  padding: 0 20px;
-  backdrop-filter: none;
-}
-.chat-nav-ios26.scrolled {
-  background: rgba(255,255,255,0.7);
-  backdrop-filter: blur(14px);
-}
-.nav-btn-ios26 {
-  background: none;
-  border: none;
-  border-radius: 50%;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-  margin-right: 8px;
-  width: 40px;
-  height: 40px;
-  display: flex;align-items: center;justify-content: center;
-}
-.nav-title-ios26 {
-  flex: 1;
-  text-align: center;
-  font-size: 19px;
-  font-weight: 600;
-  color: #222;
-  letter-spacing: 0.02em;
-}
-.nav-actions-ios26 { width: 40px; }
-
-/* 主内容区Tab */
-.tab-content-ios26 {
-  position: relative;
-  padding-bottom: 100px;
-  min-height: 100vh;
-  background: #fafbfc;
-}
-.tab-panel-ios26 { display: none; }
-.tab-panel-ios26.tab-active { display: block; }
-
-.list-ios26 {
-  padding: 18px 0 0 0;
-}
-.list-item-ios26 {
-  display: flex;
-  align-items: center;
-  padding: 16px 24px;
-  border-radius: 18px;
-  background: #fff;
-  box-shadow: 0 2px 16px rgba(30,60,114,0.07);
-  margin-bottom: 14px;
-  position: relative;
-}
-.list-item-ios26.unread::before {
-  content: '';
-  width: 9px; height: 9px;
-  border-radius: 50%;
-  background: #007aff;
-  position: absolute; left: 10px; top: 24px;
-}
-.avatar-ios26 {
-  width: 52px; height: 52px;
-  border-radius: 50%;
-  background: #222;
-  color: #fff;
-  display: flex;align-items: center;justify-content: center;
-  font-weight: 500;font-size: 15px;
-  margin-right: 15px;
-}
-.list-info-ios26 { flex: 1; }
-.list-title-ios26 {
-  font-size: 16px;font-weight:600;color:#222;margin-bottom:3px;
-}
-.list-desc-ios26 {
-  font-size:13px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+/* 聊天应用界面 */
+.chat-app {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(20px);
+    z-index: 1000;
 }
 
-/* 朋友圈区 */
-.moment-ios26 {
-  display: flex;align-items:flex-start;
-  margin-bottom: 24px;
-}
-.moment-content-ios26 { flex:1;padding-left:12px;}
-.moment-title-ios26 { font-size:15px;font-weight:600;color:#222;}
-.moment-desc-ios26 { font-size:13px;color:#4a4a4a;margin:5px 0 6px 0;}
-.moment-imgs-ios26 { display:flex;gap:7px;margin:8px 0;}
-.moment-img-ios26 {
-  width:76px;height:76px;background:#eaeaea;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#888;font-size:13px;
-}
-.moment-actions-ios26 { display:flex;gap:16px;margin:6px 0;}
-.moment-meta-ios26 { font-size:12px;color:#888;}
-
-/* 我区 */
-.profile-ios26 {
-  display:flex;flex-direction:column;align-items:center;padding:42px 20px 0 20px;
-}
-.profile-avatar-ios26 {
-  width:120px;height:120px;border-radius:60px;background:#222;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-size:17px;
-  margin-bottom:16px;cursor:pointer;
-}
-.profile-info-ios26 {width:100%;}
-.profile-nick-ios26 {margin-bottom:18px;}
-.profile-nick-ios26 label {font-size:15px;}
-.profile-nick-ios26 input {
-  background:#eaeaea;border:none;border-radius:8px;padding:7px 12px;font-size:15px;width:60%;
-}
-.profile-prompt-ios26 {
-  background:#eaeaea;border-radius:10px;padding:16px;font-size:13px;color:#5a5a5a;
-  min-height:60px;max-height:180px;overflow:auto;
-}
-.profile-save-ios26 {
-  position:absolute;top:16px;right:16px;
-  background:none;border:none;box-shadow:0 2px 12px rgba(0,0,0,0.07);border-radius:50%;width:44px;height:44px;cursor:pointer;
+.chat-nav {
+    height: calc(50px + env(safe-area-inset-top));
+    padding-top: env(safe-area-inset-top);
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* 悬浮底栏 */
-.chat-bottom-nav-ios26 {
-  position:fixed;left:0;right:0;bottom:0;z-index:50;
-  display:flex;justify-content:space-around;align-items:center;
-  background:rgba(255,255,255,0.97);
-  box-shadow:0 5px 24px rgba(30,60,114,0.1);
-  border-radius:24px 24px 0 0;
-  height:80px;padding:0 14px 10px 14px;
-  gap:8px;
+.nav-item {
+    flex: 1;
+    text-align: center;
+    padding: 12px 0;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
 }
-.nav-item-ios26 {
-  background:none;border:none;outline:none;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  flex:1;
-  gap:4px;
-  position:relative;
-  font-size:15px;
-  color:#222;
-  cursor:pointer;
-  transition:color 0.2s;
-}
-.nav-item-ios26 .nav-label-ios26 {
-  margin-top:3px;
-  padding:0 9px;
-  border-radius:11px;
-  background:none;
-  transition:background 0.2s,color 0.2s;
-}
-.nav-item-ios26.active .nav-label-ios26,
-.nav-item-ios26 .nav-label-ios26.has-badge {
-  background:#007aff;
-  color:#fff;
-}
-.nav-item-ios26 .nav-badge-ios26 {
-  position:absolute;top:7px;right:15px;
-  background:#007aff;color:#fff;
-  font-size:12px;padding:1px 8px;border-radius:11px;font-weight:600;display:none;
-}
-.nav-item-ios26.active .nav-badge-ios26 {display:inline-block;}
 
-/* FAB添加按钮 */
-.fab-add-ios26 {
-  position:fixed;bottom:108px;right:24px;z-index:30;
-  background:none;border:none;outline:none;box-shadow:0 5px 24px rgba(0,122,255,0.17);border-radius:50%;width:64px;height:64px;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:transform 0.1s;
+.nav-item.active {
+    color: white;
+    border-bottom: 2px solid #007AFF;
 }
-.fab-add-ios26:active {transform:scale(0.92);}
+
+.chat-list {
+    height: calc(100vh - 50px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    height: calc(100dvh - 50px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    overflow-y: auto;
+    padding: 10px 0;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+}
+
+/* 朋友圈界面 */
+.moments-list {
+    height: calc(100vh - 50px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    height: calc(100dvh - 50px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    overflow-y: auto;
+    padding: 10px 0;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+}
+
+/* 个人资料界面 */
+.profile-screen {
+    display: none;
+    height: calc(100vh - 50px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    height: calc(100dvh - 50px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    background: transparent;
+    overflow-y: auto;
+    padding-bottom: calc(env(safe-area-inset-bottom));
+}
 
 /* 聊天界面 */
-.chat-screen-ios26 {
-  position:fixed;top:0;left:0;right:0;bottom:0;z-index:99;
-  background:#fafbfc;
-  display:none;flex-direction:column;justify-content:flex-start;align-items:stretch;
-}
-.chat-header-ios26 {
-  display:flex;align-items:center;height:76px;padding:0 20px;
-  background:rgba(255,255,255,0.0);
-  box-shadow:0 2px 12px rgba(0,0,0,0.07);
-  border-radius:0 0 26px 26px;
-  position:relative;
-}
-.chat-back-btn-ios26 {
-  background:none;border:none;border-radius:50%;box-shadow:0 2px 12px rgba(0,0,0,0.07);width:44px;height:44px;display:flex;align-items:center;justify-content:center;margin-right:12px;cursor:pointer;
-}
-.chat-avatar-ios26 {
-  width:66px;height:66px;border-radius:33px;background:#222;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-size:15px;
-  margin:0 auto;
+.chat-screen {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(20px);
+    z-index: 1000;
 }
 
-.chat-messages-ios26 {
-  flex:1;overflow-y:auto;padding:0 20px 18px 20px;margin-top:8px;
-  display:flex;flex-direction:column;gap:12px;
-}
-.chat-date-ios26 {
-  text-align:center;color:#888;font-size:13px;margin:12px 0;
-}
-.chat-bubble-ios26 {
-  max-width:68%;padding:13px 18px;border-radius:22px;
-  font-size:16px;line-height:1.5;box-shadow:0 2px 12px rgba(0,60,114,0.07);
-  margin-bottom:2px;
-  word-break:break-all;
-  position:relative;
-}
-.chat-bubble-ios26.left {
-  background:#007aff;color:#fff;border-bottom-left-radius:7px;margin-right:auto;
-}
-.chat-bubble-ios26.right {
-  background:#fff;color:#222;border-bottom-right-radius:7px;margin-left:auto;border:1px solid #eee;
+.chat-header {
+    height: calc(60px + env(safe-area-inset-top));
+    padding-top: env(safe-area-inset-top);
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    padding-right: 20px;
+    color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* 聊天输入栏 */
-.chat-input-bar-ios26 {
-  position:fixed;bottom:92px;left:0;right:0;z-index:99;
-  display:flex;align-items:center;gap:8px;
-  background:none;
-  padding:0 18px;
-  height:62px;
+.back-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    margin-right: 15px;
+    padding: 5px;
 }
-.chat-plus-btn-ios26 {
-  background:#fff;border:none;box-shadow:0 2px 12px rgba(0,0,0,0.07);border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;margin-right:8px;cursor:pointer;
-  transition:transform 0.2s;
-}
-.chat-plus-btn-ios26:active {transform:scale(0.95);}
-.chat-input-ios26 {
-  flex:1;
-  background:#fff;border:none;border-radius:22px;padding:0 18px;
-  font-size:17px;height:44px;
-  box-shadow:0 2px 12px rgba(0,0,0,0.07);
-  outline:none;
-}
-.chat-send-btn-ios26 {
-  background:#007aff;border:none;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;margin-left:8px;cursor:pointer;
-  box-shadow:0 2px 12px rgba(0,122,255,0.09);
-  transition:transform 0.2s;
-}
-.chat-send-btn-ios26:active {transform:scale(0.95);}
 
-/* 展开功能栏 */
-.chat-tools-ios26 {
-  position:absolute;bottom:62px;left:18px;
-  display:none;flex-direction:column;gap:10px;
-  z-index:101;
-  animation:fadeInUp 0.27s ease;
+.chat-title {
+    flex: 1;
+    font-size: 18px;
+    font-weight: 600;
 }
-.chat-tools-ios26.show {display:flex;}
-@keyframes fadeInUp {
-  from { opacity:0; transform:translateY(16px);}
-  to { opacity:1; transform:translateY(0);}
+
+.chat-messages {
+    height: calc(100vh - 180px - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    height: calc(100dvh - 180px - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    overflow-y: auto;
+    padding: 20px;
 }
-.chat-tool-btn-ios26 {
-  background:#fff;border:none;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(0,0,0,0.07);cursor:pointer;
-  transition:transform 0.2s;
+
+.message {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: flex-start;
 }
-.chat-tool-btn-ios26:active {transform:scale(0.93);}
+
+.message.user {
+    flex-direction: row-reverse;
+}
+
+.message-bubble {
+    max-width: 70%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    word-wrap: break-word;
+}
+
+.message.user .message-bubble {
+    background: #007AFF;
+    color: white;
+    border-bottom-right-radius: 6px;
+}
+
+.message.ai .message-bubble {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border-bottom-left-radius: 6px;
+}
+
+.chat-input-area {
+    height: 120px;
+    background: rgba(0,0,0,0.9);
+    padding: 10px 20px;
+}
+
+.chat-tools {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.tool-btn {
+    flex: 1;
+    height: 36px;
+    border: none;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: all 0.3s ease;
+}
+
+.tool-btn:active {
+    background: rgba(255,255,255,0.25);
+}
+
+.chat-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.chat-input input {
+    flex: 1;
+    height: 36px;
+    border: none;
+    border-radius: 18px;
+    padding: 0 15px;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    outline: none;
+}
+
+.chat-input input::placeholder {
+    color: rgba(255,255,255,0.6);
+}
+
+.send-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 18px;
+    background: #007AFF;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
 /* 设置界面 */
 .settings-screen {
@@ -908,162 +856,72 @@ body::-webkit-scrollbar {
     </div>
 </div>
 
-<!-- ChatApp 主体结构（iOS 26风格重构） -->
-<!-- 只输出核心ChatApp区域，按你的设计，底部悬浮导航和聊天界面也包含 -->
-
-<div class="chat-app-ios26" id="chatApp">
-  <!-- 顶部导航，透明/渐变模糊，圆角阴影按钮 -->
-  <div class="chat-nav-ios26" id="chatNav">
-    <button class="nav-btn-ios26" id="navBackBtn" aria-label="返回">
-      <!-- 返回SVG图标 -->
-      <svg viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="white" opacity="0.6"/><path d="M14 7l-5 5 5 5" stroke="#222" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
-    <span class="nav-title-ios26" id="navTitle">消息</span>
-    <div class="nav-actions-ios26"></div>
-  </div>
-
-  <!-- 主内容区（消息/联系人/朋友圈/我 四个Tab） -->
-  <div class="tab-content-ios26" id="tabContent">
-    <!-- 消息Tab -->
-    <div class="tab-panel-ios26 tab-active" data-tab="chats">
-      <div class="list-ios26">
-        <div class="list-item-ios26 unread">
-          <div class="avatar-ios26"></div>
-          <div class="list-info-ios26">
-            <div class="list-title-ios26">联系人姓名</div>
-            <div class="list-desc-ios26">这是一条消息这是...</div>
-          </div>
-        </div>
-        <div class="list-item-ios26">
-          <div class="avatar-ios26"></div>
-          <div class="list-info-ios26">
-            <div class="list-title-ios26">联系人姓名</div>
-            <div class="list-desc-ios26">这是一条消息这是...</div>
-          </div>
-        </div>
-      </div>
+<div class="chat-app" id="chatApp">
+    <div class="chat-nav">
+        <div class="nav-item active" onclick="switchTab('chats')">消息</div>
+        <div class="nav-item" onclick="switchTab('contacts')">联系人</div>
+        <div class="nav-item" onclick="switchTab('moments')">朋友圈</div>
+        <div class="nav-item" onclick="switchTab('me')">我</div>
     </div>
-    <!-- 联系人Tab -->
-    <div class="tab-panel-ios26" data-tab="contacts">
-      <div class="list-ios26">
-        <div class="list-item-ios26">
-          <div class="avatar-ios26"></div>
-          <div class="list-info-ios26">
-            <div class="list-title-ios26">联系人姓名</div>
-            <div class="list-desc-ios26">联系人状态（AI根据prompt和记忆更新）</div>
-          </div>
+
+    <div class="chat-list" id="chatList">
+        <div class="empty-state">
+            <div class="empty-state-icon">💬</div>
+            <div>还没有联系人</div>
+            <div>点击右下角"+"添加AI朋友吧</div>
         </div>
-      </div>
-      <button class="fab-add-ios26" id="addContactBtn" aria-label="添加联系人">
-        <svg viewBox="0 0 32 32" width="32" height="32"><circle cx="16" cy="16" r="16" fill="white" opacity="0.9"/><path d="M16 10v12M10 16h12" stroke="#222" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
     </div>
-    <!-- 朋友圈Tab -->
-    <div class="tab-panel-ios26" data-tab="moments">
-      <div class="list-ios26">
-        <div class="moment-ios26">
-          <div class="avatar-ios26"></div>
-          <div class="moment-content-ios26">
-            <div class="moment-title-ios26">联系人姓名</div>
-            <div class="moment-desc-ios26">朋友圈文案...</div>
-            <div class="moment-imgs-ios26">
-              <div class="moment-img-ios26">这是图片</div>
-              <div class="moment-img-ios26">这是图片</div>
-              <div class="moment-img-ios26">这是图片</div>
+
+    <div class="moments-list" id="momentsList" style="display: none;">
+        <div class="empty-state">
+            <div class="empty-state-icon">🌟</div>
+            <div>朋友圈还很安静</div>
+            <div>添加AI朋友开始互动吧</div>
+        </div>
+    </div>
+
+    <div class="profile-screen" id="profileScreen" style="display: none;">
+        <div class="profile-content">
+            <div class="avatar-upload">
+                <div class="profile-avatar" id="profileAvatar">😊</div>
+                <input type="file" accept="image/*" onchange="updateProfileAvatar(event)">
             </div>
-            <div class="moment-actions-ios26">
-              <span class="like-ios26"><svg viewBox="0 0 18 18" width="18" height="18"><path d="M9 16C9 16 2 10.5 2 6.5C2 4.42 3.42 3 5.5 3C6.74 3 8.06 3.81 8.55 5.09C9.04 3.81 10.26 3 11.5 3C13.58 3 15 4.42 15 6.5C15 10.5 9 16 9 16Z" fill="#e74c3c"/></svg> 点赞</span>
-              <span class="comment-ios26"><svg viewBox="0 0 18 18" width="18" height="18"><path d="M3 3H15V13H5L3 15V3Z" stroke="#222" stroke-width="2" fill="none"/></svg> 评论</span>
-              <span class="share-ios26"><svg viewBox="0 0 18 18" width="18" height="18"><path d="M15 9L9 3M15 9L9 15M15 9H3" stroke="#222" stroke-width="2" fill="none"/></svg> 转发</span>
+            <div class="profile-name" id="profileName">我</div>
+            <div class="profile-bio" id="profileBio">这个人很懒，什么都没有留下...</div>
+            
+            <div class="profile-actions">
+                <button class="profile-btn" onclick="openEditProfileModal()">编辑个人资料</button>
+                <div class="data-actions">
+                    <button class="data-btn" onclick="exportData()">导出数据</button>
+                    <button class="data-btn" onclick="importData()">导入数据</button>
+                </div>
             </div>
-            <div class="moment-meta-ios26">昵称: 这是评论...</div>
-          </div>
         </div>
-      </div>
     </div>
-    <!-- 我Tab -->
-    <div class="tab-panel-ios26" data-tab="me">
-      <div class="profile-ios26">
-        <div class="profile-avatar-ios26" id="profileAvatar">用户头像<br>点击可更换</div>
-        <div class="profile-info-ios26">
-          <div class="profile-nick-ios26">
-            <label for="profileNick">昵称：</label>
-            <input type="text" id="profileNick" value="用户昵称" />
-          </div>
-          <div class="profile-prompt-ios26">
-            用户个人信息prompt用户个人信息prompt用户个人信息prompt...
-          </div>
-        </div>
-      </div>
-      <button class="profile-save-ios26" id="profileSaveBtn">
-        <svg viewBox="0 0 32 32" width="32" height="32"><circle cx="16" cy="16" r="16" fill="white" opacity="0.9"/><path d="M8 16l6 6 10-14" stroke="#007aff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-      </button>
-    </div>
-  </div>
 
-  <!-- 悬浮底栏 -->
-  <nav class="chat-bottom-nav-ios26" id="chatBottomNav">
-    <button class="nav-item-ios26 active" data-tab="chats">
-      <svg viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="#222"/><path d="M6 10h12v7H6z" fill="#fff"/><circle cx="8" cy="13" r="1.5" fill="#007aff"/></svg>
-      <span class="nav-label-ios26">消息</span>
-      <span class="nav-badge-ios26">1</span>
-    </button>
-    <button class="nav-item-ios26" data-tab="contacts">
-      <svg viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="#222"/><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM6 18c0-2.2 3-3.5 6-3.5s6 1.3 6 3.5v1.5H6V18z" fill="#fff"/></svg>
-      <span class="nav-label-ios26">联系人</span>
-    </button>
-    <button class="nav-item-ios26" data-tab="moments">
-      <svg viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="#222"/><path d="M12 7l5 10H7L12 7z" fill="#fff"/></svg>
-      <span class="nav-label-ios26">朋友圈</span>
-    </button>
-    <button class="nav-item-ios26" data-tab="me">
-      <svg viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="#222"/><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM6 18c0-2.2 3-3.5 6-3.5s6 1.3 6 3.5v1.5H6V18z" fill="#fff"/></svg>
-      <span class="nav-label-ios26">我</span>
-    </button>
-  </nav>
+    <button class="add-contact-btn" onclick="openAddContactModal()" id="addContactBtn">+</button>
 </div>
 
-<!-- 聊天界面 -->
-<div class="chat-screen-ios26" id="chatScreen">
-  <div class="chat-header-ios26" id="chatHeader">
-    <button class="chat-back-btn-ios26" id="chatBackBtn">
-      <!-- 返回SVG图标 -->
-      <svg viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="white" opacity="0.6"/><path d="M14 7l-5 5 5 5" stroke="#222" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
-    <div class="chat-avatar-ios26">对方头像</div>
-  </div>
-  <div class="chat-messages-ios26" id="chatMessages">
-    <div class="chat-date-ios26">昨天 20:43</div>
-    <div class="chat-bubble-ios26 left">你好</div>
-    <div class="chat-bubble-ios26 right">你好，有什么可以帮您？</div>
-  </div>
-  <div class="chat-input-bar-ios26" id="chatInputBar">
-    <button class="chat-plus-btn-ios26" id="chatPlusBtn">
-      <svg viewBox="0 0 32 32" width="32" height="32"><circle cx="16" cy="16" r="16" fill="white" opacity="0.9"/><path d="M16 10v12M10 16h12" stroke="#222" stroke-width="2" stroke-linecap="round"/></svg>
-    </button>
-    <input type="text" class="chat-input-ios26" id="chatInput" placeholder="输入消息..." autocomplete="off" />
-    <button class="chat-send-btn-ios26" id="chatSendBtn">
-      <svg viewBox="0 0 32 32" width="32" height="32"><circle cx="16" cy="16" r="16" fill="#007aff"/><path d="M16 10l8 6-8 6z" fill="#fff"/></svg>
-    </button>
-    <!-- 展开功能栏 -->
-    <div class="chat-tools-ios26" id="chatTools">
-      <button class="chat-tool-btn-ios26" data-tool="image" title="图片">
-        <svg viewBox="0 0 32 32" width="28" height="28"><rect x="6" y="10" width="20" height="16" rx="4" fill="#fff"/><circle cx="14" cy="18" r="3" fill="#007aff"/><path d="M20 14l4 8H8z" fill="#007aff"/></svg>
-      </button>
-      <button class="chat-tool-btn-ios26" data-tool="voice" title="语音">
-        <svg viewBox="0 0 32 32" width="28" height="28"><rect x="12" y="8" width="8" height="16" rx="4" fill="#fff"/><path d="M16 24v4M12 28h8" stroke="#007aff" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
-      <button class="chat-tool-btn-ios26" data-tool="money" title="转账">
-        <svg viewBox="0 0 32 32" width="28" height="28"><rect x="8" y="12" width="16" height="8" rx="4" fill="#fff"/><text x="16" y="18" text-anchor="middle" fill="#007aff" font-size="10" font-family="Arial">￥</text></svg>
-      </button>
-      <button class="chat-tool-btn-ios26" data-tool="link" title="链接">
-        <svg viewBox="0 0 32 32" width="28" height="28"><path d="M12 16a4 4 0 0 1 4-4h4a4 4 0 1 1 0 8h-2" stroke="#007aff" stroke-width="2" fill="none"/><path d="M20 16a4 4 0 0 0-4 4h-4a4 4 0 1 0 0-8h2" stroke="#007aff" stroke-width="2" fill="none"/></svg>
-      </button>
-      <button class="chat-tool-btn-ios26" data-tool="emoji" title="表情包">
-        <svg viewBox="0 0 32 32" width="28" height="28"><circle cx="16" cy="16" r="14" fill="#fff"/><circle cx="11" cy="13" r="2" fill="#007aff"/><circle cx="21" cy="13" r="2" fill="#007aff"/><path d="M11 21c1 2 5 2 6 0" stroke="#007aff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
-      </button>
+<div class="chat-screen" id="chatScreen">
+    <div class="chat-header">
+        <button class="back-btn" onclick="backToChatApp()">←</button>
+        <div class="chat-title" id="chatTitle">AI助手</div>
     </div>
-  </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-area">
+        <div class="chat-tools">
+            <button class="tool-btn" onclick="openImageModal()">🖼️</button>
+            <button class="tool-btn" onclick="openVoiceModal()">🎤</button>
+            <button class="tool-btn" onclick="openLinkModal()">🔗</button>
+            <button class="tool-btn" onclick="openMoneyModal()">💰</button>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="输入消息..." onkeypress="handleKeyPress(event)">
+            <button class="send-btn" onclick="sendMessage()">
+                <span id="sendIcon">➤</span>
+            </button>
+        </div>
+    </div>
 </div>
 
 <div class="settings-screen" id="settingsScreen">
@@ -1447,107 +1305,6 @@ body::-webkit-scrollbar {
         document.getElementById('profileScreen').style.display = tab === 'me' ? 'block' : 'none';
         document.getElementById('addContactBtn').style.display = (tab === 'chats' || tab === 'contacts') ? 'block' : 'none';
     }
-
-// 主要交互逻辑：Tab切换、顶栏模糊、底栏胶囊、加号展开、消息发送分离
-
-// Tab切换
-document.querySelectorAll('.nav-item-ios26').forEach(btn => {
-  btn.onclick = function() {
-    document.querySelectorAll('.nav-item-ios26').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.tab-panel-ios26').forEach(panel => {
-      panel.classList.remove('tab-active');
-      if (panel.dataset.tab === btn.dataset.tab) panel.classList.add('tab-active');
-    });
-    // 顶栏title同步
-    document.getElementById('navTitle').textContent = btn.querySelector('.nav-label-ios26').textContent;
-  }
-});
-
-// 顶栏模糊
-const nav = document.getElementById('chatNav');
-const tabContent = document.getElementById('tabContent');
-tabContent.addEventListener('scroll', () => {
-  if(tabContent.scrollTop > 18) nav.classList.add('scrolled');
-  else nav.classList.remove('scrolled');
-});
-
-// 底栏未读胶囊（演示：有未读时显示badge和蓝色胶囊）
-function setUnread(tab, count) {
-  document.querySelectorAll('.nav-item-ios26').forEach(btn => {
-    const label = btn.querySelector('.nav-label-ios26');
-    const badge = btn.querySelector('.nav-badge-ios26');
-    if (btn.dataset.tab === tab && count > 0) {
-      label.classList.add('has-badge');
-      if (badge) badge.textContent = count;
-      if (badge) badge.style.display = 'inline-block';
-    } else {
-      label.classList.remove('has-badge');
-      if (badge) badge.style.display = 'none';
-    }
-  });
-}
-// 示例：消息Tab有1条未读
-setUnread('chats', 1);
-
-// 加号展开功能栏
-const plusBtn = document.getElementById('chatPlusBtn');
-const toolsBar = document.getElementById('chatTools');
-plusBtn.onclick = function(e) {
-  toolsBar.classList.toggle('show');
-};
-
-// 聊天发送逻辑
-const input = document.getElementById('chatInput');
-const sendBtn = document.getElementById('chatSendBtn');
-const messages = document.getElementById('chatMessages');
-
-// 回车只发送消息，不触发AI回复
-input.addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    if (input.value.trim()) {
-      addMessage(input.value.trim(), 'right');
-      input.value = '';
-    }
-  }
-});
-
-// 点击发送，才获取AI回复
-sendBtn.onclick = function() {
-  if (input.value.trim()) {
-    addMessage(input.value.trim(), 'right');
-    // 触发AI回复逻辑（此处仅示例假回复）
-    setTimeout(() => {
-      addMessage('这是AI回复内容', 'left');
-    }, 800);
-    input.value = '';
-  }
-};
-
-// 消息气泡添加
-function addMessage(text, side) {
-  const bubble = document.createElement('div');
-  bubble.className = 'chat-bubble-ios26 ' + side;
-  bubble.textContent = text;
-  messages.appendChild(bubble);
-  messages.scrollTop = messages.scrollHeight;
-}
-
-// 展开工具栏的功能键点击
-document.querySelectorAll('.chat-tool-btn-ios26').forEach(btn => {
-  btn.onclick = function() {
-    const tool = btn.dataset.tool;
-    if(tool === 'emoji') {
-      // 表情包导入URL演示
-      let url = prompt('输入表情包图片URL:');
-      if(url) addMessage('[表情包] ' + url, 'right');
-    } else {
-      addMessage('点击了功能键: ' + tool, 'right');
-    }
-    toolsBar.classList.remove('show');
-  };
-});
 
     // 联系人管理
     function renderChatList() {
