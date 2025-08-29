@@ -25,7 +25,6 @@
         -webkit-tap-highlight-color: transparent;
     }
 
-    /* PWA完美全屏 + 沉浸式状态栏 */
     html {
         height: 100vh; 
         overflow: hidden;
@@ -48,8 +47,6 @@
     }
     body::-webkit-scrollbar { display: none; }
 
-    /* ============================ 修复 iOS PWA 全屏沉浸问题 ============================ */
-    /* 强制所有顶层元素填满屏幕，解决跳动和白边问题 (来自用户的最佳实践代码) */
     @media all and (display-mode: standalone) {
         html, body, .app-container {
             height: 100vh !important;
@@ -61,13 +58,10 @@
             margin: 0 !important;
             padding: 0 !important;
         }
-
-        /* 修复 iOS Safari 底部安全区域问题 */
         html {
             padding-bottom: env(safe-area-inset-bottom) !important;
         }
     }
-    /* ================================================================================= */
 
     .app-container {
         position: fixed;
@@ -81,7 +75,6 @@
         z-index: 10;
     }
     
-    /* 主屏幕 */
     .home-screen {
         display: flex;
         flex-direction: column;
@@ -94,11 +87,9 @@
     .time-widget .time { font-size: 80px; letter-spacing: -2px; line-height: 1; }
     .time-widget .date { font-size: 18px; margin-top: 10px; }
 
-    .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 40px; }
     .app-icon { width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; transition: transform 0.3s ease; color: white; background: rgba(255,255,255,0.15); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); overflow: hidden; background-size: cover; background-position: center; }
     .app-icon:active { transform: scale(0.95); }
 
-    /* Dock栏 */
     .dock {
         position: fixed;
         bottom: calc(20px + env(safe-area-inset-bottom));
@@ -132,7 +123,6 @@
         color: #000;
     }
 
-    /* 动态模糊顶栏 */
     .chat-app-header {
         position: fixed;
         top: 0;
@@ -149,7 +139,6 @@
         transition: background 0.3s, backdrop-filter 0.3s, border-bottom 0.3s;
         background: transparent;
     }
-    /* 修复：将纯色背景改为从上到下的渐变背景 */
     .chat-app-header.scrolled {
         background: linear-gradient(to bottom, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.7) 70%, rgba(255, 255, 255, 0) 100%);
         backdrop-filter: blur(20px);
@@ -163,24 +152,10 @@
         font-size: 24px;
         width: 60px;
     }
-    .chat-app-header .header-right {
-        justify-content: flex-end;
-    }
-    .chat-app-header .header-title {
-        flex: 1;
-        text-align: center;
-        font-size: 17px;
-        font-weight: 600;
-    }
-    .header-icon {
-        cursor: pointer;
-        width: 30px;
-        height: 30px;
-        display: grid;
-        place-items: center;
-    }
+    .chat-app-header .header-right { justify-content: flex-end; }
+    .chat-app-header .header-title { flex: 1; text-align: center; font-size: 17px; font-weight: 600; }
+    .header-icon { cursor: pointer; width: 30px; height: 30px; display: grid; place-items: center; }
     
-    /* 四个主内容区域 */
     .chat-app-content {
         flex: 1;
         overflow-y: auto;
@@ -190,33 +165,28 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; }
     
-    /* 分段式悬浮底栏 */
     .floating-dock {
         position: fixed;
         bottom: env(safe-area-inset-bottom, 15px);
-        left: 15px;
-        right: 15px;
+        left: 0;
+        right: 0;
         height: 60px;
         z-index: 103;
         display: flex;
-        justify-content: space-between;
-        align-items: center; /* 修复：确保两段垂直对齐 */
+        justify-content: center; /* 修复：居中对齐 */
+        align-items: center; 
+        gap: 8px; /* 修复：设置固定间距 */
     }
     .dock-main-group, .dock-profile-group {
         display: flex;
-        align-items: center; /* 修复：确保内部元素垂直居中 */
+        align-items: center;
         padding: 5px;
         background: rgba(230, 230, 230, 0.7);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        height: 50px; /* 修复：统一高度 */
-    }
-    .dock-main-group {
+        height: 50px;
         border-radius: 25px;
-    }
-    .dock-profile-group {
-        border-radius: 25px; /* 修复：统一为圆角矩形，放入图标后自然是圆形 */
     }
     .dock-item {
         cursor: pointer;
@@ -239,12 +209,76 @@
         color: #fff;
     }
 
-    /* 临时内容样式 */
-    .placeholder-content {
-        padding: 20px;
-        line-height: 1.6;
-    }
+    /* 占位符样式 */
+    .placeholder-content { padding: 20px; line-height: 1.6; }
     .placeholder-content h2 { margin-bottom: 10px; }
+
+    /* ========================================================== */
+    /* ================ "我" 界面样式 (Phase 2) =================== */
+    /* ========================================================== */
+    .me-tab-container {
+        padding: 30px 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+    }
+    .me-avatar-large {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: #eee;
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        color: #aaa;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+    .me-avatar-large::after {
+        content: '点击更换';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0,0,0,0.4);
+        color: white;
+        font-size: 12px;
+        text-align: center;
+        padding: 4px 0;
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+    .me-avatar-large:hover::after {
+        opacity: 1;
+    }
+    .me-field {
+        width: 100%;
+    }
+    .me-field label {
+        display: block;
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+    .me-field input, .me-field textarea {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        background-color: #f0f2f5;
+        font-size: 16px;
+        font-family: inherit;
+        outline-color: #007AFF;
+    }
+    .me-field textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
     
 </style>
 </head>
@@ -284,26 +318,30 @@
             <div class="tab-content active" id="tab-messages">
                 <div class="placeholder-content">
                     <h2>消息列表</h2>
-                    <p>这里将显示您的聊天记录。向下滚动查看动态模糊顶栏效果。</p>
                     <p style="height:1200px; background: #f0f0f0; margin-top:20px; padding:10px;">这是一个很高的占位符，用于撑开内容区域以测试滚动。</p>
                 </div>
             </div>
             <div class="tab-content" id="tab-contacts">
-                 <div class="placeholder-content">
-                    <h2>联系人列表</h2>
-                    <p>这里将显示您的联系人。</p>
-                </div>
+                 <div class="placeholder-content"><h2>联系人列表</h2></div>
             </div>
             <div class="tab-content" id="tab-moments">
-                 <div class="placeholder-content">
-                    <h2>朋友圈</h2>
-                    <p>这里将显示朋友圈动态。</p>
-                </div>
+                 <div class="placeholder-content"><h2>朋友圈</h2></div>
             </div>
             <div class="tab-content" id="tab-me">
-                 <div class="placeholder-content">
-                    <h2>我的</h2>
-                    <p>这里将显示您的个人资料。</p>
+                <div class="me-tab-container">
+                    <div class="me-avatar-large" id="meAvatar">
+                        </div>
+                    <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
+                    
+                    <div class="me-field">
+                        <label for="meNickname">昵称</label>
+                        <input type="text" id="meNickname" placeholder="输入你的昵称">
+                    </div>
+                    
+                    <div class="me-field">
+                        <label for="mePrompt">个人Prompt</label>
+                        <textarea id="mePrompt" placeholder="描述你的个性、说话风格等，AI朋友会更好地与你互动..."></textarea>
+                    </div>
                 </div>
             </div>
         </div>
@@ -342,19 +380,16 @@
         if(document.getElementById('currentDate')) document.getElementById('currentDate').textContent = date;
     }
 
-    // 界面切换
     function goHome() {
-        const chatApp = document.getElementById('chatApp');
-        chatApp.style.display = 'none';
+        document.getElementById('chatApp').style.display = 'none';
     }
 
     function openChatApp() {
-        const chatApp = document.getElementById('chatApp');
-        chatApp.style.display = 'flex';
+        document.getElementById('chatApp').style.display = 'flex';
     }
 
     // ==========================================================
-    // ============= XChat UI 交互逻辑 (Phase 1) ================
+    // ============= XChat 交互逻辑 (Phase 1 & 2) ===============
     // ==========================================================
     function initChatApp() {
         const dockItems = document.querySelectorAll('.dock-item');
@@ -364,58 +399,111 @@
         const contentScroller = document.getElementById('chatAppContent');
         const headerActionBtn = document.getElementById('headerActionBtn');
         
-        // 底栏切换逻辑
         dockItems.forEach(item => {
             item.addEventListener('click', () => {
                 const tabId = item.dataset.tab;
 
-                // 更新底栏激活状态
                 dockItems.forEach(i => i.classList.remove('active'));
-                
-                // 对组合和单个item分别处理激活状态
-                if(item.classList.contains('profile')) {
-                    document.querySelector('.dock-profile-group').classList.add('active-group');
-                    document.querySelector('.dock-main-group').classList.remove('active-group');
-                } else {
-                     document.querySelector('.dock-main-group').classList.add('active-group');
-                     document.querySelector('.dock-profile-group').classList.remove('active-group');
-                }
                 item.classList.add('active');
 
-
-                // 更新内容区显示
                 tabContents.forEach(content => {
-                    if (content.id === `tab-${tabId}`) {
-                        content.classList.add('active');
-                    } else {
-                        content.classList.remove('active');
-                    }
+                    content.classList.toggle('active', content.id === `tab-${tabId}`);
                 });
                 
-                // 更新顶栏标题
                 headerTitle.textContent = item.textContent;
-
-                // 根据标签页显示/隐藏右上角按钮
-                if (tabId === 'contacts') {
-                    headerActionBtn.style.display = 'flex';
-                } else {
-                    headerActionBtn.style.display = 'none';
-                }
-
-                // 切换标签时重置滚动和顶栏状态
+                headerActionBtn.style.display = (tabId === 'contacts') ? 'flex' : 'none';
                 contentScroller.scrollTop = 0;
                 header.classList.remove('scrolled');
             });
         });
 
-        // 滚动监听，实现顶栏动态模糊
         contentScroller.addEventListener('scroll', () => {
-            if (contentScroller.scrollTop > 10) {
-                header.classList.add('scrolled');
+            header.classList.toggle('scrolled', contentScroller.scrollTop > 10);
+        });
+
+        // 初始化 "我" 界面功能
+        initMeTab();
+    }
+
+    // ==========================================================
+    // ================ "我" 界面逻辑 (Phase 2) ===================
+    // ==========================================================
+    function initMeTab() {
+        const avatarEl = document.getElementById('meAvatar');
+        const avatarUploadInput = document.getElementById('avatarUpload');
+        const nicknameInput = document.getElementById('meNickname');
+        const promptTextarea = document.getElementById('mePrompt');
+
+        const PROFILE_KEY = 'xchat_user_profile';
+
+        // 节流函数，防止频繁写入localStorage
+        const throttledSave = throttle(saveProfile, 500);
+
+        function loadProfile() {
+            try {
+                const savedProfile = JSON.parse(localStorage.getItem(PROFILE_KEY)) || {};
+                const profile = {
+                    nickname: savedProfile.nickname || '狸狸',
+                    prompt: savedProfile.prompt || '',
+                    avatar: savedProfile.avatar || '🐾'
+                };
+                
+                nicknameInput.value = profile.nickname;
+                promptTextarea.value = profile.prompt;
+                updateAvatarDisplay(profile.avatar);
+
+            } catch (e) {
+                console.error("Failed to load profile", e);
+            }
+        }
+
+        function saveProfile() {
+            try {
+                const profile = {
+                    nickname: nicknameInput.value,
+                    prompt: promptTextarea.value,
+                    avatar: avatarEl.dataset.avatarData || '🐾'
+                };
+                localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+                console.log("Profile saved:", profile);
+            } catch (e) {
+                console.error("Failed to save profile", e);
+            }
+        }
+
+        function updateAvatarDisplay(avatarData) {
+            avatarEl.dataset.avatarData = avatarData;
+            if (avatarData.startsWith('data:image')) {
+                avatarEl.style.backgroundImage = `url(${avatarData})`;
+                avatarEl.textContent = '';
             } else {
-                header.classList.remove('scrolled');
+                avatarEl.style.backgroundImage = 'none';
+                avatarEl.textContent = avatarData;
+            }
+        }
+
+        // 事件监听
+        avatarEl.addEventListener('click', () => {
+            avatarUploadInput.click();
+        });
+
+        avatarUploadInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    updateAvatarDisplay(e.target.result);
+                    saveProfile(); // 选择后立即保存
+                };
+                reader.readAsDataURL(file);
             }
         });
+
+        nicknameInput.addEventListener('input', throttledSave);
+        promptTextarea.addEventListener('input', throttledSave);
+
+        // 初始化加载
+        loadProfile();
     }
 
 </script>
