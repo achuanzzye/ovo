@@ -208,70 +208,66 @@
     .placeholder-content { padding: 20px; line-height: 1.6; }
     .placeholder-content h2 { margin-bottom: 10px; }
 
-    .me-tab-container {
-        padding: 30px 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 30px;
-    }
-    .me-avatar-large {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        background-color: #eee;
-        background-size: cover;
-        background-position: center;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 40px;
-        color: #aaa;
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
-    }
-    .me-avatar-large::after {
-        content: '点击更换';
-        position: absolute;
-        bottom: 0;
+    .me-tab-container { padding: 30px 20px; display: flex; flex-direction: column; align-items: center; gap: 30px; }
+    .me-avatar-large { width: 100px; height: 100px; border-radius: 50%; background-color: #eee; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #aaa; cursor: pointer; position: relative; overflow: hidden; }
+    .me-avatar-large::after { content: '点击更换'; position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.4); color: white; font-size: 12px; text-align: center; padding: 4px 0; opacity: 0; transition: opacity 0.2s; }
+    .me-avatar-large:hover::after { opacity: 1; }
+    .me-field { width: 100%; }
+    .me-field label { display: block; font-size: 16px; font-weight: 500; margin-bottom: 8px; }
+    .me-field input, .me-field textarea { width: 100%; padding: 12px; border: none; border-radius: 10px; background-color: #f0f2f5; font-size: 16px; font-family: inherit; outline-color: #007AFF; }
+    .me-field textarea { min-height: 120px; resize: vertical; }
+
+    /* ========================================================== */
+    /* ============== "联系人" 界面样式 (Phase 2) ================= */
+    /* ========================================================== */
+    .contact-list { padding: 10px 0; }
+    .contact-item { display: flex; align-items: center; gap: 15px; padding: 10px 20px; cursor: pointer; }
+    .contact-item:hover { background-color: #f5f5f5; }
+    .contact-avatar { width: 50px; height: 50px; border-radius: 50%; background-color: #eee; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #aaa; }
+    .contact-info { flex: 1; }
+    .contact-name { font-size: 17px; font-weight: 500; }
+    .contact-status { font-size: 14px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .empty-state { text-align: center; padding: 50px 20px; color: #aaa; }
+    .empty-state-icon { font-size: 40px; margin-bottom: 10px; }
+
+    /* 添加联系人模态框样式 */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
         left: 0;
-        right: 0;
+        width: 100%;
+        height: 100%;
         background: rgba(0,0,0,0.4);
-        color: white;
-        font-size: 12px;
-        text-align: center;
-        padding: 4px 0;
-        opacity: 0;
-        transition: opacity 0.2s;
+        z-index: 200;
+        justify-content: center;
+        align-items: center;
+        animation: fadeIn 0.3s ease;
     }
-    .me-avatar-large:hover::after {
-        opacity: 1;
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal-content {
+        background: #fff;
+        border-radius: 20px;
+        padding: 24px;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        animation: slideUp 0.3s ease;
     }
-    .me-field {
-        width: 100%;
-    }
-    .me-field label {
-        display: block;
-        font-size: 16px;
-        font-weight: 500;
-        margin-bottom: 8px;
-    }
-    .me-field input, .me-field textarea {
-        width: 100%;
-        padding: 12px;
-        border: none;
-        border-radius: 10px;
-        background-color: #f0f2f5;
-        font-size: 16px;
-        font-family: inherit;
-        outline-color: #007AFF;
-    }
-    .me-field textarea {
-        min-height: 120px;
-        resize: vertical;
-    }
-    
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-header { font-size: 20px; font-weight: 600; margin-bottom: 20px; text-align: center; }
+    .modal-field { margin-bottom: 15px; }
+    .modal-field label { display: block; font-size: 14px; margin-bottom: 6px; color: #555; }
+    .modal-field input, .modal-field textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; font-family: inherit; }
+    .modal-field textarea { min-height: 100px; resize: vertical; }
+    .modal-avatar-picker { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 20px; }
+    .modal-avatar-preview { width: 80px; height: 80px; border-radius: 50%; background-color: #eee; cursor: pointer; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; font-size: 30px; color: #aaa; }
+    .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
+    .modal-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 16px; transition: transform 0.1s; }
+    .modal-btn.cancel { background: #e9ecef; color: #495057; }
+    .modal-btn.confirm { background: #007AFF; color: white; }
+    .modal-btn:active { transform: scale(0.97); }
+
 </style>
 </head>
 <body>
@@ -300,7 +296,7 @@
             </div>
             <div class="header-title" id="chatAppTitle">消息</div>
             <div class="header-right">
-                <div class="header-icon" id="headerActionBtn" style="display: none;">
+                <div class="header-icon" id="headerActionBtn" style="display: none;" onclick="openAddContactModal()">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z" fill="currentColor"/></svg>
                 </div>
             </div>
@@ -314,19 +310,22 @@
                 </div>
             </div>
             <div class="tab-content" id="tab-contacts">
-                 <div class="placeholder-content"><h2>联系人列表</h2></div>
+                 <div class="contact-list" id="contactListContainer">
+                    </div>
             </div>
             <div class="tab-content" id="tab-moments">
                  <div class="placeholder-content"><h2>朋友圈</h2></div>
             </div>
             <div class="tab-content" id="tab-me">
                 <div class="me-tab-container">
-                    <div class="me-avatar-large" id="meAvatar"></div>
+                    <label for="avatarUpload" class="me-avatar-large" id="meAvatar"></label>
                     <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
+                    
                     <div class="me-field">
                         <label for="meNickname">昵称</label>
                         <input type="text" id="meNickname" placeholder="输入你的昵称">
                     </div>
+                    
                     <div class="me-field">
                         <label for="mePrompt">个人Prompt</label>
                         <textarea id="mePrompt" placeholder="描述你的个性、说话风格等，AI朋友会更好地与你互动..."></textarea>
@@ -344,6 +343,28 @@
             <div class="dock-profile-group">
                 <div class="dock-item profile" data-tab="me">我</div>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="addContactModal">
+    <div class="modal-content">
+        <div class="modal-header">添加AI朋友</div>
+        <div class="modal-avatar-picker">
+            <label for="newContactAvatarUpload" class="modal-avatar-preview" id="newContactAvatarPreview">🤖</label>
+            <input type="file" id="newContactAvatarUpload" accept="image/*" style="display: none;">
+        </div>
+        <div class="modal-field">
+            <label for="newContactName">姓名</label>
+            <input type="text" id="newContactName" placeholder="为你的AI朋友取个名字">
+        </div>
+        <div class="modal-field">
+            <label for="newContactPrompt">性格 (Prompt)</label>
+            <textarea id="newContactPrompt" placeholder="描述他/她的性格、背景、说话风格..."></textarea>
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-btn cancel" onclick="closeAddContactModal()">取消</button>
+            <button class="modal-btn confirm" onclick="saveNewContact()">保存</button>
         </div>
     </div>
 </div>
@@ -381,13 +402,8 @@
         if(document.getElementById('currentDate')) document.getElementById('currentDate').textContent = date;
     }
 
-    function goHome() {
-        document.getElementById('chatApp').style.display = 'none';
-    }
-
-    function openChatApp() {
-        document.getElementById('chatApp').style.display = 'flex';
-    }
+    function goHome() { document.getElementById('chatApp').style.display = 'none'; }
+    function openChatApp() { document.getElementById('chatApp').style.display = 'flex'; }
 
     function initChatApp() {
         const dockItems = document.querySelectorAll('.dock-item');
@@ -417,10 +433,11 @@
         });
 
         initMeTab();
+        initContactsTab();
     }
 
     function initMeTab() {
-        const avatarEl = document.getElementById('meAvatar');
+        const avatarLabel = document.querySelector('label[for="avatarUpload"]');
         const avatarUploadInput = document.getElementById('avatarUpload');
         const nicknameInput = document.getElementById('meNickname');
         const promptTextarea = document.getElementById('mePrompt');
@@ -446,28 +463,23 @@
                 const profile = {
                     nickname: nicknameInput.value,
                     prompt: promptTextarea.value,
-                    avatar: avatarEl.dataset.avatarData || '🐾'
+                    avatar: avatarLabel.dataset.avatarData || '🐾'
                 };
                 localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
             } catch (e) { console.error("Failed to save profile", e); }
         }
 
         function updateAvatarDisplay(avatarData) {
-            avatarEl.dataset.avatarData = avatarData;
+            avatarLabel.dataset.avatarData = avatarData;
             if (avatarData.startsWith('data:image')) {
-                avatarEl.style.backgroundImage = `url(${avatarData})`;
-                avatarEl.textContent = '';
+                avatarLabel.style.backgroundImage = `url(${avatarData})`;
+                avatarLabel.textContent = '';
             } else {
-                avatarEl.style.backgroundImage = 'none';
-                avatarEl.textContent = avatarData;
+                avatarLabel.style.backgroundImage = 'none';
+                avatarLabel.textContent = avatarData;
             }
         }
-
-        // 修复：将 'click' 事件改为 'touchstart' 以确保在移动设备上可靠触发
-        avatarEl.addEventListener('touchstart', () => {
-            avatarUploadInput.click();
-        });
-
+        
         avatarUploadInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (file) {
@@ -485,6 +497,112 @@
 
         loadProfile();
     }
+
+    // ==========================================================
+    // ============ "联系人" 界面逻辑 (Phase 2) ===================
+    // ==========================================================
+    function initContactsTab() {
+        renderContactList();
+    }
+
+    function renderContactList() {
+        const container = document.getElementById('contactListContainer');
+        const CONTACTS_KEY = 'xchat_contacts';
+        const contacts = JSON.parse(localStorage.getItem(CONTACTS_KEY)) || [];
+
+        if (contacts.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">👥</div>
+                    <div>还没有联系人</div>
+                    <div>点击右上角的“+”添加你的第一个AI朋友吧</div>
+                </div>`;
+            return;
+        }
+
+        container.innerHTML = '';
+        contacts.forEach(contact => {
+            const item = document.createElement('div');
+            item.className = 'contact-item';
+            
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = 'contact-avatar';
+            if (contact.avatar.startsWith('data:image')) {
+                avatarDiv.style.backgroundImage = `url(${contact.avatar})`;
+            } else {
+                avatarDiv.textContent = contact.avatar;
+            }
+
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'contact-info';
+            infoDiv.innerHTML = `
+                <div class="contact-name">${contact.name}</div>
+                <div class="contact-status">AI根据prompt和记忆更新</div>`;
+            
+            item.appendChild(avatarDiv);
+            item.appendChild(infoDiv);
+            container.appendChild(item);
+        });
+    }
+
+    // 添加联系人模态框逻辑
+    let newContactAvatarData = '🤖';
+    function openAddContactModal() {
+        const modal = document.getElementById('addContactModal');
+        modal.style.display = 'flex';
+        // 重置模态框
+        document.getElementById('newContactName').value = '';
+        document.getElementById('newContactPrompt').value = '';
+        const avatarPreview = document.getElementById('newContactAvatarPreview');
+        avatarPreview.style.backgroundImage = 'none';
+        avatarPreview.textContent = '🤖';
+        newContactAvatarData = '🤖';
+    }
+    
+    document.getElementById('newContactAvatarUpload').addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                newContactAvatarData = e.target.result;
+                const avatarPreview = document.getElementById('newContactAvatarPreview');
+                avatarPreview.style.backgroundImage = `url(${newContactAvatarData})`;
+                avatarPreview.textContent = '';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    function closeAddContactModal() {
+        document.getElementById('addContactModal').style.display = 'none';
+    }
+
+    function saveNewContact() {
+        const name = document.getElementById('newContactName').value.trim();
+        const prompt = document.getElementById('newContactPrompt').value.trim();
+        
+        if (!name || !prompt) {
+            alert('姓名和性格Prompt不能为空！');
+            return;
+        }
+
+        const CONTACTS_KEY = 'xchat_contacts';
+        const contacts = JSON.parse(localStorage.getItem(CONTACTS_KEY)) || [];
+        
+        const newContact = {
+            id: `contact_${Date.now()}`,
+            name: name,
+            prompt: prompt,
+            avatar: newContactAvatarData
+        };
+
+        contacts.push(newContact);
+        localStorage.setItem(CONTACTS_KEY, JSON.stringify(contacts));
+        
+        renderContactList();
+        closeAddContactModal();
+    }
+
 </script>
 </body>
 </html>
