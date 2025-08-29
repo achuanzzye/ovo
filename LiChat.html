@@ -106,10 +106,6 @@
         border: 1px solid rgba(255,255,255,0.1);
     }
     
-    /* ========================================================== */
-    /* ================= XChat UI 重构 (Phase 1) ================ */
-    /* ========================================================== */
-
     .chat-app {
         display: none;
         position: fixed;
@@ -173,9 +169,9 @@
         height: 60px;
         z-index: 103;
         display: flex;
-        justify-content: center; /* 修复：居中对齐 */
+        justify-content: center;
         align-items: center; 
-        gap: 8px; /* 修复：设置固定间距 */
+        gap: 8px;
     }
     .dock-main-group, .dock-profile-group {
         display: flex;
@@ -209,13 +205,9 @@
         color: #fff;
     }
 
-    /* 占位符样式 */
     .placeholder-content { padding: 20px; line-height: 1.6; }
     .placeholder-content h2 { margin-bottom: 10px; }
 
-    /* ========================================================== */
-    /* ================ "我" 界面样式 (Phase 2) =================== */
-    /* ========================================================== */
     .me-tab-container {
         padding: 30px 20px;
         display: flex;
@@ -329,15 +321,12 @@
             </div>
             <div class="tab-content" id="tab-me">
                 <div class="me-tab-container">
-                    <div class="me-avatar-large" id="meAvatar">
-                        </div>
+                    <div class="me-avatar-large" id="meAvatar"></div>
                     <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
-                    
                     <div class="me-field">
                         <label for="meNickname">昵称</label>
                         <input type="text" id="meNickname" placeholder="输入你的昵称">
                     </div>
-                    
                     <div class="me-field">
                         <label for="mePrompt">个人Prompt</label>
                         <textarea id="mePrompt" placeholder="描述你的个性、说话风格等，AI朋友会更好地与你互动..."></textarea>
@@ -366,6 +355,18 @@
         initChatApp();
     });
 
+    // 节流函数 (辅助函数)
+    function throttle(func, limit) {
+        let inThrottle;
+        return function(...args) {
+            if (!inThrottle) {
+                func.apply(this, args);
+                inThrottle = true;
+                setTimeout(() => inThrottle = false, limit);
+            }
+        }
+    }
+
     function initHomeScreen() {
         updateClock();
         setInterval(updateClock, 1000);
@@ -388,9 +389,6 @@
         document.getElementById('chatApp').style.display = 'flex';
     }
 
-    // ==========================================================
-    // ============= XChat 交互逻辑 (Phase 1 & 2) ===============
-    // ==========================================================
     function initChatApp() {
         const dockItems = document.querySelectorAll('.dock-item');
         const tabContents = document.querySelectorAll('.tab-content');
@@ -402,14 +400,11 @@
         dockItems.forEach(item => {
             item.addEventListener('click', () => {
                 const tabId = item.dataset.tab;
-
                 dockItems.forEach(i => i.classList.remove('active'));
                 item.classList.add('active');
-
                 tabContents.forEach(content => {
                     content.classList.toggle('active', content.id === `tab-${tabId}`);
                 });
-                
                 headerTitle.textContent = item.textContent;
                 headerActionBtn.style.display = (tabId === 'contacts') ? 'flex' : 'none';
                 contentScroller.scrollTop = 0;
@@ -421,22 +416,15 @@
             header.classList.toggle('scrolled', contentScroller.scrollTop > 10);
         });
 
-        // 初始化 "我" 界面功能
         initMeTab();
     }
 
-    // ==========================================================
-    // ================ "我" 界面逻辑 (Phase 2) ===================
-    // ==========================================================
     function initMeTab() {
         const avatarEl = document.getElementById('meAvatar');
         const avatarUploadInput = document.getElementById('avatarUpload');
         const nicknameInput = document.getElementById('meNickname');
         const promptTextarea = document.getElementById('mePrompt');
-
         const PROFILE_KEY = 'xchat_user_profile';
-
-        // 节流函数，防止频繁写入localStorage
         const throttledSave = throttle(saveProfile, 500);
 
         function loadProfile() {
@@ -447,14 +435,10 @@
                     prompt: savedProfile.prompt || '',
                     avatar: savedProfile.avatar || '🐾'
                 };
-                
                 nicknameInput.value = profile.nickname;
                 promptTextarea.value = profile.prompt;
                 updateAvatarDisplay(profile.avatar);
-
-            } catch (e) {
-                console.error("Failed to load profile", e);
-            }
+            } catch (e) { console.error("Failed to load profile", e); }
         }
 
         function saveProfile() {
@@ -465,10 +449,7 @@
                     avatar: avatarEl.dataset.avatarData || '🐾'
                 };
                 localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
-                console.log("Profile saved:", profile);
-            } catch (e) {
-                console.error("Failed to save profile", e);
-            }
+            } catch (e) { console.error("Failed to save profile", e); }
         }
 
         function updateAvatarDisplay(avatarData) {
@@ -482,8 +463,8 @@
             }
         }
 
-        // 事件监听
-        avatarEl.addEventListener('click', () => {
+        // 修复：将 'click' 事件改为 'touchstart' 以确保在移动设备上可靠触发
+        avatarEl.addEventListener('touchstart', () => {
             avatarUploadInput.click();
         });
 
@@ -493,7 +474,7 @@
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     updateAvatarDisplay(e.target.result);
-                    saveProfile(); // 选择后立即保存
+                    saveProfile();
                 };
                 reader.readAsDataURL(file);
             }
@@ -502,10 +483,8 @@
         nicknameInput.addEventListener('input', throttledSave);
         promptTextarea.addEventListener('input', throttledSave);
 
-        // 初始化加载
         loadProfile();
     }
-
 </script>
 </body>
 </html>
