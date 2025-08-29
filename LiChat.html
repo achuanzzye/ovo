@@ -27,7 +27,7 @@
 
     /* PWA完美全屏 + 沉浸式状态栏 */
     html {
-        height: 100dvh; 
+        height: 100vh; 
         overflow: hidden;
         background: var(--bg-image);
         background-size: cover;
@@ -38,7 +38,7 @@
 
     body {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        height: 100dvh;
+        height: 100vh;
         width: 100vw;
         overflow: hidden;
         background: inherit;
@@ -48,11 +48,33 @@
     }
     body::-webkit-scrollbar { display: none; }
 
+    /* ============================ 修复 iOS PWA 全屏沉浸问题 ============================ */
+    /* 强制所有顶层元素填满屏幕，解决跳动和白边问题 (来自用户的最佳实践代码) */
+    @media all and (display-mode: standalone) {
+        html, body, .app-container {
+            height: 100vh !important;
+            height: 100dvh !important;
+            min-height: 100vh !important;
+            min-height: 100dvh !important;
+            max-height: 100vh !important;
+            max-height: 100dvh !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* 修复 iOS Safari 底部安全区域问题 */
+        html {
+            padding-bottom: env(safe-area-inset-bottom) !important;
+        }
+    }
+    /* ================================================================================= */
+
     .app-container {
         position: fixed;
         top: 0;
         left: 0;
         width: 100vw;
+        height: 100vh;
         height: 100dvh;
         background: transparent;
         overflow: hidden;
@@ -102,8 +124,8 @@
         position: fixed;
         top: 0;
         left: 0;
-        width: 100vw;
-        height: 100dvh;
+        width: 100%;
+        height: 100%;
         background: var(--chat-bg);
         z-index: 100;
         flex-direction: column;
@@ -124,11 +146,12 @@
         padding-left: 16px;
         padding-right: 16px;
         z-index: 102;
-        transition: background-color 0.3s, backdrop-filter 0.3s, border-bottom 0.3s;
-        background-color: transparent;
+        transition: background 0.3s, backdrop-filter 0.3s, border-bottom 0.3s;
+        background: transparent;
     }
+    /* 修复：将纯色背景改为从上到下的渐变背景 */
     .chat-app-header.scrolled {
-        background-color: rgba(255, 255, 255, 0.85);
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.7) 70%, rgba(255, 255, 255, 0) 100%);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         border-bottom: 1px solid rgba(0, 0, 0, 0.05);
@@ -170,48 +193,46 @@
     /* 分段式悬浮底栏 */
     .floating-dock {
         position: fixed;
-        bottom: calc(15px + env(safe-area-inset-bottom));
+        bottom: env(safe-area-inset-bottom, 15px);
         left: 15px;
         right: 15px;
         height: 60px;
         z-index: 103;
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: center; /* 修复：确保两段垂直对齐 */
+    }
+    .dock-main-group, .dock-profile-group {
+        display: flex;
+        align-items: center; /* 修复：确保内部元素垂直居中 */
+        padding: 5px;
+        background: rgba(230, 230, 230, 0.7);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        height: 50px; /* 修复：统一高度 */
     }
     .dock-main-group {
-        display: flex;
-        padding: 5px;
-        background: rgba(230, 230, 230, 0.7);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border-radius: 30px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        border-radius: 25px;
     }
     .dock-profile-group {
-        display: flex;
-        padding: 5px;
-        background: rgba(230, 230, 230, 0.7);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border-radius: 50%;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        border-radius: 25px; /* 修复：统一为圆角矩形，放入图标后自然是圆形 */
     }
     .dock-item {
         cursor: pointer;
-        padding: 8px 16px;
-        border-radius: 25px;
+        padding: 0 16px;
+        height: 40px;
+        line-height: 40px;
+        border-radius: 20px;
         transition: background-color 0.3s, color 0.3s;
         font-size: 15px;
         color: #555;
     }
     .dock-item.profile {
-        width: 50px;
-        height: 50px;
+        width: 40px;
+        padding: 0;
         display: grid;
         place-items: center;
-        padding: 0;
-        border-radius: 50%;
     }
     .dock-item.active {
         background-color: #007AFF;
@@ -350,7 +371,17 @@
 
                 // 更新底栏激活状态
                 dockItems.forEach(i => i.classList.remove('active'));
+                
+                // 对组合和单个item分别处理激活状态
+                if(item.classList.contains('profile')) {
+                    document.querySelector('.dock-profile-group').classList.add('active-group');
+                    document.querySelector('.dock-main-group').classList.remove('active-group');
+                } else {
+                     document.querySelector('.dock-main-group').classList.add('active-group');
+                     document.querySelector('.dock-profile-group').classList.remove('active-group');
+                }
                 item.classList.add('active');
+
 
                 // 更新内容区显示
                 tabContents.forEach(content => {
