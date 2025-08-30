@@ -106,154 +106,60 @@
         border: 1px solid rgba(255,255,255,0.1);
     }
     
-    .chat-app {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: var(--chat-bg);
-        z-index: 100;
-        flex-direction: column;
-        color: #000;
-    }
-
-    .chat-app-header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: calc(60px + env(safe-area-inset-top));
-        padding-top: env(safe-area-inset-top);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding-left: 16px;
-        padding-right: 16px;
-        z-index: 102;
-        transition: background 0.3s, backdrop-filter 0.3s, border-bottom 0.3s;
-        background: transparent;
-    }
-    .chat-app-header.scrolled {
-        background: linear-gradient(to bottom, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.7) 70%, rgba(255, 255, 255, 0) 100%);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    }
-    .chat-app-header .header-left, .chat-app-header .header-right {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 24px;
-        width: 60px;
-    }
+    .chat-app { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--chat-bg); z-index: 100; flex-direction: column; color: #000; }
+    .chat-app-header { position: fixed; top: 0; left: 0; right: 0; height: calc(60px + env(safe-area-inset-top)); padding-top: env(safe-area-inset-top); display: flex; align-items: center; justify-content: space-between; padding-left: 16px; padding-right: 16px; z-index: 102; transition: background 0.3s, backdrop-filter 0.3s, border-bottom 0.3s; background: transparent; }
+    .chat-app-header.scrolled { background: linear-gradient(to bottom, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.7) 70%, rgba(255, 255, 255, 0) 100%); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0, 0, 0, 0.05); }
+    .chat-app-header .header-left, .chat-app-header .header-right { display: flex; align-items: center; gap: 8px; font-size: 24px; width: 60px; position: relative; }
     .chat-app-header .header-right { justify-content: flex-end; }
     .chat-app-header .header-title { flex: 1; text-align: center; font-size: 17px; font-weight: 600; }
     .header-icon { cursor: pointer; width: 30px; height: 30px; display: grid; place-items: center; }
     
-    .chat-app-content {
-        flex: 1;
-        overflow-y: auto;
-        padding-top: calc(60px + env(safe-area-inset-top));
-        padding-bottom: calc(100px + env(safe-area-inset-bottom));
-    }
+    .chat-app-content { flex: 1; overflow-y: auto; padding-top: calc(60px + env(safe-area-inset-top)); padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
     
-    .floating-dock {
-        position: fixed;
-        bottom: env(safe-area-inset-bottom, 15px);
-        left: 0;
-        right: 0;
-        height: 60px;
-        z-index: 103;
-        display: flex;
-        justify-content: center;
-        align-items: center; 
-        gap: 8px;
-    }
-    .dock-main-group, .dock-profile-group {
-        display: flex;
-        align-items: center;
-        padding: 5px;
-        background: rgba(230, 230, 230, 0.7);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        height: 50px;
-        border-radius: 25px;
-    }
-    .dock-item {
-        cursor: pointer;
-        padding: 0 16px;
-        height: 40px;
-        line-height: 40px;
-        border-radius: 20px;
-        transition: background-color 0.3s, color 0.3s;
-        font-size: 15px;
-        color: #555;
-    }
-    .dock-item.profile {
-        width: 40px;
-        padding: 0;
-        display: grid;
-        place-items: center;
-    }
-    .dock-item.active {
-        background-color: #007AFF;
-        color: #fff;
-    }
-
-    .placeholder-content { padding: 20px; line-height: 1.6; }
-    .placeholder-content h2 { margin-bottom: 10px; }
+    .floating-dock { position: fixed; bottom: env(safe-area-inset-bottom, 15px); left: 0; right: 0; height: 60px; z-index: 103; display: flex; justify-content: center; align-items: center; gap: 8px; }
+    .dock-main-group, .dock-profile-group { display: flex; align-items: center; padding: 5px; background: rgba(230, 230, 230, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: 50px; border-radius: 25px; }
+    .dock-item { cursor: pointer; padding: 0 16px; height: 40px; line-height: 40px; border-radius: 20px; transition: background-color 0.3s, color 0.3s, transform 0.2s; font-size: 15px; color: #555; }
+    .dock-item.profile { width: 40px; height: 40px; padding: 0; display: grid; place-items: center; background-size: cover; background-position: center; }
+    .dock-item.active { background-color: #007AFF; color: #fff; }
+    .dock-item.profile:active { transform: scale(0.9); }
 
     .me-tab-container { padding: 30px 20px; display: flex; flex-direction: column; align-items: center; gap: 30px; }
     .me-avatar-large { width: 100px; height: 100px; border-radius: 50%; background-color: #eee; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #aaa; cursor: pointer; position: relative; overflow: hidden; }
-    .me-avatar-large::after { content: '点击更换'; position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.4); color: white; font-size: 12px; text-align: center; padding: 4px 0; opacity: 0; transition: opacity 0.2s; }
+    .me-avatar-large::after { content: '点击更换'; position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.4); color: white; font-size: 12px; text-align: center; padding: 4px 0; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
     .me-avatar-large:hover::after { opacity: 1; }
     .me-field { width: 100%; }
     .me-field label { display: block; font-size: 16px; font-weight: 500; margin-bottom: 8px; }
     .me-field input, .me-field textarea { width: 100%; padding: 12px; border: none; border-radius: 10px; background-color: #f0f2f5; font-size: 16px; font-family: inherit; outline-color: #007AFF; }
     .me-field textarea { min-height: 120px; resize: vertical; }
 
-    /* ========================================================== */
-    /* ============== "联系人" 界面样式 (Phase 2) ================= */
-    /* ========================================================== */
-    .contact-list { padding: 10px 0; }
-    .contact-item { display: flex; align-items: center; gap: 15px; padding: 10px 20px; cursor: pointer; }
-    .contact-item:hover { background-color: #f5f5f5; }
-    .contact-avatar { width: 50px; height: 50px; border-radius: 50%; background-color: #eee; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #aaa; }
-    .contact-info { flex: 1; }
+    /* 联系人列表样式 */
+    .contact-list-wrapper { overflow: hidden; } /* 防止滑动时内容溢出 */
+    .contact-item-swipe-container { position: relative; background-color: white; }
+    .contact-item { display: flex; align-items: center; gap: 15px; padding: 10px 20px; background-color: white; position: relative; z-index: 2; transition: transform 0.3s ease; }
+    .contact-item.swiped { transform: translateX(-140px); }
+    .contact-actions { position: absolute; top: 0; right: 0; height: 100%; display: flex; z-index: 1; }
+    .action-btn { width: 70px; height: 100%; border: none; color: white; display: grid; place-items: center; font-size: 15px; cursor: pointer; }
+    .action-btn.edit { background-color: #ff9500; }
+    .action-btn.delete { background-color: #ff3b30; }
+    .contact-avatar { width: 50px; height: 50px; border-radius: 50%; background-color: #eee; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #aaa; flex-shrink: 0; }
+    .contact-info { flex: 1; min-width: 0; }
     .contact-name { font-size: 17px; font-weight: 500; }
     .contact-status { font-size: 14px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .empty-state { text-align: center; padding: 50px 20px; color: #aaa; }
     .empty-state-icon { font-size: 40px; margin-bottom: 10px; }
 
-    /* 添加联系人模态框样式 */
-    .modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.4);
-        z-index: 200;
-        justify-content: center;
-        align-items: center;
-        animation: fadeIn 0.3s ease;
-    }
+    /* "+" 按钮气泡菜单样式 */
+    .popover-menu { display: none; position: absolute; top: 50px; right: 0; background: white; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.1); overflow: hidden; z-index: 110; animation: fadeIn 0.1s ease-out; }
+    .popover-item { padding: 12px 20px; font-size: 16px; cursor: pointer; }
+    .popover-item:hover { background-color: #f5f5f5; }
+    .popover-item:not(:last-child) { border-bottom: 1px solid #f0f0f0; }
+
+    /* 模态框样式 */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 200; justify-content: center; align-items: center; animation: fadeIn 0.3s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    .modal-content {
-        background: #fff;
-        border-radius: 20px;
-        padding: 24px;
-        width: 90%;
-        max-width: 400px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        animation: slideUp 0.3s ease;
-    }
+    .modal-content { background: #fff; border-radius: 20px; padding: 24px; width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); animation: slideUp 0.3s ease; }
     @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     .modal-header { font-size: 20px; font-weight: 600; margin-bottom: 20px; text-align: center; }
     .modal-field { margin-bottom: 15px; }
@@ -296,21 +202,22 @@
             </div>
             <div class="header-title" id="chatAppTitle">消息</div>
             <div class="header-right">
-                <div class="header-icon" id="headerActionBtn" style="display: none;" onclick="openAddContactModal()">
+                <div class="header-icon" id="headerActionBtn" style="display: none;">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z" fill="currentColor"/></svg>
+                </div>
+                <div class="popover-menu" id="addContactPopover">
+                    <div class="popover-item" id="popoverAddFriend">添加好友</div>
+                    <div class="popover-item" id="popoverCreateGroup">创建群聊</div>
                 </div>
             </div>
         </div>
 
         <div class="chat-app-content" id="chatAppContent">
             <div class="tab-content active" id="tab-messages">
-                <div class="placeholder-content">
-                    <h2>消息列表</h2>
-                    <p style="height:1200px; background: #f0f0f0; margin-top:20px; padding:10px;">这是一个很高的占位符，用于撑开内容区域以测试滚动。</p>
-                </div>
+                <div class="placeholder-content"><h2>消息列表</h2></div>
             </div>
             <div class="tab-content" id="tab-contacts">
-                 <div class="contact-list" id="contactListContainer">
+                 <div class="contact-list-wrapper" id="contactListContainer">
                     </div>
             </div>
             <div class="tab-content" id="tab-moments">
@@ -320,12 +227,10 @@
                 <div class="me-tab-container">
                     <label for="avatarUpload" class="me-avatar-large" id="meAvatar"></label>
                     <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
-                    
                     <div class="me-field">
                         <label for="meNickname">昵称</label>
                         <input type="text" id="meNickname" placeholder="输入你的昵称">
                     </div>
-                    
                     <div class="me-field">
                         <label for="mePrompt">个人Prompt</label>
                         <textarea id="mePrompt" placeholder="描述你的个性、说话风格等，AI朋友会更好地与你互动..."></textarea>
@@ -341,7 +246,7 @@
                 <div class="dock-item" data-tab="moments">朋友圈</div>
             </div>
             <div class="dock-profile-group">
-                <div class="dock-item profile" data-tab="me">我</div>
+                <div class="dock-item profile" data-tab="me" id="dockProfileAvatar"></div>
             </div>
         </div>
     </div>
@@ -376,32 +281,9 @@
         initChatApp();
     });
 
-    // 节流函数 (辅助函数)
-    function throttle(func, limit) {
-        let inThrottle;
-        return function(...args) {
-            if (!inThrottle) {
-                func.apply(this, args);
-                inThrottle = true;
-                setTimeout(() => inThrottle = false, limit);
-            }
-        }
-    }
-
-    function initHomeScreen() {
-        updateClock();
-        setInterval(updateClock, 1000);
-    }
-
-    function updateClock() {
-        const now = new Date();
-        const time = now.toTimeString().slice(0, 5);
-        const options = { month: 'long', day: 'numeric', weekday: 'long' };
-        const date = now.toLocaleDateString('zh-CN', options);
-        if(document.getElementById('currentTime')) document.getElementById('currentTime').textContent = time;
-        if(document.getElementById('currentDate')) document.getElementById('currentDate').textContent = date;
-    }
-
+    function throttle(func, limit) { let inThrottle; return function(...args) { if (!inThrottle) { func.apply(this, args); inThrottle = true; setTimeout(() => inThrottle = false, limit); } } }
+    function initHomeScreen() { updateClock(); setInterval(updateClock, 1000); }
+    function updateClock() { const now = new Date(); const time = now.toTimeString().slice(0, 5); const options = { month: 'long', day: 'numeric', weekday: 'long' }; const date = now.toLocaleDateString('zh-CN', options); if(document.getElementById('currentTime')) document.getElementById('currentTime').textContent = time; if(document.getElementById('currentDate')) document.getElementById('currentDate').textContent = date; }
     function goHome() { document.getElementById('chatApp').style.display = 'none'; }
     function openChatApp() { document.getElementById('chatApp').style.display = 'flex'; }
 
@@ -416,12 +298,18 @@
         dockItems.forEach(item => {
             item.addEventListener('click', () => {
                 const tabId = item.dataset.tab;
-                dockItems.forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
+                
+                // 更新激活状态 (排除profile)
+                if(!item.classList.contains('profile')) {
+                    dockItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                }
+                
                 tabContents.forEach(content => {
                     content.classList.toggle('active', content.id === `tab-${tabId}`);
                 });
-                headerTitle.textContent = item.textContent;
+                
+                headerTitle.textContent = item.classList.contains('profile') ? '我' : item.textContent;
                 headerActionBtn.style.display = (tabId === 'contacts') ? 'flex' : 'none';
                 contentScroller.scrollTop = 0;
                 header.classList.remove('scrolled');
@@ -434,6 +322,7 @@
 
         initMeTab();
         initContactsTab();
+        initPopoverMenu();
     }
 
     function initMeTab() {
@@ -445,28 +334,18 @@
         const throttledSave = throttle(saveProfile, 500);
 
         function loadProfile() {
-            try {
-                const savedProfile = JSON.parse(localStorage.getItem(PROFILE_KEY)) || {};
-                const profile = {
-                    nickname: savedProfile.nickname || '狸狸',
-                    prompt: savedProfile.prompt || '',
-                    avatar: savedProfile.avatar || '🐾'
-                };
-                nicknameInput.value = profile.nickname;
-                promptTextarea.value = profile.prompt;
-                updateAvatarDisplay(profile.avatar);
-            } catch (e) { console.error("Failed to load profile", e); }
+            const savedProfile = JSON.parse(localStorage.getItem(PROFILE_KEY)) || {};
+            const profile = { nickname: savedProfile.nickname || '狸狸', prompt: savedProfile.prompt || '', avatar: savedProfile.avatar || '🐾' };
+            nicknameInput.value = profile.nickname;
+            promptTextarea.value = profile.prompt;
+            updateAvatarDisplay(profile.avatar);
+            updateDockAvatar(profile.avatar); // 更新底栏头像
         }
 
         function saveProfile() {
-            try {
-                const profile = {
-                    nickname: nicknameInput.value,
-                    prompt: promptTextarea.value,
-                    avatar: avatarLabel.dataset.avatarData || '🐾'
-                };
-                localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
-            } catch (e) { console.error("Failed to save profile", e); }
+            const profile = { nickname: nicknameInput.value, prompt: promptTextarea.value, avatar: avatarLabel.dataset.avatarData || '🐾' };
+            localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+            updateDockAvatar(profile.avatar); // 保存时同步更新底栏头像
         }
 
         function updateAvatarDisplay(avatarData) {
@@ -479,30 +358,38 @@
                 avatarLabel.textContent = avatarData;
             }
         }
+
+        // 新增：更新底栏头像
+        function updateDockAvatar(avatarData) {
+            const dockAvatar = document.getElementById('dockProfileAvatar');
+            if (avatarData.startsWith('data:image')) {
+                dockAvatar.style.backgroundImage = `url(${avatarData})`;
+                dockAvatar.textContent = '';
+            } else {
+                dockAvatar.style.backgroundImage = 'none';
+                dockAvatar.textContent = avatarData;
+            }
+        }
         
         avatarUploadInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    updateAvatarDisplay(e.target.result);
-                    saveProfile();
-                };
-                reader.readAsDataURL(file);
-            }
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                updateAvatarDisplay(e.target.result);
+                saveProfile();
+            };
+            reader.readAsDataURL(file);
         });
 
         nicknameInput.addEventListener('input', throttledSave);
         promptTextarea.addEventListener('input', throttledSave);
-
         loadProfile();
     }
 
-    // ==========================================================
-    // ============ "联系人" 界面逻辑 (Phase 2) ===================
-    // ==========================================================
     function initContactsTab() {
         renderContactList();
+        initSwipeActions();
     }
 
     function renderContactList() {
@@ -511,46 +398,117 @@
         const contacts = JSON.parse(localStorage.getItem(CONTACTS_KEY)) || [];
 
         if (contacts.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-state-icon">👥</div>
-                    <div>还没有联系人</div>
-                    <div>点击右上角的“+”添加你的第一个AI朋友吧</div>
-                </div>`;
+            container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">👥</div><div>还没有联系人</div><div>点击右上角的“+”添加你的第一个AI朋友吧</div></div>`;
             return;
         }
 
         container.innerHTML = '';
         contacts.forEach(contact => {
-            const item = document.createElement('div');
-            item.className = 'contact-item';
+            const swipeContainer = document.createElement('div');
+            swipeContainer.className = 'contact-item-swipe-container';
+            swipeContainer.innerHTML = `
+                <div class="contact-actions">
+                    <button class="action-btn edit">编辑</button>
+                    <button class="action-btn delete">删除</button>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-avatar" id="avatar-${contact.id}"></div>
+                    <div class="contact-info">
+                        <div class="contact-name">${contact.name}</div>
+                        <div class="contact-status">AI根据prompt和记忆更新</div>
+                    </div>
+                </div>`;
+            container.appendChild(swipeContainer);
             
-            const avatarDiv = document.createElement('div');
-            avatarDiv.className = 'contact-avatar';
+            const avatarDiv = document.getElementById(`avatar-${contact.id}`);
             if (contact.avatar.startsWith('data:image')) {
                 avatarDiv.style.backgroundImage = `url(${contact.avatar})`;
             } else {
                 avatarDiv.textContent = contact.avatar;
             }
+        });
+        initSwipeActions(); // 重新渲染后需要重新绑定滑动事件
+    }
+    
+    // 滑动操作逻辑
+    function initSwipeActions() {
+        let startX, currentX, swipedItem = null;
+        
+        document.querySelectorAll('.contact-item').forEach(item => {
+            item.addEventListener('touchstart', (e) => {
+                // 如果有已打开的，先关闭
+                if (swipedItem && swipedItem !== item) {
+                    swipedItem.classList.remove('swiped');
+                }
+                startX = e.touches[0].clientX;
+            }, { passive: true });
 
-            const infoDiv = document.createElement('div');
-            infoDiv.className = 'contact-info';
-            infoDiv.innerHTML = `
-                <div class="contact-name">${contact.name}</div>
-                <div class="contact-status">AI根据prompt和记忆更新</div>`;
-            
-            item.appendChild(avatarDiv);
-            item.appendChild(infoDiv);
-            container.appendChild(item);
+            item.addEventListener('touchmove', (e) => {
+                currentX = e.touches[0].clientX;
+                const diffX = currentX - startX;
+                if (diffX < 0 && diffX > -140) { // 只允许左滑
+                    item.style.transform = `translateX(${diffX}px)`;
+                    item.style.transition = 'none';
+                }
+            }, { passive: true });
+
+            item.addEventListener('touchend', () => {
+                const diffX = currentX - startX;
+                item.style.transition = 'transform 0.3s ease';
+                if (diffX < -50) { // 滑动超过50px则打开
+                    item.classList.add('swiped');
+                    item.style.transform = '';
+                    swipedItem = item;
+                } else {
+                    item.classList.remove('swiped');
+                    item.style.transform = '';
+                    if (swipedItem === item) swipedItem = null;
+                }
+                startX = null;
+                currentX = null;
+            });
+        });
+
+        // 点击其他地方关闭
+        document.addEventListener('click', (e) => {
+            if (swipedItem && !swipedItem.contains(e.target)) {
+                swipedItem.classList.remove('swiped');
+                swipedItem = null;
+            }
+        }, true);
+    }
+    
+    // 气泡菜单逻辑
+    function initPopoverMenu() {
+        const actionBtn = document.getElementById('headerActionBtn');
+        const popover = document.getElementById('addContactPopover');
+        
+        actionBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            popover.style.display = popover.style.display === 'block' ? 'none' : 'block';
+        });
+
+        document.getElementById('popoverAddFriend').addEventListener('click', () => {
+            popover.style.display = 'none';
+            openAddContactModal();
+        });
+
+        document.getElementById('popoverCreateGroup').addEventListener('click', () => {
+            popover.style.display = 'none';
+            alert('创建群聊功能正在开发中...');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (popover.style.display === 'block' && !actionBtn.contains(e.target)) {
+                popover.style.display = 'none';
+            }
         });
     }
 
-    // 添加联系人模态框逻辑
     let newContactAvatarData = '🤖';
     function openAddContactModal() {
         const modal = document.getElementById('addContactModal');
         modal.style.display = 'flex';
-        // 重置模态框
         document.getElementById('newContactName').value = '';
         document.getElementById('newContactPrompt').value = '';
         const avatarPreview = document.getElementById('newContactAvatarPreview');
@@ -561,16 +519,15 @@
     
     document.getElementById('newContactAvatarUpload').addEventListener('change', (event) => {
         const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                newContactAvatarData = e.target.result;
-                const avatarPreview = document.getElementById('newContactAvatarPreview');
-                avatarPreview.style.backgroundImage = `url(${newContactAvatarData})`;
-                avatarPreview.textContent = '';
-            };
-            reader.readAsDataURL(file);
-        }
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            newContactAvatarData = e.target.result;
+            const avatarPreview = document.getElementById('newContactAvatarPreview');
+            avatarPreview.style.backgroundImage = `url(${newContactAvatarData})`;
+            avatarPreview.textContent = '';
+        };
+        reader.readAsDataURL(file);
     });
 
     function closeAddContactModal() {
@@ -580,29 +537,16 @@
     function saveNewContact() {
         const name = document.getElementById('newContactName').value.trim();
         const prompt = document.getElementById('newContactPrompt').value.trim();
-        
-        if (!name || !prompt) {
-            alert('姓名和性格Prompt不能为空！');
-            return;
-        }
+        if (!name || !prompt) { alert('姓名和性格Prompt不能为空！'); return; }
 
         const CONTACTS_KEY = 'xchat_contacts';
         const contacts = JSON.parse(localStorage.getItem(CONTACTS_KEY)) || [];
-        
-        const newContact = {
-            id: `contact_${Date.now()}`,
-            name: name,
-            prompt: prompt,
-            avatar: newContactAvatarData
-        };
-
+        const newContact = { id: `contact_${Date.now()}`, name: name, prompt: prompt, avatar: newContactAvatarData };
         contacts.push(newContact);
         localStorage.setItem(CONTACTS_KEY, JSON.stringify(contacts));
-        
         renderContactList();
         closeAddContactModal();
     }
-
 </script>
 </body>
 </html>
