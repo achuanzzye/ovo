@@ -21,7 +21,6 @@
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; height: 100vh; width: 100vw; overflow: hidden; background: inherit; background-attachment: fixed; -ms-overflow-style: none; scrollbar-width: none; }
     body::-webkit-scrollbar { display: none; }
     
-    /* 修复：全局禁止长按选中 */
     html, body {
       -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
     }
@@ -43,13 +42,13 @@
     .dock { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 20px; right: 20px; height: 80px; background: rgba(255,255,255,0.15); backdrop-filter: blur(20px); border-radius: 25px; display: flex; align-items: center; justify-content: center; gap: 25px; border: 1px solid rgba(255,255,255,0.1); }
     
     .chat-app { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--chat-bg); z-index: 100; flex-direction: column; color: #000; }
-    .chat-app-header { position: fixed; top: 0; left: 0; right: 0; height: calc(60px + env(safe-area-inset-top)); padding-top: env(safe-area-inset-top); display: flex; align-items: center; justify-content: space-between; padding-left: 16px; padding-right: 16px; z-index: 102; transition: background 0.3s, backdrop-filter 0.3s, border-bottom 0.3s; background: transparent; }
+    .chat-app-header { position: fixed; top: 0; left: 0; right: 0; height: calc(50px + env(safe-area-inset-top)); padding-top: env(safe-area-inset-top); display: flex; align-items: center; justify-content: space-between; padding-left: 16px; padding-right: 16px; z-index: 102; transition: background 0.3s, backdrop-filter 0.3s, border-bottom 0.3s; background: transparent; }
     .chat-app-header.scrolled { background: linear-gradient(to bottom, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.7) 70%, rgba(255, 255, 255, 0) 100%); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0, 0, 0, 0.05); }
     .chat-app-header .header-left, .chat-app-header .header-right { display: flex; align-items: center; gap: 8px; font-size: 24px; width: 60px; position: relative; }
     .chat-app-header .header-right { justify-content: flex-end; }
     .chat-app-header .header-title { flex: 1; text-align: center; font-size: 17px; font-weight: 600; }
     .header-icon { cursor: pointer; width: 30px; height: 30px; display: grid; place-items: center; }
-    .chat-app-content { flex: 1; overflow-y: auto; padding-top: calc(60px + env(safe-area-inset-top)); padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
+    .chat-app-content { flex: 1; overflow-y: auto; padding-top: calc(50px + env(safe-area-inset-top)); padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
     .floating-dock { position: fixed; bottom: env(safe-area-inset-bottom, 15px); left: 0; right: 0; height: 60px; z-index: 103; display: flex; justify-content: center; align-items: center; gap: 8px; }
@@ -101,9 +100,6 @@
     .empty-state { text-align: center; padding: 50px 20px; color: #aaa; }
     .empty-state-icon { font-size: 40px; margin-bottom: 10px; }
     
-    /* ========================================================== */
-    /* ============== 消息和聊天界面样式 (Phase 2) ================ */
-    /* ========================================================== */
     .message-list { padding: 10px 0; }
     .message-item { display: flex; align-items: center; gap: 15px; padding: 10px 20px; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
     .message-item:hover { background-color: #f5f5f5; }
@@ -112,23 +108,148 @@
     .message-preview { font-size: 14px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .message-time { font-size: 14px; color: #aaa; }
 
-    .chat-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 110; background: #f0f2f5; flex-direction: column; }
-    .chat-header { height: calc(60px + env(safe-area-inset-top)); padding-top: env(safe-area-inset-top); display: flex; align-items: center; padding: 0 10px; background-color: #f7f7f7; border-bottom: 1px solid #ddd; z-index: 2; }
-    .chat-header .back-btn { background: none; border: none; font-size: 24px; cursor: pointer; padding: 10px; }
-    .chat-header .contact-avatar { margin-left: 5px; }
-    .chat-header .contact-name { font-size: 17px; font-weight: 600; }
-    .chat-messages { flex: 1; overflow-y: auto; padding: 20px 10px; }
-    .message-bubble-container { display: flex; margin-bottom: 15px; }
-    .message-bubble-container.user { justify-content: flex-end; }
-    .message-bubble-container.ai { justify-content: flex-start; }
-    .message-bubble-container .contact-avatar { margin: 0 10px; }
-    .message-bubble { max-width: 75%; padding: 10px 15px; border-radius: 20px; word-wrap: break-word; line-height: 1.5; }
-    .user .message-bubble { background-color: #007AFF; color: white; border-bottom-right-radius: 5px; }
-    .ai .message-bubble { background-color: #fff; color: #000; border-bottom-left-radius: 5px; }
-    .chat-input-area { padding: 10px; padding-bottom: calc(10px + env(safe-area-inset-bottom)); background-color: #f7f7f7; border-top: 1px solid #ddd; display: flex; align-items: center; gap: 10px; }
-    .chat-input { flex: 1; height: 40px; border: none; border-radius: 20px; padding: 0 15px; background-color: #fff; font-size: 16px; }
-    .chat-send-btn { width: 40px; height: 40px; border: none; border-radius: 50%; background-color: #007AFF; color: white; cursor: pointer; display: grid; place-items: center; font-size: 20px; flex-shrink: 0; }
+    /* ========================================================== */
+    /* ============== 聊天界面UI重构样式 (Phase 2) ================ */
+    /* ========================================================== */
+    .chat-screen {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        z-index: 110;
+        background: #fff; /* 使用纯白背景 */
+        flex-direction: column;
+        transition: transform 0.3s ease-in-out;
+    }
+    .chat-screen.hidden { transform: translateX(100%); }
+
+    /* 聊天界面顶栏 */
+    .chat-header {
+        position: fixed; top: 0; left: 0; right: 0;
+        height: calc(50px + env(safe-area-inset-top));
+        padding-top: env(safe-area-inset-top);
+        display: flex;
+        align-items: center;
+        z-index: 10;
+        transition: background 0.3s, backdrop-filter 0.3s;
+        background: transparent;
+    }
+    .chat-header.scrolled {
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.7) 70%, rgba(255, 255, 255, 0) 100%);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+    .chat-header .back-btn {
+        background: rgba(0,0,0,0.05);
+        border: none;
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        margin-left: 16px;
+    }
+    .chat-header .header-title {
+        position: absolute; left: 50%; top: 50%;
+        transform: translate(-50%, -50%);
+        padding-top: env(safe-area-inset-top);
+        font-size: 17px; font-weight: 600;
+        opacity: 0; transition: opacity 0.3s;
+    }
+    .chat-header.scrolled .header-title { opacity: 1; }
+
+    /* 聊天消息区域 */
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px;
+        padding-top: calc(50px + env(safe-area-inset-top)); /* 留出顶栏空间 */
+        padding-bottom: calc(70px + env(safe-area-inset-bottom)); /* 留出输入框空间 */
+    }
+    .chat-contact-header {
+        text-align: center;
+        padding: 20px 0;
+    }
+    .chat-contact-header .contact-avatar { margin: 0 auto 10px auto; }
+    .chat-contact-header .contact-name { font-size: 22px; font-weight: 600; }
+    .chat-timestamp { text-align: center; color: #aaa; font-size: 12px; margin: 15px 0; }
     
+    .message-bubble-container { display: flex; margin-bottom: 10px; max-width: 85%; }
+    .message-bubble-container.user { margin-left: auto; justify-content: flex-end; }
+    .message-bubble-container.ai { margin-right: auto; justify-content: flex-start; }
+    .message-bubble { padding: 10px 15px; border-radius: 20px; word-wrap: break-word; line-height: 1.5; }
+    .user .message-bubble { background-color: #007AFF; color: white; border-bottom-right-radius: 5px; }
+    .ai .message-bubble { background-color: #f0f2f5; color: #000; border-bottom-left-radius: 5px; }
+
+    /* 聊天输入区域 */
+    .chat-input-area {
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        padding: 10px;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom));
+        background: transparent;
+        z-index: 10;
+        display: flex;
+        align-items: flex-end; /* 垂直底部对齐 */
+        gap: 10px;
+    }
+    .chat-input-wrapper {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        background-color: #f0f2f5;
+        border-radius: 22px;
+        padding: 5px;
+    }
+    .chat-input {
+        flex: 1;
+        border: none;
+        background: transparent;
+        padding: 8px 10px;
+        font-size: 16px;
+        outline: none;
+    }
+    .chat-action-btn, .chat-send-btn {
+        width: 34px; height: 34px;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        font-size: 20px;
+        flex-shrink: 0;
+        transition: transform 0.2s;
+    }
+    .chat-action-btn { background-color: transparent; color: #007AFF; }
+    .chat-send-btn { background-color: #007AFF; color: white; }
+    .chat-send-btn:active, .chat-action-btn:active { transform: scale(0.9); }
+
+    /* 展开的功能菜单 */
+    .chat-action-menu {
+        display: flex;
+        gap: 15px;
+        padding: 0 10px 10px 54px; /* 左侧留出加号按钮位置 */
+        height: 0;
+        overflow: hidden;
+        transition: height 0.3s ease;
+    }
+    .chat-action-menu.expanded {
+        height: 60px; /* 展开高度 */
+        padding-top: 10px;
+    }
+    .action-menu-item {
+        display: flex; flex-direction: column; align-items: center; gap: 5px;
+        font-size: 12px; color: #888;
+        cursor: pointer;
+    }
+    .action-menu-icon {
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        background-color: #f0f2f5;
+        display: grid; place-items: center;
+        font-size: 20px;
+    }
+
 </style>
 </head>
 <body>
@@ -169,8 +290,7 @@
 
         <div class="chat-app-content" id="chatAppContent">
             <div class="tab-content active" id="tab-messages">
-                <div class="message-list" id="messageListContainer">
-                    </div>
+                <div class="message-list" id="messageListContainer"></div>
             </div>
             <div class="tab-content" id="tab-contacts">
                  <div class="contact-list-wrapper" id="contactListContainer"></div>
@@ -212,13 +332,40 @@
         <div class="header-icon back-btn" onclick="closeChatScreen()">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.41 7.41L14 6L8 12L14 18L15.41 16.59L10.83 12L15.41 7.41Z" fill="currentColor"/></svg>
         </div>
-        <div class="contact-avatar" id="chatScreenAvatar"></div>
-        <div class="contact-name" id="chatScreenName"></div>
+        <div class="header-title" id="chatScreenTitle"></div>
     </div>
-    <div class="chat-messages" id="chatMessagesContainer"></div>
-    <div class="chat-input-area">
-        <input type="text" class="chat-input" id="chatInput" placeholder="输入消息...">
-        <button class="chat-send-btn" id="chatSendBtn">➤</button>
+    <div class="chat-messages" id="chatMessagesContainer">
+        </div>
+    <div class="chat-input-area-wrapper">
+        <div class="chat-action-menu" id="chatActionMenu">
+            <div class="action-menu-item">
+                <div class="action-menu-icon">🖼️</div>
+                <span>图片</span>
+            </div>
+            <div class="action-menu-item">
+                <div class="action-menu-icon">🎤</div>
+                <span>语音</span>
+            </div>
+            <div class="action-menu-item">
+                <div class="action-menu-icon">🔗</div>
+                <span>链接</span>
+            </div>
+            <div class="action-menu-item">
+                <div class="action-menu-icon">💰</div>
+                <span>转账</span>
+            </div>
+             <div class="action-menu-item">
+                <div class="action-menu-icon">😊</div>
+                <span>表情包</span>
+            </div>
+        </div>
+        <div class="chat-input-area">
+            <button class="chat-action-btn" id="chatActionBtn">+</button>
+            <div class="chat-input-wrapper">
+                <input type="text" class="chat-input" id="chatInput" placeholder="输入消息...">
+            </div>
+            <button class="chat-send-btn" id="chatSendBtn">➤</button>
+        </div>
     </div>
 </div>
 
@@ -282,7 +429,7 @@
                 headerActionBtn.style.display = (tabId === 'contacts') ? 'flex' : 'none';
                 contentScroller.scrollTop = 0;
                 header.classList.remove('scrolled');
-                if (tabId === 'messages') renderMessageList(); // 切换到消息页时刷新
+                if (tabId === 'messages') renderMessageList();
             });
         });
 
@@ -361,7 +508,6 @@
     function renderContactList() {
         const container = document.getElementById('contactListContainer');
         const contacts = JSON.parse(localStorage.getItem(DB_KEYS.CONTACTS)) || [];
-
         if (contacts.length === 0) {
             container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">👥</div><div>还没有联系人</div><div>点击右上角的“+”添加你的第一个AI朋友吧</div></div>`;
             return;
@@ -399,7 +545,7 @@
             item.addEventListener('touchmove', (e) => {
                 currentX = e.touches[0].clientX;
                 const diffX = currentX - startX;
-                if (diffX < 0 && diffX > -140) { item.style.transform = `translateX(${diffX}px)`; item.style.transition = 'none'; }
+                if (diffX < -10 && diffX > -140) { item.style.transform = `translateX(${diffX}px)`; item.style.transition = 'none'; }
             }, { passive: true });
             item.addEventListener('touchend', () => {
                 const diffX = currentX - startX;
@@ -408,7 +554,7 @@
                 item.style.transform = ''; startX = null; currentX = null;
             });
         });
-        document.addEventListener('click', (e) => { if (swipedItem && !swipedItem.contains(e.target)) { swipedItem.classList.remove('swiped'); swipedItem = null; } }, true);
+        document.addEventListener('click', (e) => { if (swipedItem && !swipedItem.parentElement.contains(e.target)) { swipedItem.classList.remove('swiped'); swipedItem = null; } }, true);
     }
     
     function initPopoverMenu() {
@@ -460,12 +606,10 @@
         closeAddContactModal();
     }
 
-    // 新增：消息列表逻辑
     function renderMessageList() {
         const container = document.getElementById('messageListContainer');
         const contacts = JSON.parse(localStorage.getItem(DB_KEYS.CONTACTS)) || [];
         const allMessages = JSON.parse(localStorage.getItem(DB_KEYS.MESSAGES)) || {};
-        
         const conversations = contacts.map(contact => {
             const messages = allMessages[contact.id] || [];
             const lastMessage = messages[messages.length - 1];
@@ -476,14 +620,12 @@
             container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">✉️</div><div>还没有消息</div><div>去和你的AI朋友打个招呼吧</div></div>`;
             return;
         }
-
         container.innerHTML = '';
         conversations.forEach(({ contact, lastMessage }) => {
             const item = document.createElement('div');
             item.className = 'message-item';
             item.onclick = () => openChatScreen(contact.id);
             const time = lastMessage ? new Date(lastMessage.timestamp).toTimeString().slice(0, 5) : '';
-
             item.innerHTML = `
                 <div class="contact-avatar" id="msg-avatar-${contact.id}"></div>
                 <div class="message-info">
@@ -492,25 +634,19 @@
                 </div>
                 <div class="message-time">${time}</div>`;
             container.appendChild(item);
-            
             const avatarDiv = document.getElementById(`msg-avatar-${contact.id}`);
             if (contact.avatar.startsWith('data:image')) { avatarDiv.style.backgroundImage = `url(${contact.avatar})`; } else { avatarDiv.textContent = contact.avatar; }
         });
     }
 
-    // 新增：聊天界面逻辑
     let currentChatContactId = null;
     function openChatScreen(contactId) {
         const contacts = JSON.parse(localStorage.getItem(DB_KEYS.CONTACTS)) || [];
         const contact = contacts.find(c => c.id === contactId);
         if (!contact) return;
-        
         currentChatContactId = contactId;
         const screen = document.getElementById('chatScreen');
-        document.getElementById('chatScreenName').textContent = contact.name;
-        const avatarDiv = document.getElementById('chatScreenAvatar');
-        if (contact.avatar.startsWith('data:image')) { avatarDiv.style.backgroundImage = `url(${contact.avatar})`; avatarDiv.textContent = ''; } else { avatarDiv.style.backgroundImage = 'none'; avatarDiv.textContent = contact.avatar; }
-        
+        document.getElementById('chatScreenTitle').textContent = contact.name;
         renderChatMessages();
         screen.style.display = 'flex';
     }
@@ -518,14 +654,37 @@
     function closeChatScreen() {
         document.getElementById('chatScreen').style.display = 'none';
         currentChatContactId = null;
-        renderMessageList(); // 关闭时刷新消息列表
+        renderMessageList();
     }
 
     function renderChatMessages() {
         const container = document.getElementById('chatMessagesContainer');
+        const contacts = JSON.parse(localStorage.getItem(DB_KEYS.CONTACTS)) || [];
+        const contact = contacts.find(c => c.id === currentChatContactId);
         const allMessages = JSON.parse(localStorage.getItem(DB_KEYS.MESSAGES)) || {};
         const messages = allMessages[currentChatContactId] || [];
         container.innerHTML = '';
+
+        // 添加顶部的联系人信息
+        const contactHeader = document.createElement('div');
+        contactHeader.className = 'chat-contact-header';
+        const avatarDiv = document.createElement('div');
+        avatarDiv.className = 'contact-avatar';
+        if (contact.avatar.startsWith('data:image')) { avatarDiv.style.backgroundImage = `url(${contact.avatar})`; } else { avatarDiv.textContent = contact.avatar; }
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'contact-name';
+        nameDiv.textContent = contact.name;
+        contactHeader.appendChild(avatarDiv);
+        contactHeader.appendChild(nameDiv);
+        container.appendChild(contactHeader);
+        
+        // 添加时间戳和消息
+        if (messages.length > 0) {
+            const timestamp = document.createElement('div');
+            timestamp.className = 'chat-timestamp';
+            timestamp.textContent = '昨天 ' + new Date(messages[0].timestamp).toTimeString().slice(0,5);
+            container.appendChild(timestamp);
+        }
         messages.forEach(msg => addBubbleToScreen(msg.text, msg.sender));
     }
 
@@ -533,28 +692,14 @@
         const container = document.getElementById('chatMessagesContainer');
         const bubbleContainer = document.createElement('div');
         bubbleContainer.className = `message-bubble-container ${sender}`;
-        
-        let avatarHtml = '';
-        if (sender === 'ai') {
-            const contacts = JSON.parse(localStorage.getItem(DB_KEYS.CONTACTS)) || [];
-            const contact = contacts.find(c => c.id === currentChatContactId);
-            const avatarContent = contact.avatar.startsWith('data:image') ? '' : contact.avatar;
-            const avatarStyle = contact.avatar.startsWith('data:image') ? `style="background-image: url(${contact.avatar})"` : '';
-            avatarHtml = `<div class="contact-avatar" ${avatarStyle}>${avatarContent}</div>`;
-        }
-
-        bubbleContainer.innerHTML = `
-            ${avatarHtml}
-            <div class="message-bubble">${text}</div>`;
+        bubbleContainer.innerHTML = `<div class="message-bubble">${text}</div>`;
         container.appendChild(bubbleContainer);
         container.scrollTop = container.scrollHeight;
     }
 
     function saveMessage(text, sender) {
         const allMessages = JSON.parse(localStorage.getItem(DB_KEYS.MESSAGES)) || {};
-        if (!allMessages[currentChatContactId]) {
-            allMessages[currentChatContactId] = [];
-        }
+        if (!allMessages[currentChatContactId]) { allMessages[currentChatContactId] = []; }
         allMessages[currentChatContactId].push({ text, sender, timestamp: Date.now() });
         localStorage.setItem(DB_KEYS.MESSAGES, JSON.stringify(allMessages));
     }
@@ -562,17 +707,18 @@
     function initChatScreen() {
         const input = document.getElementById('chatInput');
         const sendBtn = document.getElementById('chatSendBtn');
+        const actionBtn = document.getElementById('chatActionBtn');
+        const actionMenu = document.getElementById('chatActionMenu');
+        const chatHeader = document.getElementById('chatScreenHeader');
+        const messagesContainer = document.getElementById('chatMessagesContainer');
 
         const handleSend = (isAiRequest) => {
             const text = input.value.trim();
             if (!text) return;
-
             addBubbleToScreen(text, 'user');
             saveMessage(text, 'user');
             input.value = '';
-
             if (isAiRequest) {
-                // 模拟AI回复
                 setTimeout(() => {
                     const reply = "这是AI的模拟回复。";
                     addBubbleToScreen(reply, 'ai');
@@ -581,14 +727,19 @@
             }
         };
 
-        input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                handleSend(false); // 回车只发送
-            }
+        input.addEventListener('keypress', (e) => { if (e.key === 'Enter') { handleSend(false); } });
+        sendBtn.addEventListener('click', () => { handleSend(true); });
+        actionBtn.addEventListener('click', () => {
+            actionMenu.classList.toggle('expanded');
         });
 
-        sendBtn.addEventListener('click', () => {
-            handleSend(true); // 按钮发送并请求AI
+        // 动态顶栏标题
+        messagesContainer.addEventListener('scroll', () => {
+            const contactHeader = messagesContainer.querySelector('.chat-contact-header');
+            if (contactHeader) {
+                const isScrolledPast = messagesContainer.scrollTop > contactHeader.offsetHeight;
+                chatHeader.classList.toggle('scrolled', isScrolledPast);
+            }
         });
     }
 
