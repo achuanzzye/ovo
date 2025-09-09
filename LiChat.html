@@ -10,8 +10,6 @@
     <meta name="application-name" content="狸狸聊天器">
     <meta name="theme-color" content="#FFFFFF">
     <title>狸狸聊天器</title>
-    <link rel="apple-touch-icon" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAALeQGiurXWalX9xKJAFjN2D5-leZgIXAAJsHwACj8BxVUCgv_URGrTRNgQ.jpeg" />
-<style>
 <style>
     :root {
         --bg-image: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
@@ -100,14 +98,16 @@
     .modal-btn:active { transform: scale(0.97); }
     .empty-state { text-align: center; padding: 50px 20px; color: #aaa; }
     .empty-state-icon { font-size: 40px; margin-bottom: 10px; }
-    .message-list { padding-top: 10px; }
+    .message-list { padding: 10px 0; }
     .message-item { display: flex; align-items: center; gap: 15px; padding: 10px 20px; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
     .message-item:hover { background-color: #f5f5f5; }
     .message-info { flex: 1; min-width: 0; }
     .message-name { font-size: 17px; font-weight: 500; }
     .message-preview { font-size: 14px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .message-time { font-size: 14px; color: #aaa; }
+
     .chat-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 110; background: #fff; flex-direction: column; transition: transform 0.3s ease-in-out; }
+    .chat-screen.hidden { transform: translateX(100%); }
     .chat-header { position: fixed; top: 0; left: 0; right: 0; height: calc(50px + env(safe-area-inset-top)); padding-top: env(safe-area-inset-top); display: flex; align-items: center; z-index: 10; transition: background 0.3s, backdrop-filter 0.3s; background: transparent; }
     .chat-header.scrolled { background: linear-gradient(to bottom, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.7) 70%, rgba(255, 255, 255, 0) 100%); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
     .chat-header .back-btn { background: rgba(0,0,0,0.05); border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: grid; place-items: center; margin-left: 16px; }
@@ -124,7 +124,9 @@
     .message-bubble { padding: 10px 15px; border-radius: 20px; word-wrap: break-word; line-height: 1.5; }
     .user .message-bubble { background-color: #007AFF; color: white; border-bottom-right-radius: 5px; }
     .ai .message-bubble { background-color: #f0f2f5; color: #000; border-bottom-left-radius: 5px; }
+
     .chat-input-area-wrapper { position: fixed; bottom: 0; left: 0; right: 0; z-index: 10; padding-bottom: env(safe-area-inset-bottom); }
+    /* 修复：调整聊天输入区样式，使其与主页底栏风格统一 */
     .chat-input-area { padding: 10px; display: flex; align-items: flex-end; gap: 8px; }
     .chat-action-pod, .chat-input-pod { background: rgba(230, 230, 230, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
     .chat-action-pod { width: 44px; height: 44px; border-radius: 22px; display: grid; place-items: center; flex-shrink: 0; }
@@ -132,22 +134,48 @@
     .chat-action-btn { background: none; border: none; font-size: 24px; color: #333; cursor: pointer; width: 100%; height: 100%; }
     .chat-input { flex: 1; border: none; background: transparent; padding: 0 10px; font-size: 16px; outline: none; height: 34px; }
     .chat-send-btn { width: 34px; height: 34px; border: none; border-radius: 50%; background-color: #007AFF; color: white; cursor: pointer; display: grid; place-items: center; font-size: 20px; flex-shrink: 0; }
-    .chat-action-menu { padding-left: 10px; display: flex; flex-direction: column; gap: 10px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; }
+    
+    /* 修复：调整展开菜单为纵向，圆形图标按钮 */
+    .chat-action-menu { 
+        padding-left: 10px;
+        display: flex; 
+        flex-direction: column; /* 纵向排列 */
+        gap: 10px;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease, padding 0.3s ease;
+    }
     .chat-action-menu.expanded { max-height: 300px; padding-bottom: 10px; }
-    .action-menu-item { cursor: pointer; display: flex; align-items: center; opacity: 0; transform: translateY(-10px); transition: opacity 0.3s ease, transform 0.3s ease; }
-    .chat-action-menu.expanded .action-menu-item { opacity: 1; transform: translateY(0); }
-    .action-menu-item:nth-child(1) { transition-delay: 0.05s; } .action-menu-item:nth-child(2) { transition-delay: 0.1s; } .action-menu-item:nth-child(3) { transition-delay: 0.15s; } .action-menu-item:nth-child(4) { transition-delay: 0.2s; } .action-menu-item:nth-child(5) { transition-delay: 0.25s; }
-    .action-menu-icon { width: 44px; height: 44px; border-radius: 50%; background-color: rgba(230, 230, 230, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: grid; place-items: center; font-size: 24px; flex-shrink: 0; }
-    .moments-list { padding: 10px; }
-    .moment-card { background: #fff; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden; }
-    .moment-header { display: flex; align-items: center; gap: 10px; padding: 12px; }
-    .moment-content { padding: 0 12px 12px 12px; font-size: 16px; line-height: 1.6; }
-    .moment-actions { display: flex; justify-content: flex-end; gap: 20px; padding: 8px 12px; color: #888; font-size: 14px; }
-    .moment-action { cursor: pointer; display: flex; align-items: center; gap: 5px; }
-    .moment-action.liked { color: #ff3b30; }
-    .moment-comments-section { background: #f7f7f7; padding: 10px 12px; font-size: 14px; }
-    .comment-item { margin-bottom: 5px; }
-    .comment-author { font-weight: 600; color: #555; }
+    .action-menu-item {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .chat-action-menu.expanded .action-menu-item {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    /* 为每个item设置不同的动画延迟 */
+    .action-menu-item:nth-child(1) { transition-delay: 0.05s; }
+    .action-menu-item:nth-child(2) { transition-delay: 0.1s; }
+    .action-menu-item:nth-child(3) { transition-delay: 0.15s; }
+    .action-menu-item:nth-child(4) { transition-delay: 0.2s; }
+    .action-menu-item:nth-child(5) { transition-delay: 0.25s; }
+
+    .action-menu-icon {
+        width: 44px; height: 44px;
+        border-radius: 50%;
+        background-color: rgba(230, 230, 230, 0.7);
+        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        display: grid; place-items: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+    
 </style>
 </head>
 <body>
@@ -176,7 +204,7 @@
             </div>
             <div class="header-title" id="chatAppTitle">消息</div>
             <div class="header-right">
-                <div class="header-icon" id="headerActionBtn" style="display: none;">
+                <div class="header-icon" id="headerActionBtn" style="display: none;" onclick="toggleAddContactPopover(event)">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z" fill="currentColor"/></svg>
                 </div>
                 <div class="popover-menu" id="addContactPopover">
@@ -194,7 +222,7 @@
                  <div class="contact-list-wrapper" id="contactListContainer"></div>
             </div>
             <div class="tab-content" id="tab-moments">
-                 <div class="moments-list" id="momentsListContainer"></div>
+                 <div class="placeholder-content"><h2>朋友圈</h2></div>
             </div>
             <div class="tab-content" id="tab-me">
                 <div class="me-tab-container">
@@ -235,11 +263,21 @@
     <div class="chat-messages" id="chatMessagesContainer"></div>
     <div class="chat-input-area-wrapper">
         <div class="chat-action-menu" id="chatActionMenu">
-            <div class="action-menu-item" onclick="openSpecialMessageModal('image')"><div class="action-menu-icon">🖼️</div></div>
-            <div class="action-menu-item" onclick="openSpecialMessageModal('voice')"><div class="action-menu-icon">🎤</div></div>
-            <div class="action-menu-item" onclick="openSpecialMessageModal('link')"><div class="action-menu-icon">🔗</div></div>
-            <div class="action-menu-item" onclick="openSpecialMessageModal('money')"><div class="action-menu-icon">💰</div></div>
-            <div class="action-menu-item" onclick="openSpecialMessageModal('sticker')"><div class="action-menu-icon">😊</div></div>
+            <div class="action-menu-item">
+                <div class="action-menu-icon">🖼️</div>
+            </div>
+            <div class="action-menu-item">
+                <div class="action-menu-icon">🎤</div>
+            </div>
+            <div class="action-menu-item">
+                <div class="action-menu-icon">🔗</div>
+            </div>
+            <div class="action-menu-item">
+                <div class="action-menu-icon">💰</div>
+            </div>
+             <div class="action-menu-item">
+                <div class="action-menu-icon">😊</div>
+            </div>
         </div>
         <div class="chat-input-area">
             <div class="chat-action-pod">
@@ -254,33 +292,45 @@
 </div>
 
 <div class="modal" id="addContactModal">
-    </div>
-
-<div class="modal" id="specialMessageModal">
     <div class="modal-content">
-        <div class="modal-header" id="specialMessageModalTitle"></div>
-        <div id="specialMessageModalBody"></div>
+        <div class="modal-header">添加AI朋友</div>
+        <div class="modal-avatar-picker">
+            <label for="newContactAvatarUpload" class="modal-avatar-preview" id="newContactAvatarPreview">🤖</label>
+            <input type="file" id="newContactAvatarUpload" accept="image/*" style="display: none;">
+        </div>
+        <div class="modal-field">
+            <label for="newContactName">姓名</label>
+            <input type="text" id="newContactName" placeholder="为你的AI朋友取个名字">
+        </div>
+        <div class="modal-field">
+            <label for="newContactPrompt">性格 (Prompt)</label>
+            <textarea id="newContactPrompt" placeholder="描述他/她的性格、背景、说话风格..."></textarea>
+        </div>
         <div class="modal-buttons">
-            <button class="modal-btn cancel" onclick="closeModal()">取消</button>
-            <button class="modal-btn confirm" onclick="sendSpecialMessage()">发送</button>
+            <button class="modal-btn cancel" onclick="closeAddContactModal()">取消</button>
+            <button class="modal-btn confirm" onclick="saveNewContact()">保存</button>
         </div>
     </div>
 </div>
 
 <script>
-    const DB_KEYS = { PROFILE: 'xchat_user_profile', CONTACTS: 'xchat_contacts', MESSAGES: 'xchat_messages', MOMENTS: 'xchat_moments' };
-    window.addEventListener('load', function() { initHomeScreen(); initChatApp(); });
+    const DB_KEYS = {
+        PROFILE: 'xchat_user_profile',
+        CONTACTS: 'xchat_contacts',
+        MESSAGES: 'xchat_messages'
+    };
+
+    window.addEventListener('load', function() {
+        initHomeScreen();
+        initChatApp();
+    });
+
     function throttle(func, limit) { let inThrottle; return function(...args) { if (!inThrottle) { func.apply(this, args); inThrottle = true; setTimeout(() => inThrottle = false, limit); } } }
     function initHomeScreen() { updateClock(); setInterval(updateClock, 1000); }
     function updateClock() { const now = new Date(); const time = now.toTimeString().slice(0, 5); const options = { month: 'long', day: 'numeric', weekday: 'long' }; const date = now.toLocaleDateString('zh-CN', options); if(document.getElementById('currentTime')) document.getElementById('currentTime').textContent = time; if(document.getElementById('currentDate')) document.getElementById('currentDate').textContent = date; }
-    function goHome() { 
-        document.getElementById('homeScreen').style.display = 'flex';
-        document.getElementById('chatApp').style.display = 'none';
-    }
-    function openChatApp() {
-        document.getElementById('homeScreen').style.display = 'none';
-        document.getElementById('chatApp').style.display = 'flex';
-    }
+    function goHome() { document.getElementById('chatApp').style.display = 'none'; }
+    function openChatApp() { document.getElementById('chatApp').style.display = 'flex'; }
+
     function initChatApp() {
         const dockItems = document.querySelectorAll('.dock-item');
         const tabContents = document.querySelectorAll('.tab-content');
@@ -288,6 +338,7 @@
         const headerTitle = document.getElementById('chatAppTitle');
         const contentScroller = document.getElementById('chatAppContent');
         const headerActionBtn = document.getElementById('headerActionBtn');
+        
         dockItems.forEach(item => {
             item.addEventListener('click', () => {
                 const tabId = item.dataset.tab;
@@ -297,70 +348,329 @@
                 }
                 tabContents.forEach(content => content.classList.toggle('active', content.id === `tab-${tabId}`));
                 headerTitle.textContent = item.classList.contains('profile') ? '我' : item.textContent;
-                headerActionBtn.style.display = (tabId === 'contacts' || tabId === 'moments') ? 'flex' : 'none';
-                if(tabId === 'moments'){ headerActionBtn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 18H11V16H3V18ZM3 13H21V11H3V13ZM3 6V8H21V6H3Z" fill="currentColor"/></svg>`; } else { headerActionBtn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z" fill="currentColor"/></svg>`; }
+                headerActionBtn.style.display = (tabId === 'contacts') ? 'flex' : 'none';
                 contentScroller.scrollTop = 0;
                 header.classList.remove('scrolled');
                 if (tabId === 'messages') renderMessageList();
-                if (tabId === 'moments') renderMomentsList();
             });
         });
-        contentScroller.addEventListener('scroll', () => { header.classList.toggle('scrolled', contentScroller.scrollTop > 10); });
+
+        contentScroller.addEventListener('scroll', () => {
+            header.classList.toggle('scrolled', contentScroller.scrollTop > 10);
+        });
+
         initMeTab();
         initContactsTab();
         initPopoverMenu();
         initChatScreen();
-        initMomentsTab();
         renderMessageList();
     }
-    // ... (rest of the JS functions: initMeTab, initContactsTab, initPopoverMenu, etc. remain the same)
-    
-    function renderMomentsList() {
-        const container = document.getElementById('momentsListContainer');
-        const moments = JSON.parse(localStorage.getItem(DB_KEYS.MOMENTS)) || [];
-        const contacts = JSON.parse(localStorage.getItem(DB_KEYS.CONTACTS)) || [];
-        if (contacts.length > 0 && moments.length === 0) {
-            const contact = contacts[0];
-            moments.push({ id: `moment_${Date.now()}`, contactId: contact.id, content: '今天天气真好，晒晒太阳。☀️', likes: [], comments: [{ author: 'NPC路人甲', content: '看起来很不错！' }] });
-            localStorage.setItem(DB_KEYS.MOMENTS, JSON.stringify(moments));
+
+    function initMeTab() {
+        const avatarLabel = document.querySelector('label[for="avatarUpload"]');
+        const avatarUploadInput = document.getElementById('avatarUpload');
+        const nicknameInput = document.getElementById('meNickname');
+        const promptTextarea = document.getElementById('mePrompt');
+        const throttledSave = throttle(saveProfile, 500);
+
+        function loadProfile() {
+            const savedProfile = JSON.parse(localStorage.getItem(DB_KEYS.PROFILE)) || {};
+            const profile = { nickname: savedProfile.nickname || '狸狸', prompt: savedProfile.prompt || '', avatar: savedProfile.avatar || '🐾' };
+            nicknameInput.value = profile.nickname;
+            promptTextarea.value = profile.prompt;
+            updateAvatarDisplay(profile.avatar);
+            updateDockAvatar(profile.avatar);
         }
-        if (moments.length === 0) {
-            container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">✨</div><div>朋友圈空空如也</div></div>`;
+
+        function saveProfile() {
+            const profile = { nickname: nicknameInput.value, prompt: promptTextarea.value, avatar: avatarLabel.dataset.avatarData || '🐾' };
+            localStorage.setItem(DB_KEYS.PROFILE, JSON.stringify(profile));
+            updateDockAvatar(profile.avatar);
+        }
+
+        function updateAvatarDisplay(avatarData) {
+            avatarLabel.dataset.avatarData = avatarData;
+            if (avatarData.startsWith('data:image')) {
+                avatarLabel.style.backgroundImage = `url(${avatarData})`;
+                avatarLabel.textContent = '';
+            } else {
+                avatarLabel.style.backgroundImage = 'none';
+                avatarLabel.textContent = avatarData;
+            }
+        }
+        function updateDockAvatar(avatarData) {
+            const dockAvatar = document.getElementById('dockProfileAvatar');
+            if (avatarData.startsWith('data:image')) {
+                dockAvatar.style.backgroundImage = `url(${avatarData})`;
+                dockAvatar.textContent = '';
+            } else {
+                dockAvatar.style.backgroundImage = 'none';
+                dockAvatar.textContent = avatarData;
+            }
+        }
+        avatarUploadInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                updateAvatarDisplay(e.target.result);
+                saveProfile();
+            };
+            reader.readAsDataURL(file);
+        });
+        nicknameInput.addEventListener('input', throttledSave);
+        promptTextarea.addEventListener('input', throttledSave);
+        loadProfile();
+    }
+
+    function initContactsTab() {
+        renderContactList();
+    }
+
+    function renderContactList() {
+        const container = document.getElementById('contactListContainer');
+        const contacts = JSON.parse(localStorage.getItem(DB_KEYS.CONTACTS)) || [];
+        if (contacts.length === 0) {
+            container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">👥</div><div>还没有联系人</div><div>点击右上角的“+”添加你的第一个AI朋友吧</div></div>`;
             return;
         }
         container.innerHTML = '';
-        moments.forEach(moment => {
-            const contact = contacts.find(c => c.id === moment.contactId);
-            if (!contact) return;
-            const card = document.createElement('div');
-            card.className = 'moment-card';
-            const likedByMe = moment.likes.includes('user');
-            card.innerHTML = `
-                <div class="moment-header">
-                    <div class="contact-avatar" id="moment-avatar-${moment.id}"></div>
-                    <div class="contact-name">${contact.name}</div>
+        contacts.forEach(contact => {
+            const swipeContainer = document.createElement('div');
+            swipeContainer.className = 'contact-item-swipe-container';
+            swipeContainer.innerHTML = `
+                <div class="contact-actions">
+                    <button class="action-btn edit">编辑</button>
+                    <button class="action-btn delete">删除</button>
                 </div>
-                <div class="moment-content">${moment.content}</div>
-                <div class="moment-actions">
-                    <div class="moment-action ${likedByMe ? 'liked' : ''}" onclick="toggleLike('${moment.id}')">❤️ <span>${moment.likes.length}</span></div>
-                    <div class="moment-action" onclick="alert('评论功能开发中...')">💬 <span>${moment.comments.length}</span></div>
-                    <div class="moment-action" onclick="deleteMoment('${moment.id}')">🗑️</div>
+                <div class="contact-item" data-contact-id="${contact.id}">
+                    <div class="contact-avatar" id="avatar-${contact.id}"></div>
+                    <div class="contact-info">
+                        <div class="contact-name">${contact.name}</div>
+                        <div class="contact-status">AI根据prompt和记忆更新</div>
+                    </div>
+                </div>`;
+            container.appendChild(swipeContainer);
+            const avatarDiv = document.getElementById(`avatar-${contact.id}`);
+            if (contact.avatar.startsWith('data:image')) { avatarDiv.style.backgroundImage = `url(${contact.avatar})`; } else { avatarDiv.textContent = contact.avatar; }
+        });
+        initSwipeActions();
+    }
+    
+    function initSwipeActions() {
+        let startX, currentX, swipedItem = null;
+        document.querySelectorAll('.contact-item').forEach(item => {
+            item.addEventListener('touchstart', (e) => {
+                if (swipedItem && swipedItem !== item) { swipedItem.classList.remove('swiped'); }
+                startX = e.touches[0].clientX;
+            }, { passive: true });
+            item.addEventListener('touchmove', (e) => {
+                currentX = e.touches[0].clientX;
+                const diffX = currentX - startX;
+                if (diffX < -10 && diffX > -140) { item.style.transform = `translateX(${diffX}px)`; item.style.transition = 'none'; }
+            }, { passive: true });
+            item.addEventListener('touchend', () => {
+                const diffX = currentX - startX;
+                item.style.transition = 'transform 0.3s ease';
+                if (diffX < -50) { item.classList.add('swiped'); swipedItem = item; } else { item.classList.remove('swiped'); if (swipedItem === item) swipedItem = null; }
+                item.style.transform = ''; startX = null; currentX = null;
+            });
+        });
+        document.addEventListener('click', (e) => { if (swipedItem && !swipedItem.parentElement.contains(e.target)) { swipedItem.classList.remove('swiped'); swipedItem = null; } }, true);
+    }
+    
+    function initPopoverMenu() {
+        const actionBtn = document.getElementById('headerActionBtn');
+        const popover = document.getElementById('addContactPopover');
+        actionBtn.addEventListener('click', (e) => { e.stopPropagation(); popover.style.display = popover.style.display === 'block' ? 'none' : 'block'; });
+        document.getElementById('popoverAddFriend').addEventListener('click', () => { popover.style.display = 'none'; openAddContactModal(); });
+        document.getElementById('popoverCreateGroup').addEventListener('click', () => { popover.style.display = 'none'; alert('创建群聊功能正在开发中...'); });
+        document.addEventListener('click', (e) => { if (popover.style.display === 'block' && !actionBtn.contains(e.target)) { popover.style.display = 'none'; } });
+    }
+
+    let newContactAvatarData = '🤖';
+    function openAddContactModal() {
+        const modal = document.getElementById('addContactModal');
+        modal.style.display = 'flex';
+        document.getElementById('newContactName').value = '';
+        document.getElementById('newContactPrompt').value = '';
+        const avatarPreview = document.getElementById('newContactAvatarPreview');
+        avatarPreview.style.backgroundImage = 'none';
+        avatarPreview.textContent = '🤖';
+        newContactAvatarData = '🤖';
+    }
+    
+    document.getElementById('newContactAvatarUpload').addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            newContactAvatarData = e.target.result;
+            const avatarPreview = document.getElementById('newContactAvatarPreview');
+            avatarPreview.style.backgroundImage = `url(${newContactAvatarData})`;
+            avatarPreview.textContent = '';
+        };
+        reader.readAsDataURL(file);
+    });
+
+    function closeAddContactModal() { document.getElementById('addContactModal').style.display = 'none'; }
+
+    function saveNewContact() {
+        const name = document.getElementById('newContactName').value.trim();
+        const prompt = document.getElementById('newContactPrompt').value.trim();
+        if (!name || !prompt) { alert('姓名和性格Prompt不能为空！'); return; }
+        const contacts = JSON.parse(localStorage.getItem(DB_KEYS.CONTACTS)) || [];
+        const newContact = { id: `contact_${Date.now()}`, name: name, prompt: prompt, avatar: newContactAvatarData };
+        contacts.push(newContact);
+        localStorage.setItem(DB_KEYS.CONTACTS, JSON.stringify(contacts));
+        renderContactList();
+        renderMessageList();
+        closeAddContactModal();
+    }
+
+    function renderMessageList() {
+        const container = document.getElementById('messageListContainer');
+        const contacts = JSON.parse(localStorage.getItem(DB_KEYS.CONTACTS)) || [];
+        const allMessages = JSON.parse(localStorage.getItem(DB_KEYS.MESSAGES)) || {};
+        const conversations = contacts.map(contact => {
+            const messages = allMessages[contact.id] || [];
+            const lastMessage = messages[messages.length - 1];
+            return { contact, lastMessage };
+        }).sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
+        if (conversations.length === 0) {
+            container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">✉️</div><div>还没有消息</div><div>去和你的AI朋友打个招呼吧</div></div>`;
+            return;
+        }
+        container.innerHTML = '';
+        conversations.forEach(({ contact, lastMessage }) => {
+            const item = document.createElement('div');
+            item.className = 'message-item';
+            item.onclick = () => openChatScreen(contact.id);
+            const time = lastMessage ? new Date(lastMessage.timestamp).toTimeString().slice(0, 5) : '';
+            item.innerHTML = `
+                <div class="contact-avatar" id="msg-avatar-${contact.id}"></div>
+                <div class="message-info">
+                    <div class="message-name">${contact.name}</div>
+                    <div class="message-preview">${lastMessage?.text || '暂无消息'}</div>
                 </div>
-                ${moment.comments.length > 0 ? `<div class="moment-comments-section">${moment.comments.map(c => `<div class="comment-item"><span class="comment-author">${c.author}:</span> ${c.content}</div>`).join('')}</div>` : ''}`;
-            container.appendChild(card);
-            const avatarDiv = document.getElementById(`moment-avatar-${moment.id}`);
+                <div class="message-time">${time}</div>`;
+            container.appendChild(item);
+            const avatarDiv = document.getElementById(`msg-avatar-${contact.id}`);
             if (contact.avatar.startsWith('data:image')) { avatarDiv.style.backgroundImage = `url(${contact.avatar})`; } else { avatarDiv.textContent = contact.avatar; }
         });
     }
 
-    function deleteMoment(momentId) {
-        if (!confirm('确定要删除这条朋友圈吗？')) return;
-        let moments = JSON.parse(localStorage.getItem(DB_KEYS.MOMENTS)) || [];
-        moments = moments.filter(m => m.id !== momentId);
-        localStorage.setItem(DB_KEYS.MOMENTS, JSON.stringify(moments));
-        renderMomentsList();
+    let currentChatContactId = null;
+    function openChatScreen(contactId) {
+        const contacts = JSON.parse(localStorage.getItem(DB_KEYS.CONTACTS)) || [];
+        const contact = contacts.find(c => c.id === contactId);
+        if (!contact) return;
+        currentChatContactId = contactId;
+        const screen = document.getElementById('chatScreen');
+        document.getElementById('chatScreenTitle').textContent = contact.name;
+        renderChatMessages();
+        screen.style.display = 'flex';
     }
-    // ... (rest of the JS functions for chat, contacts, etc.)
+
+    function closeChatScreen() {
+        document.getElementById('chatScreen').style.display = 'none';
+        currentChatContactId = null;
+        renderMessageList();
+    }
+
+    function formatTimestamp(ts, prevTs) {
+        if (prevTs && (ts - prevTs) < 300000) { return null; } // 5分钟内不显示
+        const date = new Date(ts);
+        const today = new Date();
+        const yesterday = new Date(today.getTime() - 86400000);
+        const time = date.toTimeString().slice(0, 5);
+        if (date.toDateString() === today.toDateString()) { return time; }
+        if (date.toDateString() === yesterday.toDateString()) { return `昨天 ${time}`; }
+        return `${date.getMonth() + 1}月${date.getDate()}日 ${time}`;
+    }
+
+    function renderChatMessages() {
+        const container = document.getElementById('chatMessagesContainer');
+        const contacts = JSON.parse(localStorage.getItem(DB_KEYS.CONTACTS)) || [];
+        const contact = contacts.find(c => c.id === currentChatContactId);
+        const allMessages = JSON.parse(localStorage.getItem(DB_KEYS.MESSAGES)) || {};
+        const messages = allMessages[currentChatContactId] || [];
+        container.innerHTML = '';
+        const contactHeader = document.createElement('div');
+        contactHeader.className = 'chat-contact-header';
+        const avatarDiv = document.createElement('div');
+        avatarDiv.className = 'contact-avatar';
+        if (contact.avatar.startsWith('data:image')) { avatarDiv.style.backgroundImage = `url(${contact.avatar})`; } else { avatarDiv.textContent = contact.avatar; }
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'contact-name';
+        nameDiv.textContent = contact.name;
+        contactHeader.appendChild(avatarDiv);
+        contactHeader.appendChild(nameDiv);
+        container.appendChild(contactHeader);
+        let lastTimestamp = 0;
+        messages.forEach(msg => {
+            const timeString = formatTimestamp(msg.timestamp, lastTimestamp);
+            if (timeString) {
+                const timestampDiv = document.createElement('div');
+                timestampDiv.className = 'chat-timestamp';
+                timestampDiv.textContent = timeString;
+                container.appendChild(timestampDiv);
+            }
+            addBubbleToScreen(msg.text, msg.sender);
+            lastTimestamp = msg.timestamp;
+        });
+    }
+
+    function addBubbleToScreen(text, sender) {
+        const container = document.getElementById('chatMessagesContainer');
+        const bubbleContainer = document.createElement('div');
+        bubbleContainer.className = `message-bubble-container ${sender}`;
+        bubbleContainer.innerHTML = `<div class="message-bubble">${text}</div>`;
+        container.appendChild(bubbleContainer);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function saveMessage(text, sender) {
+        const allMessages = JSON.parse(localStorage.getItem(DB_KEYS.MESSAGES)) || {};
+        if (!allMessages[currentChatContactId]) { allMessages[currentChatContactId] = []; }
+        allMessages[currentChatContactId].push({ text, sender, timestamp: Date.now() });
+        localStorage.setItem(DB_KEYS.MESSAGES, JSON.stringify(allMessages));
+    }
+
+    function initChatScreen() {
+        const input = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('chatSendBtn');
+        const actionBtn = document.getElementById('chatActionBtn');
+        const actionMenu = document.getElementById('chatActionMenu');
+        const chatHeader = document.getElementById('chatScreenHeader');
+        const messagesContainer = document.getElementById('chatMessagesContainer');
+        const handleSend = (isAiRequest) => {
+            const text = input.value.trim();
+            if (!text) return;
+            saveMessage(text, 'user');
+            renderChatMessages();
+            input.value = '';
+            if (isAiRequest) {
+                setTimeout(() => {
+                    const reply = "这是AI的模拟回复。";
+                    saveMessage(reply, 'ai');
+                    renderChatMessages();
+                }, 1000);
+            }
+        };
+        input.addEventListener('keypress', (e) => { if (e.key === 'Enter') { handleSend(false); } });
+        sendBtn.addEventListener('click', () => { handleSend(true); });
+        actionBtn.addEventListener('click', () => {
+            actionMenu.classList.toggle('expanded');
+        });
+        messagesContainer.addEventListener('scroll', () => {
+            const contactHeader = messagesContainer.querySelector('.chat-contact-header');
+            if (contactHeader) {
+                const isScrolledPast = messagesContainer.scrollTop > contactHeader.offsetHeight;
+                chatHeader.classList.toggle('scrolled', isScrolledPast);
+            }
+        });
+    }
 </script>
 </body>
 </html>
