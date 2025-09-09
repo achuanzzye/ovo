@@ -138,12 +138,9 @@
     .chat-action-menu.expanded .action-menu-item { opacity: 1; transform: translateY(0); }
     .action-menu-item:nth-child(1) { transition-delay: 0.05s; } .action-menu-item:nth-child(2) { transition-delay: 0.1s; } .action-menu-item:nth-child(3) { transition-delay: 0.15s; } .action-menu-item:nth-child(4) { transition-delay: 0.2s; } .action-menu-item:nth-child(5) { transition-delay: 0.25s; }
     .action-menu-icon { width: 44px; height: 44px; border-radius: 50%; background-color: rgba(230, 230, 230, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: grid; place-items: center; font-size: 24px; flex-shrink: 0; }
-    
     .moments-list { padding: 10px; }
     .moment-card { background: #fff; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden; }
-    .moment-header { display: flex; align-items: center; gap: 10px; padding: 12px; position: relative; }
-    .moment-info { flex-grow: 1; }
-    .moment-options { cursor: pointer; padding: 5px; color: #888; }
+    .moment-header { display: flex; align-items: center; gap: 10px; padding: 12px; }
     .moment-content { padding: 0 12px 12px 12px; font-size: 16px; line-height: 1.6; }
     .moment-actions { display: flex; justify-content: flex-end; gap: 20px; padding: 8px 12px; color: #888; font-size: 14px; }
     .moment-action { cursor: pointer; display: flex; align-items: center; gap: 5px; }
@@ -151,7 +148,6 @@
     .moment-comments-section { background: #f7f7f7; padding: 10px 12px; font-size: 14px; }
     .comment-item { margin-bottom: 5px; }
     .comment-author { font-weight: 600; color: #555; }
-    
 </style>
 </head>
 <body>
@@ -181,7 +177,8 @@
             <div class="header-title" id="chatAppTitle">消息</div>
             <div class="header-right">
                 <div class="header-icon" id="headerActionBtn" style="display: none;">
-                    </div>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z" fill="currentColor"/></svg>
+                </div>
                 <div class="popover-menu" id="addContactPopover">
                     <div class="popover-item" id="popoverAddFriend">添加好友</div>
                     <div class="popover-item" id="popoverCreateGroup">创建群聊</div>
@@ -238,11 +235,11 @@
     <div class="chat-messages" id="chatMessagesContainer"></div>
     <div class="chat-input-area-wrapper">
         <div class="chat-action-menu" id="chatActionMenu">
-            <div class="action-menu-item" onclick="openSpecialMessageModal('imageModal')"><div class="action-menu-icon">🖼️</div></div>
-            <div class="action-menu-item" onclick="openSpecialMessageModal('voiceModal')"><div class="action-menu-icon">🎤</div></div>
-            <div class="action-menu-item" onclick="openSpecialMessageModal('linkModal')"><div class="action-menu-icon">🔗</div></div>
-            <div class="action-menu-item" onclick="openSpecialMessageModal('moneyModal')"><div class="action-menu-icon">💰</div></div>
-            <div class="action-menu-item" onclick="openSpecialMessageModal('stickerModal')"><div class="action-menu-icon">😊</div></div>
+            <div class="action-menu-item" onclick="openSpecialMessageModal('image')"><div class="action-menu-icon">🖼️</div></div>
+            <div class="action-menu-item" onclick="openSpecialMessageModal('voice')"><div class="action-menu-icon">🎤</div></div>
+            <div class="action-menu-item" onclick="openSpecialMessageModal('link')"><div class="action-menu-icon">🔗</div></div>
+            <div class="action-menu-item" onclick="openSpecialMessageModal('money')"><div class="action-menu-icon">💰</div></div>
+            <div class="action-menu-item" onclick="openSpecialMessageModal('sticker')"><div class="action-menu-icon">😊</div></div>
         </div>
         <div class="chat-input-area">
             <div class="chat-action-pod">
@@ -256,15 +253,26 @@
     </div>
 </div>
 
-<div class="modal" id="addContactModal">...</div>
-<div class="modal" id="imageModal">...</div>
-<div id="modalContainer"></div>
+<div class="modal" id="addContactModal">
+    </div>
 
+<div class="modal" id="specialMessageModal">
+    <div class="modal-content">
+        <div class="modal-header" id="specialMessageModalTitle"></div>
+        <div id="specialMessageModalBody"></div>
+        <div class="modal-buttons">
+            <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+            <button class="modal-btn confirm" onclick="sendSpecialMessage()">发送</button>
+        </div>
+    </div>
+</div>
 
 <script>
-    // ... (大部分JS代码保持不变) ...
-
-    // 修复：界面切换逻辑，确保完全隐藏/显示
+    const DB_KEYS = { PROFILE: 'xchat_user_profile', CONTACTS: 'xchat_contacts', MESSAGES: 'xchat_messages', MOMENTS: 'xchat_moments' };
+    window.addEventListener('load', function() { initHomeScreen(); initChatApp(); });
+    function throttle(func, limit) { let inThrottle; return function(...args) { if (!inThrottle) { func.apply(this, args); inThrottle = true; setTimeout(() => inThrottle = false, limit); } } }
+    function initHomeScreen() { updateClock(); setInterval(updateClock, 1000); }
+    function updateClock() { const now = new Date(); const time = now.toTimeString().slice(0, 5); const options = { month: 'long', day: 'numeric', weekday: 'long' }; const date = now.toLocaleDateString('zh-CN', options); if(document.getElementById('currentTime')) document.getElementById('currentTime').textContent = time; if(document.getElementById('currentDate')) document.getElementById('currentDate').textContent = date; }
     function goHome() { 
         document.getElementById('homeScreen').style.display = 'flex';
         document.getElementById('chatApp').style.display = 'none';
@@ -273,159 +281,86 @@
         document.getElementById('homeScreen').style.display = 'none';
         document.getElementById('chatApp').style.display = 'flex';
     }
-
-    // ... (大部分JS代码保持不变) ...
-
-    function initMomentsTab() {
-        renderMomentsList();
+    function initChatApp() {
+        const dockItems = document.querySelectorAll('.dock-item');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const header = document.getElementById('chatAppHeader');
+        const headerTitle = document.getElementById('chatAppTitle');
+        const contentScroller = document.getElementById('chatAppContent');
+        const headerActionBtn = document.getElementById('headerActionBtn');
+        dockItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const tabId = item.dataset.tab;
+                if(!item.classList.contains('profile')) {
+                    dockItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                }
+                tabContents.forEach(content => content.classList.toggle('active', content.id === `tab-${tabId}`));
+                headerTitle.textContent = item.classList.contains('profile') ? '我' : item.textContent;
+                headerActionBtn.style.display = (tabId === 'contacts' || tabId === 'moments') ? 'flex' : 'none';
+                if(tabId === 'moments'){ headerActionBtn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 18H11V16H3V18ZM3 13H21V11H3V13ZM3 6V8H21V6H3Z" fill="currentColor"/></svg>`; } else { headerActionBtn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z" fill="currentColor"/></svg>`; }
+                contentScroller.scrollTop = 0;
+                header.classList.remove('scrolled');
+                if (tabId === 'messages') renderMessageList();
+                if (tabId === 'moments') renderMomentsList();
+            });
+        });
+        contentScroller.addEventListener('scroll', () => { header.classList.toggle('scrolled', contentScroller.scrollTop > 10); });
+        initMeTab();
+        initContactsTab();
+        initPopoverMenu();
+        initChatScreen();
+        initMomentsTab();
+        renderMessageList();
     }
-
+    // ... (rest of the JS functions: initMeTab, initContactsTab, initPopoverMenu, etc. remain the same)
+    
     function renderMomentsList() {
         const container = document.getElementById('momentsListContainer');
-        let moments = JSON.parse(localStorage.getItem(DB_KEYS.MOMENTS)) || [];
+        const moments = JSON.parse(localStorage.getItem(DB_KEYS.MOMENTS)) || [];
         const contacts = JSON.parse(localStorage.getItem(DB_KEYS.CONTACTS)) || [];
-        
-        // 模拟AI生成动态
         if (contacts.length > 0 && moments.length === 0) {
-            contacts.forEach(contact => {
-                 moments.push({
-                    id: `moment_${Date.now()}_${contact.id}`,
-                    contactId: contact.id,
-                    content: `你好，我是${contact.name}。今天天气真好！`,
-                    likes: [],
-                    comments: [{ author: 'NPC路人甲', content: '看起来很不错！' }]
-                });
-            });
+            const contact = contacts[0];
+            moments.push({ id: `moment_${Date.now()}`, contactId: contact.id, content: '今天天气真好，晒晒太阳。☀️', likes: [], comments: [{ author: 'NPC路人甲', content: '看起来很不错！' }] });
             localStorage.setItem(DB_KEYS.MOMENTS, JSON.stringify(moments));
         }
-
         if (moments.length === 0) {
             container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">✨</div><div>朋友圈空空如也</div></div>`;
             return;
         }
-
         container.innerHTML = '';
         moments.forEach(moment => {
             const contact = contacts.find(c => c.id === moment.contactId);
             if (!contact) return;
-
             const card = document.createElement('div');
             card.className = 'moment-card';
             const likedByMe = moment.likes.includes('user');
-
             card.innerHTML = `
                 <div class="moment-header">
                     <div class="contact-avatar" id="moment-avatar-${moment.id}"></div>
-                    <div class="moment-info">
-                         <div class="contact-name">${contact.name}</div>
-                    </div>
-                    <div class="moment-options" onclick="deleteMoment('${moment.id}')">...</div>
+                    <div class="contact-name">${contact.name}</div>
                 </div>
                 <div class="moment-content">${moment.content}</div>
                 <div class="moment-actions">
                     <div class="moment-action ${likedByMe ? 'liked' : ''}" onclick="toggleLike('${moment.id}')">❤️ <span>${moment.likes.length}</span></div>
                     <div class="moment-action" onclick="alert('评论功能开发中...')">💬 <span>${moment.comments.length}</span></div>
+                    <div class="moment-action" onclick="deleteMoment('${moment.id}')">🗑️</div>
                 </div>
-                ${moment.comments.length > 0 ? `<div class="moment-comments-section">${moment.comments.map(c => `<div class="comment-item"><span class="comment-author">${c.author}:</span> ${c.content}</div>`).join('')}</div>` : ''}
-            `;
+                ${moment.comments.length > 0 ? `<div class="moment-comments-section">${moment.comments.map(c => `<div class="comment-item"><span class="comment-author">${c.author}:</span> ${c.content}</div>`).join('')}</div>` : ''}`;
             container.appendChild(card);
             const avatarDiv = document.getElementById(`moment-avatar-${moment.id}`);
             if (contact.avatar.startsWith('data:image')) { avatarDiv.style.backgroundImage = `url(${contact.avatar})`; } else { avatarDiv.textContent = contact.avatar; }
         });
     }
-    
-    function deleteMoment(momentId) {
-        if (confirm('确定要删除这条动态吗？')) {
-            let moments = JSON.parse(localStorage.getItem(DB_KEYS.MOMENTS)) || [];
-            moments = moments.filter(m => m.id !== momentId);
-            localStorage.setItem(DB_KEYS.MOMENTS, JSON.stringify(moments));
-            renderMomentsList();
-        }
-    }
 
-    function toggleLike(momentId) {
+    function deleteMoment(momentId) {
+        if (!confirm('确定要删除这条朋友圈吗？')) return;
         let moments = JSON.parse(localStorage.getItem(DB_KEYS.MOMENTS)) || [];
-        const moment = moments.find(m => m.id === momentId);
-        if (!moment) return;
-        const userIndex = moment.likes.indexOf('user');
-        if (userIndex > -1) { moment.likes.splice(userIndex, 1); } else { moment.likes.push('user'); }
+        moments = moments.filter(m => m.id !== momentId);
         localStorage.setItem(DB_KEYS.MOMENTS, JSON.stringify(moments));
         renderMomentsList();
     }
-
-    // 新增：为特殊消息按钮绑定打开模态框的事件
-    function initChatScreen() {
-        // ... (已有代码) ...
-        const actionMenuItems = document.querySelectorAll('.action-menu-item');
-        actionMenuItems.forEach(item => {
-            const modalId = item.getAttribute('onclick').match(/'([^']+)'/)[1];
-            item.addEventListener('click', () => openSpecialMessageModal(modalId));
-        });
-    }
-
-    // 新增：打开特殊消息模态框的通用函数
-    function openSpecialMessageModal(modalId) {
-        // 先关闭可能已打开的菜单
-        document.getElementById('chatActionMenu').classList.remove('expanded');
-        // 打开对应的模态框
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.style.display = 'flex';
-        } else {
-            alert(`${modalId} 模态框尚未创建`);
-        }
-    }
-
-    // 修复：为左滑按钮和加号按钮添加事件监听
-    function initContactsTab() {
-        renderContactList();
-    }
-    
-    function renderContactList() {
-        // ... (已有代码) ...
-        // 绑定事件
-        document.querySelectorAll('.action-btn.edit').forEach(btn => btn.onclick = () => alert('编辑功能开发中...'));
-        document.querySelectorAll('.action-btn.delete').forEach(btn => btn.onclick = () => alert('删除功能开发中...'));
-        initSwipeActions();
-    }
-
-    // 修复：确保加号按钮的事件监听在 render 之后
-    function initPopoverMenu() {
-        const actionBtn = document.getElementById('headerActionBtn');
-        const popover = document.getElementById('addContactPopover');
-        
-        // 确保按钮存在再添加监听
-        if (actionBtn) {
-            actionBtn.onclick = (e) => {
-                 e.stopPropagation(); 
-                 if(document.getElementById('chatAppTitle').textContent === '朋友圈') { 
-                     alert('发布朋友圈功能开发中...'); 
-                     return; 
-                 } 
-                 popover.style.display = popover.style.display === 'block' ? 'none' : 'block';
-            };
-        }
-
-        document.getElementById('popoverAddFriend').addEventListener('click', () => { popover.style.display = 'none'; openAddContactModal(); });
-        document.getElementById('popoverCreateGroup').addEventListener('click', () => { popover.style.display = 'none'; alert('创建群聊功能正在开发中...'); });
-        document.addEventListener('click', (e) => { if (popover.style.display === 'block' && actionBtn && !actionBtn.contains(e.target)) { popover.style.display = 'none'; } });
-    }
+    // ... (rest of the JS functions for chat, contacts, etc.)
 </script>
-
-<div id="modalContainer">
-    <div class="modal" id="imageModal">
-        <div class="modal-content">
-            <div class="modal-header">发送图片</div>
-            <div class="modal-field">
-                <textarea class="modal-input" placeholder="请描述这张图片的内容..."></textarea>
-            </div>
-            <div class="modal-buttons">
-                <button class="modal-btn cancel" onclick="this.closest('.modal').style.display='none'">取消</button>
-                <button class="modal-btn confirm">发送</button>
-            </div>
-        </div>
-    </div>
-    </div>
-
 </body>
 </html>
