@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>资料库小组件</title>
+  <style>
+    :root {
+      --bg-color: transparent;
+      --text-color: #000000;
+      --card-bg: #f2f2f7;
+      --subtext-color: #8e8e93; 
+      --card-shadow: 0 4px 14px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.03);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --text-color: #ffffff;
+        --card-bg: #2c2c2e;
+        --subtext-color: #98989d; 
+        --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Helvetica Neue", sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      padding: 12px 10px;
+      user-select: none;
+      overflow: hidden;
+    }
+
+
+    .widget-container {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 100%;
+    }
+
+
+    .header {
+      display: flex;
+      align-items: center;
+      padding-left: 2px;
+    }
+
+
+    .title {
+      font-size: 36px;
+      font-weight: 700; 
+      letter-spacing: -0.5px;
+      color: var(--text-color);
+      outline: none;
+      border-radius: 6px;
+      padding: 0 4px;
+      margin-left: -4px;
+      cursor: pointer;
+      display: inline-block;
+      white-space: nowrap;
+    }
+
+    .title:focus {
+      background-color: rgba(120, 120, 128, 0.15);
+      cursor: text;
+    }
+
+
+    .gallery-grid {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      width: 100%;
+    }
+
+
+    .item-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+
+
+    .img-card {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 18px;
+      overflow: hidden;
+      background-color: var(--card-bg);
+      box-shadow: var(--card-shadow); /* 使用重新调校的阴影 */
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .img-card:active {
+      transform: scale(0.96);
+    }
+
+    .img-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+    }
+
+
+    .sub-caption {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--subtext-color);
+      outline: none;
+      text-align: center;
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border-radius: 4px;
+      padding: 1px 2px;
+      cursor: pointer;
+    }
+
+    .sub-caption:focus {
+      background-color: rgba(120, 120, 128, 0.15);
+      cursor: text;
+      overflow: visible;
+    }
+
+
+    #file-input {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="widget-container">
+
+    <div class="header">
+      <div id="widget-title" class="title" contenteditable="true" spellcheck="false">资料库</div>
+    </div>
+
+
+    <div class="gallery-grid">
+      
+
+      <div class="item-column">
+        <div class="img-card" onclick="triggerUpload(0)">
+          <img id="img-0" src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=400&auto=format&fit=crop&q=80" alt="图片1" />
+        </div>
+        <div id="caption-0" class="sub-caption" contenteditable="true" spellcheck="false">备注 1</div>
+      </div>
+
+
+      <div class="item-column">
+        <div class="img-card" onclick="triggerUpload(1)">
+          <img id="img-1" src="https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400&auto=format&fit=crop&q=80" alt="图片2" />
+        </div>
+        <div id="caption-1" class="sub-caption" contenteditable="true" spellcheck="false">备注 2</div>
+      </div>
+
+
+      <div class="item-column">
+        <div class="img-card" onclick="triggerUpload(2)">
+          <img id="img-2" src="https://images.unsplash.com/photo-1563089145-599997674d42?w=400&auto=format&fit=crop&q=80" alt="图片3" />
+        </div>
+        <div id="caption-2" class="sub-caption" contenteditable="true" spellcheck="false">备注 3</div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <input type="file" id="file-input" accept="image/*" onchange="handleFileSelect(event)">
+
+  <script>
+    let currentEditIndex = null;
+
+
+    window.addEventListener('DOMContentLoaded', () => {
+
+      const savedTitle = localStorage.getItem('haifeng_widget_title');
+      if (savedTitle) {
+        document.getElementById('widget-title').innerText = savedTitle;
+      }
+
+
+      for (let i = 0; i < 3; i++) {
+        const savedImg = localStorage.getItem(`haifeng_widget_img_${i}`);
+        if (savedImg) {
+          document.getElementById(`img-${i}`).src = savedImg;
+        }
+
+        const savedCaption = localStorage.getItem(`haifeng_widget_caption_${i}`);
+        if (savedCaption) {
+          document.getElementById(`caption-${i}`).innerText = savedCaption;
+        }
+      }
+    });
+
+
+    const titleEl = document.getElementById('widget-title');
+    titleEl.addEventListener('blur', () => {
+      let text = titleEl.innerText.trim();
+      if (!text) text = '资料库';
+      titleEl.innerText = text;
+      localStorage.setItem('haifeng_widget_title', text);
+    });
+
+    titleEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        titleEl.blur();
+      }
+    });
+
+
+    for (let i = 0; i < 3; i++) {
+      const capEl = document.getElementById(`caption-${i}`);
+      capEl.addEventListener('blur', () => {
+        let text = capEl.innerText.trim();
+        if (!text) text = `备注 ${i + 1}`;
+        capEl.innerText = text;
+        localStorage.setItem(`haifeng_widget_caption_${i}`, text);
+      });
+
+      capEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          capEl.blur();
+        }
+      });
+    }
+
+
+    function triggerUpload(index) {
+      currentEditIndex = index;
+      document.getElementById('file-input').click();
+    }
+
+
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file || currentEditIndex === null) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64Data = e.target.result;
+
+        document.getElementById(`img-${currentEditIndex}`).src = base64Data;
+
+        localStorage.setItem(`haifeng_widget_img_${currentEditIndex}`, base64Data);
+
+        event.target.value = '';
+      };
+      reader.readAsDataURL(file);
+    }
+  </script>
+</body>
+</html>
