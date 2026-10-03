@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="referrer" content="no-referrer">
+  <title>相册卡片</title>
+  <style>
+    :root {
+      /* 基础变量 */
+      --bg-color: #0f1014; 
+      --text-main: #e2e5e8;
+      --text-muted: rgba(226, 229, 232, 0.5);
+      --accent-color: #d4af37;
+      --glass-bg: rgba(128, 128, 128, 0.12);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --glass-hover: rgba(128, 128, 128, 0.2);
+      
+      /* 滤镜变量 */
+      --current-filter: none;
+    }
+
+    /* 亮色模式适配 */
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg-color: #f0f2f5;
+        --text-main: #1a1b1e;
+        --text-muted: rgba(26, 27, 30, 0.5);
+        --accent-color: #c59b27;
+        --glass-bg: rgba(255, 255, 255, 0.5);
+        --glass-border: rgba(0, 0, 0, 0.05);
+        --glass-hover: rgba(255, 255, 255, 0.7);
+      }
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    html, body {
+      background: transparent !important; 
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start; 
+      min-height: 100vh;
+      padding: 0; 
+      overflow-x: hidden;
+      
+      /* 禁用长按选中及呼出菜单 */
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    button { background: none; border: none; font: inherit; color: inherit; cursor: pointer; outline: none; }
+    
+    [contenteditable="true"] { 
+      outline: none; 
+      transition: background 0.2s; 
+      border-radius: 6px; 
+      padding: 0 4px; 
+      /* 允许可编辑区域选中文字 */
+      -webkit-user-select: text;
+      user-select: text;
+    }
+    [contenteditable="true"]:focus { background: var(--glass-bg); box-shadow: 0 0 0 2px var(--glass-bg); }
+
+    .cinematic-card {
+      width: 100%;
+      max-width: 440px;
+      background: transparent; 
+      border: none;            
+      box-shadow: none;        
+      backdrop-filter: none;   
+      -webkit-backdrop-filter: none;
+      padding: 16px 12px;      
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      position: relative;
+    }
+
+    /* 顶部信息 */
+    .header { display: flex; justify-content: space-between; align-items: flex-end; padding: 0 4px; }
+    .title-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
+    .main-title { font-size: 24px; font-weight: 700; font-family: Georgia, serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 0.5px; }
+    .sub-title { font-size: 13px; color: var(--text-muted); cursor: pointer; }
+    
+    .btn-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+      color: var(--text-main);
+    }
+    @media (hover: hover) { .btn-icon:hover { background: var(--glass-hover); transform: scale(1.05); } }
+    .btn-icon:active { transform: scale(0.95); }
+    .btn-icon svg { width: 16px; height: 16px; fill: currentColor; }
+    .header .btn-icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; }
+
+    /* 电影单画幅相册 */
+    .grid-gallery {
+      width: 100%;
+      height: 134px; 
+    }
+    
+    .grid-item {
+      width: 100%;
+      height: 100%;
+      display: block;
+      position: relative;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s, filter 0.3s;
+    }
+    .grid-item:active { transform: scale(0.98); }
+    
+    .grid-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: filter 0.5s ease;
+      filter: var(--current-filter);
+      /* 禁止图片被拖拽 */
+      -webkit-user-drag: none;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(0,0,0,0.8);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s;
+      z-index: 100;
+    }
+    .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    #imagePicker { display: none; }
+  </style>
+</head>
+<body>
+
+  <main class="cinematic-card">
+    
+    <header class="header">
+      <div class="title-group">
+        <h1 class="main-title" contenteditable="true" spellcheck="false" data-text="title">Cinematic Moments</h1>
+        <span class="sub-title" data-signal>▸ 正在记录一段影像...</span>
+      </div>
+      <button class="btn-icon" data-filter-toggle aria-label="切换滤镜" title="切换电影色彩">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="14.31" y1="8" x2="20.05" y2="17.94"></line>
+          <line x1="9.69" y1="8" x2="21.17" y2="8"></line>
+          <line x1="7.38" y1="12" x2="13.12" y2="2.06"></line>
+          <line x1="9.69" y1="16" x2="3.95" y2="6.06"></line>
+          <line x1="14.31" y1="16" x2="2.83" y2="16"></line>
+          <line x1="16.62" y1="12" x2="10.88" y2="21.94"></line>
+        </svg>
+      </button>
+    </header>
+
+    <section class="grid-gallery">
+      <button class="grid-item" data-upload="img1" title="更换主镜头">
+        <img class="grid-img" data-img="img1" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='134'><rect width='400' height='134' fill='%23333'/></svg>" alt="主镜头">
+      </button>
+    </section>
+
+  </main>
+
+  <div class="toast" id="toastMsg"></div>
+  <input type="file" id="imagePicker" accept="image/*">
+
+  <script>
+    (() => {
+      const STORE_KEY = "cinematic-card-state-pure";
+      const DB_NAME = "CinematicImagesDB";
+      const STORE_NAME = "images";
+
+      // 补充漏掉的默认状态定义
+      const defaultState = {
+        title: "Cinematic Moments",
+        filterIndex: 3
+      };
+
+      const filters = [
+        { name: "经典黑白", style: "grayscale(100%) contrast(1.1) brightness(0.9)" },
+        { name: "复古暖调", style: "sepia(0.5) contrast(1.1) brightness(0.9) hue-rotate(-15deg)" },
+        { name: "冷冽极简", style: "grayscale(0.6) contrast(1.2) brightness(0.9) hue-rotate(180deg) saturate(1.2)" },
+        { name: "原图色彩", style: "none" }
+      ];
+
+      const signals = [
+        "▸ 正在记录一段影像...", "▸ 胶片正在显影中", 
+        "▸ 收录今日的浪漫", "▸ 一帧一帧的生活", "▸ 取景框里的世界"
+      ];
+
+      let state = { ...defaultState };
+      let db = null;
+      let pendingImgKey = null;
+      let toastTimer = null;
+
+      const els = {
+        title: document.querySelector('[data-text="title"]'),
+        signal: document.querySelector('[data-signal]'),
+        filterBtn: document.querySelector('[data-filter-toggle]'),
+        imgBtns: document.querySelectorAll('[data-upload]'),
+        fileInput: document.getElementById('imagePicker'),
+        toast: document.getElementById('toastMsg')
+      };
+
+      function init() {
+        loadState();
+        initIndexedDB().then(loadImages);
+        bindEvents();
+        updateUI();
+        refreshSignal();
+      }
+
+      function loadState() {
+        try {
+          const saved = localStorage.getItem(STORE_KEY);
+          if (saved) {
+            state = { ...defaultState, ...JSON.parse(saved) };
+          }
+        } catch (e) {}
+      }
+
+      function saveState() {
+        localStorage.setItem(STORE_KEY, JSON.stringify(state));
+      }
+
+      function updateUI() {
+        els.title.textContent = state.title;
+        applyFilter();
+      }
+
+      function refreshSignal() {
+        els.signal.textContent = signals[Math.floor(Math.random() * signals.length)];
+      }
+
+      function applyFilter() {
+        const filter = filters[state.filterIndex];
+        document.documentElement.style.setProperty('--current-filter', filter.style);
+      }
+
+      function toggleFilter() {
+        state.filterIndex = (state.filterIndex + 1) % filters.length;
+        applyFilter();
+        saveState();
+        showToast(`已切换至: ${filters[state.filterIndex].name}`);
+      }
+
+      function initIndexedDB() {
+        return new Promise((resolve, reject) => {
+          const request = indexedDB.open(DB_NAME, 1);
+          request.onupgradeneeded = (e) => {
+            const database = e.target.result;
+            if (!database.objectStoreNames.contains(STORE_NAME)) {
+              database.createObjectStore(STORE_NAME);
+            }
+          };
+          request.onsuccess = (e) => { db = e.target.result; resolve(); };
+          request.onerror = (e) => { console.warn("IndexedDB Error", e); reject(); };
+        });
+      }
+
+      function saveImage(key, blob) {
+        if (!db) return;
+        const tx = db.transaction(STORE_NAME, "readwrite");
+        tx.objectStore(STORE_NAME).put(blob, key);
+      }
+
+      function loadImages() {
+        if (!db) return;
+        ['img1'].forEach(key => {
+          const tx = db.transaction(STORE_NAME, "readonly");
+          const req = tx.objectStore(STORE_NAME).get(key);
+          req.onsuccess = () => {
+            if (req.result) {
+              const url = URL.createObjectURL(req.result);
+              const imgNode = document.querySelector(`[data-img="${key}"]`);
+              if (imgNode) imgNode.src = url;
+            }
+          };
+        });
+      }
+
+      function handleFileSelect(e) {
+        const file = e.target.files[0];
+        if (!file || !pendingImgKey) return;
+        const url = URL.createObjectURL(file);
+        document.querySelector(`[data-img="${pendingImgKey}"]`).src = url;
+        saveImage(pendingImgKey, file);
+        els.fileInput.value = ""; 
+      }
+
+      function bindEvents() {
+        const saveText = (key, node) => { state[key] = node.textContent.trim(); saveState(); };
+        
+        els.title.addEventListener('blur', () => saveText('title', els.title));
+        
+        els.title.addEventListener('keydown', e => {
+          if (e.key === 'Enter') { e.preventDefault(); els.title.blur(); }
+        });
+
+        els.filterBtn.addEventListener('click', toggleFilter);
+        els.signal.addEventListener('click', refreshSignal);
+
+        els.imgBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            pendingImgKey = btn.getAttribute('data-upload');
+            els.fileInput.click();
+          });
+        });
+        els.fileInput.addEventListener('change', handleFileSelect);
+      }
+
+      function showToast(msg) {
+        els.toast.textContent = msg;
+        els.toast.classList.add('visible');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => { els.toast.classList.remove('visible'); }, 2500);
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>
