@@ -1,0 +1,118 @@
+# AppleFlow — AppleFlow-All (Quantumult X All-in-One)
+
+HOST-SUFFIX,guzzoni.apple.com,直连模式
+# Siri 与普通话来电筛选主网关（严禁代理/Fake-IP）
+HOST-SUFFIX,siri.apple.com,直连模式
+# Siri 语音核心域
+HOST,dejavu.apple.com,直连模式
+# Siri 语音识别辅助
+HOST,sequoia.apple.com,直连模式
+# Siri 自然语言服务
+HOST-SUFFIX,smoot.apple.com,直连模式
+#Spotlight，Siri 搜索建议
+
+HOST,identity.apple.com,直连模式
+# Apple ID 身份认证直连
+
+HOST-SUFFIX,push.apple.com,直连模式
+# APNs 推送直连
+
+HOST-KEYWORD,apple.com.edgekey.net,直连模式
+#Apple Akamai 边缘直连
+
+IP-CIDR,17.249.0.0/16,直连模式
+IP-CIDR,17.252.0.0/16,直连模式
+IP-CIDR,17.57.144.0/22,直连模式
+IP-CIDR,17.188.128.0/18,直连模式
+IP-CIDR,17.188.20.0/23,直连模式
+# APNs IPv4
+
+IP6-CIDR,2403:300:a42::/48,直连模式
+IP6-CIDR,2403:300:a51::/48,直连模式
+IP6-CIDR,2620:149:a44::/48,直连模式
+IP6-CIDR,2a01:b740:a42::/48,直连模式
+# Apple APNs IPv6 号段
+
+HOST,gspe1-ssl.ls.apple.com,OpenAI
+# Apple 智能区域与定位准入校验（禁 MitM）
+
+HOST-SUFFIX,issuer.apple.com,OpenAI
+# PCC 盲签名令牌签发（inference / waitlist）
+HOST-SUFFIX,ropes.apple.com,OpenAI
+# PCC ROPES 隐私推理网关
+HOST,mask-api.icloud.com,OpenAI
+# PCC 匿名令牌签发
+HOST,mask.icloud.com,OpenAI
+# PCC OHTTP 盲化网关
+HOST,mask-h2.icloud.com,OpenAI
+# PCC OHTTP HTTP/2 回退网关
+
+HOST,ss-cleanup-proxy-prod.us-east-1m.app.apple.com,OpenAI
+# 相册高质量消除云端推理节点
+HOST-SUFFIX,app.apple.com,OpenAI
+# 相册高质量消除与生成式服务接口
+
+HOST-SUFFIX,apple-relay.apple.com,OpenAI
+# PCC 隐私云计算中继（勿拦 UDP 443 / QUIC）
+HOST-SUFFIX,apple-relay.cloudflare.com,OpenAI
+# PCC Cloudflare 中继
+HOST-SUFFIX,apple-relay.fastly-edge.com,OpenAI
+# PCC Fastly 中继
+HOST-SUFFIX,apple-relay.akamaized.net,OpenAI
+# PCC Akamai 中继
+
+HOST-SUFFIX,cp4.cloudflare.com,OpenAI
+# Apple 隐私中继辅助端点
+
+HOST-SUFFIX,openai.com,OpenAI
+# Siri ChatGPT 扩展核心接口
+HOST-SUFFIX,chatgpt.com,OpenAI
+# Siri ChatGPT 扩展与账户登录
+HOST-SUFFIX,chat.com,OpenAI
+# ChatGPT 官方短域名
+HOST-SUFFIX,sora.com,OpenAI
+# OpenAI Sora 视频生成服务
+HOST-SUFFIX,oaistatic.com,OpenAI
+# OpenAI 静态资源
+HOST-SUFFIX,oaiusercontent.com,OpenAI
+# ChatGPT 生图与多模态附件
+HOST-SUFFIX,oaistatsig.com,OpenAI
+# OpenAI 客户端特性开关校验
+HOST-SUFFIX,openai.com.cdn.cloudflare.net,OpenAI
+# OpenAI Cloudflare 边缘加速
+HOST,openai-api.arkoselabs.com,OpenAI
+# OpenAI 安全校验
+HOST-SUFFIX,chatgpt.livekit.cloud,OpenAI
+# ChatGPT 高级实时语音 WebRTC 信令
+HOST-SUFFIX,host.livekit.cloud,OpenAI
+# ChatGPT 高级实时语音媒体节点
+HOST-SUFFIX,turn.livekit.cloud,OpenAI
+# ChatGPT 高级实时语音 TURN 中继
+
+HOST,lens.google.com,OpenAI
+# 视觉智能 Google Lens 识图入口
+HOST-SUFFIX,gemini.google.com,OpenAI
+# Google Gemini 网页与客户端
+HOST,gemini.gstatic.com,OpenAI
+# Google Gemini 专用静态资源
+HOST,generativelanguage.googleapis.com,OpenAI
+# Google Gemini 生成式 API
+HOST,proactivebackend-pa.googleapis.com,OpenAI
+# Google Gemini App 后端接口
+HOST,robinfrontend-pa.googleapis.com,OpenAI
+# Google Gemini 助手前端接口
+HOST,aistudio.google.com,OpenAI
+# Google AI Studio 开发台
+HOST,alkalimakersuite-pa.clients6.google.com,OpenAI
+# Google AI Studio 核心接口
+HOST-SUFFIX,deepmind.google,OpenAI
+# Google DeepMind 服务
+
+HOST-SUFFIX,anthropic.com,OpenAI
+# Claude / Xcode Intelligence 扩展
+HOST-SUFFIX,claude.ai,OpenAI
+# Claude AI 服务
+HOST-SUFFIX,claude.com,OpenAI
+# Claude 官方主域
+HOST-SUFFIX,claudeusercontent.com,OpenAI
+# Claude Artifacts 预览沙盒与附件渲染
